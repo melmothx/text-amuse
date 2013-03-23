@@ -18,7 +18,10 @@ Constructor. Accepts a string to be parsed
 sub new {
     my $class = shift;
     my $line = shift;
+    # don't accept undefined values
+    die "Missing input!" unless (defined $line);
     die "Too many arguments, I accept only a single string" if @_;
+
     my $self = {
                 rawline => $line,
                 block => "",      # the block it says to belog
@@ -60,7 +63,7 @@ sub block {
     if (@_) {
         $self->{block} = shift;
     }
-    return $self->{block};
+    return $self->{block} || $self->type;
 }
 
 =head3 type
@@ -116,10 +119,130 @@ sub indentation {
     return length($self->removed);
 }
 
+sub _block_re {
+    my $self = shift;
+    return qr{(
+                 biblio   |
+                 play     |
+                 comment  |
+                 verse    |
+                 center   |
+                 right    |
+                 example  |
+                 verbatim |
+                 quote
+             )}x
+}
+
 sub _parse_string {
     my $self = shift;
-    my $string = $self->rawline;
-    $self->string($string);
+    my $l = $self->rawline;
+    my $blockre = $self->_block_re;
+    # null line is default, do nothing
+    if ($l =~ m/^\s*$/s) {
+        # do nothing, already default
+        $self->removed($l);
+    }
+    elsif ($l =~ m!^(<($blockre)>\s*)$!s) {
+        $self->type("startblock");
+        $self->removed($1);
+        $self->block($2);
+    }
+    elsif ($l =~ m!^(</($blockre)>\s*)$!s) {
+        $self->type("stopblock");
+        $self->removed($1);
+        $self->block($2);
+    }
+    # headers
+    elsif ($l =~ m!^((\*{1,5}) )(.+)$!s) {
+        $self->type("h" . length($2));
+        $self->removed($1);
+        $self->string($3);
+    }
+    elsif ($l =~ m/^( +\- +)(.*)/s) {
+        $self->type("li");
+        $self->removed($1);
+        $self->string($2);
+        $self->block("ul");
+    }
+    elsif ($l =~ m/^(\s+  # leading space and type $1
+                       (  # the type               $2
+                           [0-9]+   |
+                           [a-hA-H] |
+                           [ixvIXV]+  |
+                       )     
+                       \. # a single dot
+                       \s)  # space
+                   (.*) # the string itself $3
+                  /sx) {
+        $self->type("li");
+        $self->removed($1);
+        $self->string($3);
+        $self->_identify_list_type($2); # this will set the type;
+        die "Something went wrong" if $self->type eq "null";
+    }
+    elsif ($l =~ m/^(\> )(.*)/s) {
+        $self->string($2);
+        $self->removed($1);
+        $self->type("verse");
+    }
+    elsif ($l =~ m/\|/) {
+        $self->type("table");
+        $self->string($l);
+    }
+    elsif ($l =~ m/^(\; (.+))$/s) {
+        $self->removed($l);
+        $self->type("comment");
+    }
+    elsif ($l =~ m/^((\[[0-9]+\])\s+)(.*)$/s) {
+        $self->type("footnote");
+        $self->string($3);
+        $self->removed($1);
+    }
+    elsif ($l =~ m/^( {20,})([^ ].+)$/s) {
+        $self->type("right");
+        $self->removed($1);
+        $self->string($2);
+    }
+    elsif ($l =~ m/^( {6,})([^ ].+)$/s) {
+        $self->type("center");
+        $self->removed($1);
+        $self->string($2);
+    }
+    elsif ($l =~ m/^( {2,})([^ ].+)$/s) {
+        $self->type("quote");
+        $self->removed($1);
+        $self->string($2);
+    }
+    else {
+        $self->type("regular");
+        $self->string($l);
+    }
+    # and finally assert that we didn't screw up
+    my $origline = $self->rawline;
+    my $test = $self->removed . $self->string;
+    die "We screw up: <$origline> ne <$test>\n"
+      unless $origline eq $test;
+}
+
+
+sub _identify_list_type {
+    my ($self, $list_type) = @_;
+    my $type;
+    if ($list_type =~ m/[0-9]/) {
+        $type = "oln";
+    } elsif ($list_type =~ m/[a-h]/) {
+        $type = "ola";
+    } elsif ($list_type =~ m/[A-H]/) {
+        $type = "olA";
+    } elsif ($list_type =~ m/[ixvl]/) {
+        $type = "oli";
+    } elsif ($list_type =~ m/[IXVL]/) {
+        $type = "olI";
+    } else {
+        die "$type Unrecognized, fix your code\n";
+    }
+    $self->block($type);
 }
 
 
