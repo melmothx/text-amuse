@@ -28,8 +28,6 @@ sub new {
                 type => "null", # the type
                 string => "",      # the string
                 removed => "", # the portion of the string removed
-                indentation => 0, # the indentation as numerical value
-
                };
     bless $self, $class;
     # initialize it
@@ -46,6 +44,11 @@ Accessor to the raw input line
 sub rawline {
     my $self = shift;
     return $self->{rawline};
+}
+
+sub _reset_rawline {
+    my ($self, $line) = @_;
+    $self->{rawline} = $line;
 }
 
 =head2 ACCESSORS
@@ -250,7 +253,9 @@ sub _identify_list_type {
 
 =head2 HELPERS
 
-=head3 is_start_example
+=head3 is_start_block($blockname)
+
+Return true if the element is a "startblock" of the required block name
 
 =cut
 
@@ -264,7 +269,9 @@ sub is_start_block {
     }
 }
 
-=head3 is_stop_example
+=head3 is_stop_block($blockname)
+
+Return true if the element is a "stopblock" of the required block name
 
 =cut
 
@@ -278,9 +285,16 @@ sub is_stop_block {
     }
 }
 
+=head3 add_to_string($string, $other_string, [...])
+
+Append (just concatenate) the given strings to the string attribute.
+
+=cut
+
 sub add_to_string {
     my ($self, @args) = @_;
     my $orig = $self->string;
+    $self->_reset_rawline(); # we modify the string, so throw away the rawline
     $self->string(join("", $orig, @args));
 }
 

@@ -35,8 +35,8 @@ is_deeply {$muse->raw_header},
   "header ok";
 
 is(scalar ($muse->parsed_body), 4, "Found three elements");
-diag "Testing if I can call rawline, block, type, string, ";
-diag "removed, indentation on each element";
+# diag "Testing if I can call rawline, block, type, string, ";
+# diag "removed, indentation on each element";
 foreach my $el ($muse->parsed_body) {
     ok defined($el->rawline), "el: " . $el->rawline;
     ok defined($el->block),   "el: " . $el->block;

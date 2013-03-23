@@ -9,7 +9,7 @@ plan tests => 264;
 sub test_line {
     my $string = shift;
     my $exp = shift;
-    diag "Testing <$string>";
+    print "Testing <$string>\n";
     my $el = Text::AMuse::Element->new($string);
     is($el->type, $exp->{type}, "type ok: $exp->{type}");
     is($el->block, $exp->{block}, "block ok: $exp->{block}");

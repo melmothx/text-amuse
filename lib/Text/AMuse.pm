@@ -62,7 +62,8 @@ sub new {
     bless $self, $class;
 }
 
-sub debug {
+
+sub _debug {
     my $self = shift;
     my @args = @_;
     if ((@args) && $self->{debug}) {
@@ -92,7 +93,7 @@ cleaned up.
 sub get_lines {
     my $self = shift;
     my $file = $self->filename;
-    $self->debug("Reading $file");
+    $self->_debug("Reading $file");
     open (my $fh, "<:encoding(utf-8)", $file) or die "Couldn't open $file! $!\n";
     my @lines;
     while (<$fh>) {
@@ -191,7 +192,7 @@ sub parsed_body {
         $self->{parsed_body} = shift;
     }
     return @{$self->{parsed_body}} if defined $self->{parsed_body};
-    $self->debug("Parsing body");
+    $self->_debug("Parsing body");
     # be sure to start with a null block
     my @parsed = (Text::AMuse::Element->new("")); 
     foreach my $l ($self->raw_body) {
@@ -228,13 +229,6 @@ sub _catch_example {
 }
 
 
-
-
-sub bare {
-    my $self = shift;
-    my $format = shift;
-    
-}
 
 
 
