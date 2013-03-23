@@ -2,7 +2,7 @@ package Text::AMuse;
 
 use 5.010001;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 =head1 NAME
 
@@ -33,21 +33,159 @@ Perhaps a little code snippet.
 A list of functions that can be exported.  You can delete this section
 if you don't export anything, such as for a purely object-oriented module.
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
-=head2 function1
-
-=cut
-
-sub function1 {
-}
-
-=head2 function2
+=head2 new(file => $filename)
 
 =cut
 
-sub function2 {
+sub new {
+    my $class = shift;
+    my %args;
+    my $self;
+    if (@_ % 2 == 0) {
+        %args = @_;
+    }
+    elsif (@_ == 1) {
+        $args{file} = shift;
+    }
+    else {
+        die "Wrong arguments! The constructor accepts only a filename\n";
+    }
+    if (-f $args{file}) {
+        $self->{filename} = $args{file};
+    } else {
+        die "Wrong argument! $args{file} doesn't exist!\n"
+    }
+    $self->{debug} = 1 if $args{debug};
+    bless $self, $class;
 }
+
+sub debug {
+    my $self = shift;
+    my @args = @_;
+    if ((@args) && $self->{debug}) {
+        print join("\n", @args), "\n";
+    }
+}
+
+=head2 filename
+
+Return the filename of the processed file
+
+=cut
+
+sub filename {
+    my $self = shift;
+    return $self->{filename}
+}
+
+=head2 get_lines
+
+Returns the raw input lines as a list, reading from the filename if
+it's the first time we call it. Tabs, \r and trailing whitespace are
+cleaned up.
+
+=cut
+
+sub get_lines {
+    my $self = shift;
+    my $file = $self->filename;
+    $self->debug("Reading $file");
+    open (my $fh, "<:encoding(utf-8)", $file) or die "Couldn't open $file! $!\n";
+    my @lines;
+    while (<$fh>) {
+        my $l = $_;
+        # EOL
+        $l =~ s/\r\n/\n/gs;
+        $l =~ s/\r/\n/gs;
+        # TAB
+        $l =~ s/\t/    /g;
+        # trailing
+        $l =~ s/ +$//mg;
+        push @lines, $l;
+    }
+    close $fh;
+    # store the lines in the object
+    return @lines;
+}
+
+
+sub _split_body_and_directives {
+    my $self = shift;
+    my (%directives, @body);
+    my $in_meta = 1;
+    my $lastdirective;
+    my @input = $self->get_lines;
+    # scan the line
+    while (@input) {
+        my $line = shift @input;
+        if ($in_meta) {
+            # reset the directives on blank lines
+            if ($line =~ m/^\s*$/s) {
+                $lastdirective = undef;
+            } elsif ($line =~ m/^\#(\w+)\s+(.+)$/s) {
+                my $dir = $1;
+                $directives{$dir} = $2;
+                $lastdirective = $dir;
+            } elsif ($lastdirective) {
+                $directives{$lastdirective} .= $line;
+            } else {
+                $in_meta = 0
+            }
+        }
+        next if $in_meta;
+        push @body, $line;
+    }
+    push @body, "\n"; # append a newline
+    # before returning, let's clean the %directives from EOLs
+    foreach my $key (keys %directives) {
+        $directives{$key} =~ s/\s/ /gs;
+        $directives{$key} =~ s/\s+$//gs;
+    }
+    $self->{raw_body}   = \@body;
+    $self->{raw_header} = \%directives;
+}
+
+=head2 raw_header
+
+Accessor to the raw header of the muse file. The header is returned as
+hash, with key/value pairs
+
+=cut
+
+sub raw_header {
+    my $self = shift;
+    unless (defined $self->{raw_header}) {
+        $self->_split_body_and_directives;
+    }
+    return %{$self->{raw_header}}
+}
+
+=head2 raw_body
+
+Accessor to the raw body of the muse file. The body is returned as a
+list of lines.
+
+=cut
+
+sub raw_body {
+    my $self = shift;
+    unless (defined $self->{raw_body}) {
+        $self->_split_body_and_directives;
+    }
+    return @{$self->{raw_body}}
+}
+
+
+sub bare {
+    my $self = shift;
+    my $format = shift;
+    
+}
+
+
+
 
 =head1 AUTHOR
 
