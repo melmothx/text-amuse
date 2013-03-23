@@ -6,7 +6,7 @@ use Text::AMuse;
 use File::Spec::Functions;
 use Data::Dumper;
 
-plan tests => 45;
+plan tests => 47;
 
 diag "Constructor";
 
@@ -89,7 +89,8 @@ is($parsed[3]->string, $expected_example, "Content looks ok");
 
 # dump_content($example);
 
-my $poetry = Text::AMuse->new(file => testfile("verse.muse"));
+my $poetry = Text::AMuse->new(file => testfile("verse.muse"),
+                              debug => 1);
 
 $poetry->_catch_example;
 $poetry->_catch_verse;
@@ -113,6 +114,8 @@ In terms of terse verse,
 EOF
 
 is($parsed[9]->string, $exppoetry, "content ok, list not interpreted");
+is($parsed[10]->type, "footnote", "footnote not eaten");
+is($parsed[10]->string, "The author\n", "Footnote ok");
 # print $parsed[9]->string;
 # dump_content($poetry);
 
