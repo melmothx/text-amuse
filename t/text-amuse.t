@@ -6,7 +6,7 @@ use Text::AMuse;
 use File::Spec::Functions;
 use Data::Dumper;
 
-# plan tests => 1;
+plan tests => 45;
 
 diag "Constructor";
 
@@ -87,9 +87,34 @@ EOF
 
 is($parsed[3]->string, $expected_example, "Content looks ok");
 
-dump_content($example);
+# dump_content($example);
 
-done_testing();
+my $poetry = Text::AMuse->new(file => testfile("verse.muse"));
+
+$poetry->_catch_example;
+$poetry->_catch_verse;
+
+@parsed = $poetry->parsed_body;
+is($parsed[3]->type, "verse", "verse ok");
+is($parsed[3]->string,
+   "A line of Emacs verse;\n  forgive its being so terse.\n\n\n",
+   "content looks ok");
+is($parsed[4]->type, "h2", "h2 ok");
+is($parsed[9]->type, "verse", "another verse");
+my $exppoetry = <<'EOF';
+A line of Emacs verse;
+  forgive its being so terse.
+
+In terms of terse verse,
+        you could do worse. [1]
+
+ A. This poetry will stop here, even if it's not close
+
+EOF
+
+is($parsed[9]->string, $exppoetry, "content ok, list not interpreted");
+# print $parsed[9]->string;
+# dump_content($poetry);
 
 
 sub dump_content {
@@ -98,4 +123,8 @@ sub dump_content {
         print ">> Start type: ", $i->type, "\n",
           $i->string, ">> Stop\n";
     }
+}
+
+sub testfile {
+    return catfile(t => testfiles => shift);
 }

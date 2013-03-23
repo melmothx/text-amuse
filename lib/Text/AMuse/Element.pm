@@ -285,6 +285,26 @@ sub is_stop_block {
     }
 }
 
+=head3 is_regular_maybe
+
+Return true if the element is "regular", i.e., it just have trailing
+white space
+
+=cut
+
+sub is_regular_maybe {
+    my $self = shift;
+    if ($self->type eq 'li' or
+        $self->type eq 'null' or
+        $self->type eq 'regular') {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+
+
 =head3 add_to_string($string, $other_string, [...])
 
 Append (just concatenate) the given strings to the string attribute.

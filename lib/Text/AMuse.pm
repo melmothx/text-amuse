@@ -202,8 +202,8 @@ sub parsed_body {
     return @{$self->{parsed_body}};
 }
 
-# here we pack the block with the same s
-
+# <example> is greedy, and will stop only at another </example> or at
+# the end of input.
 sub _catch_example {
     my $self = shift;
     my @els  = $self->parsed_body;
@@ -228,7 +228,36 @@ sub _catch_example {
     $self->parsed_body(\@out);
 }
 
+# verses are the other big problem, because they are not regular
+# strings and can't be nested (as the example, but it's a slightly
+# different case.
 
+sub _catch_verse {
+    my $self = shift;
+    my @els = $self->parsed_body;
+    my @out;
+    while (@els) {
+        my $el = shift @els;
+        if ($el->is_start_block('verse')) {
+            while (my $e = shift(@els)) {
+                # stop if we find a closed environment
+                last if $e->is_stop_block('verse');
+                if ($e->is_regular_maybe) {
+                    $el->add_to_string($e->rawline)
+                } else {
+                    # argh, too late! Put it back
+                    $self->_debug("Rewinding");
+                    unshift @els, $e;
+                    last;
+                }
+            }
+            $el->type("verse"); # change the type
+        }
+        push @out, $el;
+    }
+    # and finally reset
+    $self->parsed_body(\@out);
+}
 
 
 

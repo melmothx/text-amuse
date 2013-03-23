@@ -1,0 +1,29 @@
+#title Verses
+
+Regular.
+
+<verse>
+A line of Emacs verse;
+  forgive its being so terse.
+
+
+** Another
+
+Multiple stanzas may be included in one set of <verse> tags, as
+follows.
+
+<verse>
+A line of Emacs verse;
+  forgive its being so terse.
+
+In terms of terse verse,
+        you could do worse. [1]
+
+ A. This poetry will stop here, even if it's not close
+
+[1] The author
+
+[2] Another author
+
+[3] This sucks
+
