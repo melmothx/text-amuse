@@ -6,7 +6,7 @@ use Text::AMuse;
 use File::Spec::Functions;
 use Data::Dumper;
 
-plan tests => 47;
+plan tests => 81;
 
 diag "Constructor";
 
@@ -45,10 +45,6 @@ foreach my $el ($muse->parsed_body) {
     ok defined($el->removed), "el: " . $el->removed;
     ok defined($el->indentation), "el: " . $el->indentation;
 }
-
-my $lists = Text::AMuse->new(file => catfile(t => testfiles => 'lists.muse'));
-
-# print Dumper([$lists->parsed_body]);
 
 my $example =
   Text::AMuse->new(file => catfile(t => testfiles => 'example.muse'));
@@ -119,12 +115,70 @@ is($parsed[10]->string, "The author\n", "Footnote ok");
 # print $parsed[9]->string;
 # dump_content($poetry);
 
+my $packs = Text::AMuse->new(file => catfile(t => testfiles => 'packing.muse'));
+@parsed = $packs->document;
+
+is($parsed[1]->string, "this title\nwill merge\n");
+is($parsed[1]->type, "h1");
+
+is($parsed[3]->string, "this title\nwill merge\n");
+is($parsed[3]->type, "h2");
+
+is($parsed[5]->string, "this title\nwill merge\n");
+is($parsed[5]->type, "h3");
+
+is($parsed[7]->string, "this title\nwill merge\n");
+is($parsed[7]->type, "h4");
+
+is($parsed[9]->string, "this title\nwill merge\n");
+is($parsed[9]->type, "h5");
+
+is($parsed[12]->string, "This will not merge (of course)\n");
+is($parsed[12]->type, "regular");
+
+is($parsed[14]->string, "we continue without merging (ugly but valid)\n");
+is($parsed[14]->type, "regular");
+
+is($parsed[16]->string, "Verse will not merge (of course)\n");
+is($parsed[16]->type, "verse");
+
+is($parsed[17]->string, "and we continue without merging (ugly but valid)\n");
+is($parsed[17]->type, "regular");
+
+is($parsed[19]->string, "nor the example\n");
+is($parsed[19]->type, "example");
+
+is($parsed[20]->string, "will not merge\n");
+is($parsed[20]->type, "regular");
+
+is($parsed[22]->string, "the | table\nwill | merge\n");
+is($parsed[22]->type, "table");
+
+is($parsed[25]->string, "the list\nwill merge\n");
+is($parsed[25]->type, "li");
+is($parsed[25]->block, "ul");
+
+is($parsed[27]->string, "the list\nwill merge\n");
+is($parsed[27]->type, "li");
+is($parsed[27]->block, "ola");
+
+is($parsed[29]->string, "the footnote\nwill merge\n");
+is($parsed[29]->type, "footnote");
+
+is($parsed[31]->string, "");
+is($parsed[32]->string, "will not merge\n");
+
 
 sub dump_content {
     my $obj = shift;
     foreach my $i ($obj->parsed_body) {
-        print ">> Start type: ", $i->type, "\n",
-          $i->string, ">> Stop\n";
+        if ($i->type eq 'null') {
+            print "** NULL **\n";
+            die "null with content?" if $i->string =~ m/\S/;
+        } else {
+            print "====Start type:", $i->type, "======\n",
+              $i->string, "====Stop===\n";
+        }
     }
 }
 

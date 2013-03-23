@@ -51,6 +51,14 @@ sub _reset_rawline {
     $self->{rawline} = $line;
 }
 
+sub will_not_merge {
+    my ($self, $arg) = @_;
+    if (defined $arg) {
+        $self->{_will_not_merge} = $arg;
+    }
+    return $self->{_will_not_merge};
+}
+
 =head2 ACCESSORS
 
 The following accessors set the value if an argument is provided. 
@@ -303,7 +311,39 @@ sub is_regular_maybe {
     }
 }
 
+=sub can_merge_next 
 
+Return true if the element will merge the next one
+
+=cut
+
+sub can_merge_next {
+    my $self = shift;
+    return 0 if $self->will_not_merge;
+    if ($self->type ne 'stopblock'  and
+        $self->type ne 'startblock' and
+        $self->type ne 'null'       and
+        $self->type ne 'table'      and
+        $self->type ne 'comment') {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+=sub can_be_merged 
+
+Return true if the element will merge the next one. Only regular strings.
+
+=cut
+
+sub can_be_merged {
+    my $self = shift;
+    return 0 if $self->will_not_merge;
+    if ($self->type eq 'regular') {
+        return 1
+    }
+}
 
 =head3 add_to_string($string, $other_string, [...])
 

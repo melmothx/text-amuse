@@ -202,6 +202,39 @@ sub parsed_body {
     return @{$self->{parsed_body}};
 }
 
+=head2 document
+
+Return the list of the elements which compose the body, once they have
+properly parsed and packed.
+
+=cut
+
+sub document {
+    my $self = shift;
+
+    # order matters!
+    # pack the examples
+    $self->_catch_example;
+
+    # pack the verses
+    $self->_catch_verse;
+
+    # then pack the lines
+    $self->_pack_lines;
+
+    # then process the lists, using the indentation
+
+    # then unroll the blocks
+
+    # then store the footnotes
+
+    # last run to check if we don't miss anything
+    
+    # all done, return something
+    return $self->parsed_body;
+}
+
+
 # <example> is greedy, and will stop only at another </example> or at
 # the end of input.
 sub _catch_example {
@@ -220,6 +253,7 @@ sub _catch_example {
                 }
             }
             # now we exited the hell loop. We change the element
+            $el->will_not_merge(1);
             $el->type("example");
         }
         push @out, $el;
@@ -251,6 +285,7 @@ sub _catch_verse {
                     last;
                 }
             }
+            $el->will_not_merge(1);
             $el->type("verse"); # change the type
         }
         push @out, $el;
@@ -259,7 +294,31 @@ sub _catch_verse {
     $self->parsed_body(\@out);
 }
 
-
+sub _pack_lines {
+    my $self = shift;
+    my @els = $self->parsed_body;
+    die "Can't process an empty list\n" unless (@els);
+    my @out;
+    # insert the first.
+    push @out, shift(@els);
+    while (my $el = shift(@els)) {
+        my $last = $out[$#out];
+        # same type, same indentation
+        if ($el->can_be_merged and # basically, only regular
+            $last->can_merge_next) {
+            $last->add_to_string($el->string)
+        }
+        # tables will merge only with themselves
+        elsif ($el->type eq 'table' and
+               $last->type eq 'table') {
+            $last->add_to_string($el->string)
+        }
+        else {
+            push @out, $el;
+        }
+    }
+    $self->parsed_body(\@out);
+}
 
 =head1 AUTHOR
 
