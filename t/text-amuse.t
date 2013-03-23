@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use Text::AMuse;
 use File::Spec::Functions;
+use Data::Dumper;
 
 # plan tests => 1;
 
@@ -32,5 +33,18 @@ is_deeply [$muse->raw_body],
 is_deeply {$muse->raw_header},
   { title => "1 2 3 4", author => "hello" },
   "header ok";
+
+is(scalar @{$muse->_parsed_body}, 3, "Found three elements");
+diag "Testing if I can call rawline, block, type, string, ";
+diag "removed, indentation on each element";
+foreach my $el (@{$muse->_parsed_body}) {
+    ok defined($el->rawline), "el: " . $el->rawline;
+    ok defined($el->block),   "el: " . $el->block;
+    ok defined($el->type),    "el: " . $el->type;
+    ok defined($el->string),  "el: " . $el->string;
+    ok defined($el->removed), "el: " . $el->removed;
+    ok defined($el->indentation), "el: " . $el->indentation;
+}
+
 
 done_testing();

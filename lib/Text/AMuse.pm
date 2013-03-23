@@ -3,6 +3,7 @@ package Text::AMuse;
 use 5.010001;
 use strict;
 use warnings;
+use Text::AMuse::Element;
 
 =head1 NAME
 
@@ -35,7 +36,7 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 METHODS
 
-=head2 new(file => $filename)
+=head3 new(file => $filename)
 
 =cut
 
@@ -69,7 +70,7 @@ sub debug {
     }
 }
 
-=head2 filename
+=head3 filename
 
 Return the filename of the processed file
 
@@ -80,7 +81,7 @@ sub filename {
     return $self->{filename}
 }
 
-=head2 get_lines
+=head3 get_lines
 
 Returns the raw input lines as a list, reading from the filename if
 it's the first time we call it. Tabs, \r and trailing whitespace are
@@ -147,7 +148,7 @@ sub _split_body_and_directives {
     $self->{raw_header} = \%directives;
 }
 
-=head2 raw_header
+=head3 raw_header
 
 Accessor to the raw header of the muse file. The header is returned as
 hash, with key/value pairs
@@ -162,7 +163,7 @@ sub raw_header {
     return %{$self->{raw_header}}
 }
 
-=head2 raw_body
+=head3 raw_body
 
 Accessor to the raw body of the muse file. The body is returned as a
 list of lines.
@@ -177,13 +178,38 @@ sub raw_body {
     return @{$self->{raw_body}}
 }
 
+=head2 _parsed_body (internal, but documented)
+
+Accessor to the list of parsed lines. Each line will come as an
+hashref with the properties attached.
+
+   { type => "regular", # the type
+     string => "",      # the string
+     removed => "",     # the portion of the string removed
+     indentation => 0,  # the indentation as a
+     block => "",       # the block it says to belog
+  }
+
+=cut
+
+sub _parsed_body {
+    my $self = shift;
+    return $self->{parsed_body} if defined $self->{parsed_body};
+    $self->debug("Parsing body");
+    my @parsed;
+    foreach my $l ($self->raw_body) {
+        push @parsed, Text::AMuse::Element->new($l);
+    }
+    $self->{parsed_body} = \@parsed;
+    return $self->{parsed_body};
+}
+
 
 sub bare {
     my $self = shift;
     my $format = shift;
     
 }
-
 
 
 
