@@ -10,7 +10,7 @@ use Data::Dumper;
 
 diag "Constructor";
 
-my $testfile = catfile(t => 'prova.muse');
+my $testfile = catfile(t => testfiles =>  'prova.muse');
 my $muse = Text::AMuse->new(file => $testfile, debug => 1);
 
 is($muse->filename, $testfile, "filename ok");
@@ -46,11 +46,12 @@ foreach my $el ($muse->parsed_body) {
     ok defined($el->indentation), "el: " . $el->indentation;
 }
 
-my $lists = Text::AMuse->new(file => catfile(t => 'lists.muse'));
+my $lists = Text::AMuse->new(file => catfile(t => testfiles => 'lists.muse'));
 
 # print Dumper([$lists->parsed_body]);
 
-my $example = Text::AMuse->new(file => catfile(t => 'example.muse'));
+my $example =
+  Text::AMuse->new(file => catfile(t => testfiles => 'example.muse'));
 
 $example->_catch_example;
 my @parsed = $example->parsed_body;
@@ -61,7 +62,7 @@ is($parsed[2]->string, "", "Third is empty");
 is($parsed[3]->type, "example", "Type set to example");
 is($parsed[4]->string, "", "Last is empty");
 
-$example = Text::AMuse->new(file => catfile(t => 'example-2.muse'));
+$example = Text::AMuse->new(file => catfile(t => testfiles => 'example-2.muse'));
 
 $example->_catch_example;
 @parsed = $example->parsed_body;
