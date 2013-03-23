@@ -248,5 +248,40 @@ sub _identify_list_type {
     $self->block($type);
 }
 
+=head2 HELPERS
+
+=head3 is_start_example
+
+=cut
+
+sub is_start_block {
+    my $self = shift;
+    my $block = shift || "";
+    if ($self->type eq 'startblock' and $self->block eq $block) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+=head3 is_stop_example
+
+=cut
+
+sub is_stop_block {
+    my $self = shift;
+    my $block = shift || "";
+    if ($self->type eq 'stopblock' and $self->block eq $block) {
+        return 1
+    } else {
+        return 0
+    }
+}
+
+sub add_to_string {
+    my ($self, @args) = @_;
+    my $orig = $self->string;
+    $self->string(join("", $orig, @args));
+}
 
 1;

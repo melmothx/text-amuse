@@ -178,31 +178,56 @@ sub raw_body {
     return @{$self->{raw_body}}
 }
 
-=head2 _parsed_body (internal, but documented)
+=head2 parsed_body (internal, but documented)
 
-Accessor to the list of parsed lines. Each line will come as an
-hashref with the properties attached.
-
-   { type => "regular", # the type
-     string => "",      # the string
-     removed => "",     # the portion of the string removed
-     indentation => 0,  # the indentation as a
-     block => "",       # the block it says to belog
-  }
+Accessor to the list of parsed lines. Each line will come as a
+L<Text::AMuse::Element> object
 
 =cut
 
-sub _parsed_body {
+sub parsed_body {
     my $self = shift;
-    return $self->{parsed_body} if defined $self->{parsed_body};
+    if (@_) {
+        $self->{parsed_body} = shift;
+    }
+    return @{$self->{parsed_body}} if defined $self->{parsed_body};
     $self->debug("Parsing body");
-    my @parsed;
+    # be sure to start with a null block
+    my @parsed = (Text::AMuse::Element->new("")); 
     foreach my $l ($self->raw_body) {
         push @parsed, Text::AMuse::Element->new($l);
     }
     $self->{parsed_body} = \@parsed;
-    return $self->{parsed_body};
+    return @{$self->{parsed_body}};
 }
+
+# here we pack the block with the same s
+
+sub _catch_example {
+    my $self = shift;
+    my @els  = $self->parsed_body;
+    my @out;
+    while (@els) {
+        my $el = shift @els;
+        if ($el->is_start_block('example')) {
+            # then enter a subloop and slurp until we find a stop
+            while (my $e = shift(@els)) {
+                if ($e->is_stop_block('example')) {
+                    last
+                } else {
+                    $el->add_to_string($e->rawline)
+                }
+            }
+            # now we exited the hell loop. We change the element
+            $el->type("example");
+        }
+        push @out, $el;
+    }
+    # and we reset the parsed body;
+    $self->parsed_body(\@out);
+}
+
+
 
 
 sub bare {
