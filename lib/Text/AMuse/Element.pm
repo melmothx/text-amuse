@@ -200,17 +200,20 @@ sub _parse_string {
         $self->removed($1);
     }
     elsif ($l =~ m/^( {20,})([^ ].+)$/s) {
-        $self->type("right");
+        $self->block("right");
+        $self->type("regular");
         $self->removed($1);
         $self->string($2);
     }
     elsif ($l =~ m/^( {6,})([^ ].+)$/s) {
-        $self->type("center");
+        $self->block("center");
+        $self->type("regular");
         $self->removed($1);
         $self->string($2);
     }
     elsif ($l =~ m/^( {2,})([^ ].+)$/s) {
-        $self->type("quote");
+        $self->block("quote");
+        $self->type("regular");
         $self->removed($1);
         $self->string($2);
     }

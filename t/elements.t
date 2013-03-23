@@ -143,14 +143,14 @@ test_line(">  a verse", {
                        });
 
 test_line("  a quote", {
-                        type => 'quote',
+                        type => 'regular',
                         block => 'quote',
                         removed => "  ",
                         indentation => 2,
                        });
           
 test_line("     a quote", {
-                        type => 'quote',
+                        type => 'regular',
                         block => 'quote',
                         removed => "     ",
                         indentation => 5,
@@ -158,7 +158,7 @@ test_line("     a quote", {
 
 foreach (6, 8, 19) {
     test_line((" " x $_) . "center", {
-                        type => 'center',
+                        type => 'regular',
                         block => 'center',
                         removed => " " x $_,
                         indentation => $_,
@@ -167,7 +167,7 @@ foreach (6, 8, 19) {
 
 foreach (20, 30) {
     test_line((" " x $_) . "right", {
-                        type => 'right',
+                        type => 'regular',
                         block => 'right',
                         removed => " " x $_,
                         indentation => $_,
