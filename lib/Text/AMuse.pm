@@ -71,6 +71,7 @@ sub _debug {
     }
 }
 
+
 =head3 filename
 
 Return the filename of the processed file
@@ -231,11 +232,38 @@ sub document {
     $self->_unroll_blocks;
 
     # then store the footnotes
+    $self->_store_footnotes;
 
-    # last run to check if we don't miss anything
+    # last run to check if we don't miss anything and remove the nulls
+    $self->_remove_nulls;
     
     # all done, return something
     return $self->parsed_body;
+}
+
+=head3 get_footnote
+
+Accessor to the internal footnotes hash. You can access the footnote
+with a numerical argument.
+
+=cut
+
+sub get_footnote {
+    my ($self, $arg) = @_;
+    return undef unless $arg;
+    if (exists $self->_raw_footnotes->{$arg}) {
+        return $self->_raw_footnotes->{$arg};
+    }
+    else { return undef }
+}
+
+
+sub _raw_footnotes {
+    my $self = shift;
+    if (@_) {
+        $self->{_raw_footnotes} = shift;
+    }
+    return $self->{_raw_footnotes};
 }
 
 
@@ -476,6 +504,39 @@ sub _unroll_blocks {
     $self->parsed_body(\@out);
 }
 
+sub _store_footnotes {
+    my $self = shift;
+    my @els = $self->parsed_body;
+    my @out;
+    my %footnotes;
+    while (my $el = shift(@els)) {
+        if ($el->type eq 'footnote') {
+            if ($el->removed =~ m/\[([0-9])\]/) {
+                warn "Overwriting footnote number $1" if exists $footnotes{$1};
+                $footnotes{$1} = $el->string;
+            }
+            else { die "Something is wrong here!\n" }
+        }
+        else {
+            push @out, $el;
+        }
+    }
+    $self->parsed_body(\@out);
+    $self->_raw_footnotes(\%footnotes);
+    return;
+}
+
+sub _remove_nulls {
+    my $self = shift;
+    my @els = $self->parsed_body;
+    my @out;
+    while (my $el = shift(@els)) {
+        unless ($el->type eq 'null') {
+            push @out, $el;
+        }
+    }
+    $self->parsed_body(\@out);
+}
 
 
 =head1 AUTHOR
