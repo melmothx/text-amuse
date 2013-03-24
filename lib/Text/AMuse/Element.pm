@@ -141,7 +141,9 @@ sub _block_re {
                  right    |
                  example  |
                  verbatim |
-                 quote
+                 quote    |
+                 li | ul | ola | olA | oli | olI | oln # these are private
+
              )}x
 }
 
@@ -183,7 +185,7 @@ sub _parse_string {
                            [ixvIXV]+  |
                        )     
                        \. # a single dot
-                       \s)  # space
+                       \s+)  # space
                    (.*) # the string itself $3
                   /sx) {
         $self->type("li");
@@ -342,6 +344,23 @@ sub can_be_merged {
     return 0 if $self->will_not_merge;
     if ($self->type eq 'regular') {
         return 1
+    }
+}
+
+=sub can_be_in_list
+
+Return true if the element can be inside a list
+
+=cut 
+
+sub can_be_in_list {
+    my $self = shift;
+    if ($self->type eq 'li' or
+        $self->type eq 'null', or
+        $self->type eq 'regular') {
+        return 1
+    } else {
+        return 0
     }
 }
 

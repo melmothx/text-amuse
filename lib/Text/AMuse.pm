@@ -184,6 +184,8 @@ sub raw_body {
 Accessor to the list of parsed lines. Each line will come as a
 L<Text::AMuse::Element> object
 
+The first block is guaranteed to be a null block
+
 =cut
 
 sub parsed_body {
@@ -223,6 +225,7 @@ sub document {
     $self->_pack_lines;
 
     # then process the lists, using the indentation
+    $self->_process_lists;
 
     # then unroll the blocks
 
@@ -318,6 +321,141 @@ sub _pack_lines {
         }
     }
     $self->parsed_body(\@out);
+}
+
+sub _process_lists {
+    my $self = shift;
+    my @els = $self->parsed_body;
+    die "Can't process an empty list\n" unless (@els);
+    my @out;
+    my @listpile;
+
+    while (my $el = shift(@els)) {
+
+        # first, check if can be in list. If not, empty the queue.
+        unless ($el->can_be_in_list) {
+            while (@listpile) {
+                my $pending = pop(@listpile)->{block};
+                # we create an element to close all
+                push @out, Text::AMuse::Element->new("</$pending>");
+            }
+            # push the element
+            push @out, $el;
+            next;
+        }
+        # ignore the null, just push it into the output
+        if ($el->type eq 'null') {
+            push @out, $el;
+            next;
+        }
+        # are we actually in a list?
+        unless (@listpile or $el->type eq 'li') {
+            # no? good!
+            push @out, $el;
+            next 
+        }
+        
+        # if we're still here, we are actually in a list
+        # no pile, this is the first element
+
+        unless (@listpile) {
+            die "Something went wrong!\n" unless $el->type eq 'li';
+            # first the block type;
+            my $block = $el->block;
+            push @listpile, { block => $block,
+                              indentation => $el->indentation };
+            push @listpile, { block => "li",
+                              indentation => $el->indentation };
+            push @out, Text::AMuse::Element->new("<$block>");
+            push @out, Text::AMuse::Element->new("<li>");
+            # change the type, it's a paragraph now
+            $el->type('regular');
+            push @out, $el;
+            next;
+        }
+        
+        # if we're here, we have an existing list, so we check the
+        # indentation.
+        
+        # the type is regular: It can only close or continue
+        if ($el->type eq 'regular') {
+            $el->block(""); # it's no more a quote/center/right
+            # equal or major indentation, just append and next
+            if ($el->indentation >= $listpile[$#listpile]->{indentation}) {
+                push @out, $el;
+                next;
+            }
+            # and while it's minor, pop the pile
+            while ($el->indentation < $listpile[$#listpile]->{indentation}) {
+                my $pending = pop(@listpile)->{block};
+                push @out, Text::AMuse::Element->new("</$pending>");
+            }
+            # all done
+            push @out, $el;
+            next;
+        }
+
+        # check if it's all OK
+        die "We broke the module!" unless $el->type eq 'li';
+        # we're here, change the type as we're done
+        $el->type('regular');
+
+        if ($el->indentation == $listpile[$#listpile]->{indentation}) {
+            # if the indentation is equal, we don't need to touch the pile,
+            # as it was useless to pop and push the same li element.
+            push @out, Text::AMuse::Element->new("</li>");
+            push @out, Text::AMuse::Element->new("<li>");
+            push @out, $el;
+            next;
+        }
+        # indentation is major, open a new level
+        elsif ($el->indentation > $listpile[$#listpile]->{indentation}) {
+            my $block = $el->block;
+            push @listpile, { block => $block,
+                              indentation => $el->indentation };
+            push @listpile, { block => "li",
+                              indentation => $el->indentation };
+            push @out, Text::AMuse::Element->new("<$block>");
+            push @out, Text::AMuse::Element->new("<li>");
+            push @out, $el;
+            next;
+        }
+        # if it's minor, we pop from the pile until we are ok
+        while(@listpile and
+              $el->indentation < $listpile[$#listpile]->{indentation}) {
+            my $pending = pop(@listpile)->{block};
+            push @out, Text::AMuse::Element->new("</$pending>");
+        }
+        # here we reached the desired level
+        if (@listpile) {
+            push @out, Text::AMuse::Element->new("</li>");
+            push @out, Text::AMuse::Element->new("<li>");
+        }
+        # if by chance, we emptied all, something is wrong, so start anew.
+        else {
+            my $block = $el->block;
+            push @listpile, { block => $block,
+                              indentation => $el->indentation };
+            push @listpile, { block => "li",
+                              indentation => $el->indentation };
+            push @out, Text::AMuse::Element->new("<$block>");
+            push @out, Text::AMuse::Element->new("<li>");
+
+        }
+        push @out, $el;
+    }
+
+    # be sure to have the pile empty
+    while (@listpile) {
+        my $pending = pop(@listpile)->{block};
+        # we create an element to close all
+        push @out, Text::AMuse::Element->new("</$pending>");
+    }
+    foreach my $check (@out) {
+        die "Found a stray type!" . $check->string . ":" . $check->type
+          if $check->type =~ m/^(li|[uo]l)/;
+    }
+    $self->parsed_body(\@out);    
 }
 
 =head1 AUTHOR
