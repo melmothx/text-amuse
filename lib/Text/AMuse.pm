@@ -550,14 +550,15 @@ sub _sanity_check {
     while (my $el = shift(@els)) {
         if ($el->type eq 'startblock') {
             push @pile, $el->block;
+            $self->_debug("Pushing " . $el->block);
             die "Uh?\n" unless $el->block;
         }
         elsif ($el->type eq 'stopblock') {
             my $exp = pop @pile;
-            unless ($exp eq $el->block) {
-                warn "Couldn't retrieve " . $el->block . "from the pile\n";
+            unless ($exp and $exp eq $el->block) {
+                warn "Couldn't retrieve " . $el->block . " from the pile\n";
                 # put it back
-                push @pile, $exp;
+                push @pile, $exp if $exp;
                 # so what to do here? just removed it
                 next;
             }
@@ -565,8 +566,8 @@ sub _sanity_check {
         elsif (@pile and $el->should_close_blocks) {
             while (@pile) {
                 my $block = shift(@pile);
-                # force the closing
-                push @out, Text::AMuse::Element->new('</$block>');
+                warn "Forcing the closing of $block\n";
+                push @out, Text::AMuse::Element->new("</$block>");
             }
         }
         push @out, $el;
@@ -574,8 +575,9 @@ sub _sanity_check {
     # do we still have things into the pile?
     while (@pile) {
         my $block = shift(@pile);
+        $self->_debug("forcing the closing of $block");
         # force the closing
-        push @out, Text::AMuse::Element->new('</$block>');
+        push @out, Text::AMuse::Element->new("</$block>");
     }
     $self->parsed_body(\@out);
 }
