@@ -208,7 +208,8 @@ sub parsed_body {
 =head2 document
 
 Return the list of the elements which compose the body, once they have
-properly parsed and packed.
+properly parsed and packed. Nulls and footnotes are removed. (To get
+the footnotes use the accessor below).
 
 =cut
 
