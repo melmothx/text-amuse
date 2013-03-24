@@ -11,10 +11,6 @@ plan tests => 1;
 my $list = Text::AMuse->new(file => catfile(t => testfiles => 'lists.muse'));
 
 my @good;
-$list->_catch_example;
-$list->_catch_verse;
-$list->_pack_lines;
-$list->_process_lists;
 
 my @expected = (
                 {
@@ -416,7 +412,7 @@ item above.
                 }
                );
 
-foreach my $e ($list->parsed_body) {
+foreach my $e ($list->document) {
     next if $e->type eq 'null';
     push @good, {
                  type  => $e->type,
