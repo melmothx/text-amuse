@@ -116,7 +116,10 @@ is($parsed[10]->string, "The author\n", "Footnote ok");
 # dump_content($poetry);
 
 my $packs = Text::AMuse->new(file => catfile(t => testfiles => 'packing.muse'));
-@parsed = $packs->document;
+$packs->_catch_example;
+$packs->_catch_verse;
+$packs->_pack_lines;
+@parsed = $packs->parsed_body;
 
 is($parsed[1]->string, "this title\nwill merge\n");
 is($parsed[1]->type, "h1");
