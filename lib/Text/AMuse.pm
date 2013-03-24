@@ -228,6 +228,7 @@ sub document {
     $self->_process_lists;
 
     # then unroll the blocks
+    $self->_unroll_blocks;
 
     # then store the footnotes
 
@@ -457,6 +458,25 @@ sub _process_lists {
     }
     $self->parsed_body(\@out);    
 }
+
+sub _unroll_blocks {
+    my $self = shift;
+    my @els = $self->parsed_body;
+    my @out;
+    while (my $el = shift @els) {
+        if ($el->can_be_regular) {
+            my $block = $el->block;
+            $el->block("");
+            push @out, Text::AMuse::Element->new("<$block>");
+            push @out, $el;
+            push @out, Text::AMuse::Element->new("</$block>");
+        }
+        else { push @out, $el }
+    }
+    $self->parsed_body(\@out);
+}
+
+
 
 =head1 AUTHOR
 

@@ -370,6 +370,26 @@ sub can_be_in_list {
     }
 }
 
+=head3 can_be_regular
+
+Return true if the element is quote, center, right
+
+=cut
+
+sub can_be_regular {
+    my $self = shift;
+    return 0 unless $self->type eq 'regular';
+    if ($self->block eq 'quote' or
+        $self->block eq 'center' or
+        $self->block eq 'right') {
+        return 1
+    }
+    else {
+        return 0
+    }
+}
+
+
 =head3 add_to_string($string, $other_string, [...])
 
 Append (just concatenate) the given strings to the string attribute.
