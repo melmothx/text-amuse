@@ -215,31 +215,34 @@ the footnotes use the accessor below).
 
 sub document {
     my $self = shift;
+    unless (defined $self->{_parsed_document}) {
+        # order matters!
+        # pack the examples
+        $self->_catch_example;
 
-    # order matters!
-    # pack the examples
-    $self->_catch_example;
+        # pack the verses
+        $self->_catch_verse;
 
-    # pack the verses
-    $self->_catch_verse;
+        # then pack the lines
+        $self->_pack_lines;
 
-    # then pack the lines
-    $self->_pack_lines;
+        # then process the lists, using the indentation
+        $self->_process_lists;
 
-    # then process the lists, using the indentation
-    $self->_process_lists;
+        # then unroll the blocks
+        $self->_unroll_blocks;
 
-    # then unroll the blocks
-    $self->_unroll_blocks;
+        # then store the footnotes
+        $self->_store_footnotes;
 
-    # then store the footnotes
-    $self->_store_footnotes;
+        # last run to check if we don't miss anything and remove the nulls
+        $self->_remove_nulls;
 
-    # last run to check if we don't miss anything and remove the nulls
-    $self->_remove_nulls;
-    
-    # all done, return something
-    return $self->parsed_body;
+        $self->_sanity_check;
+
+        $self->{_parsed_document} = [$self->parsed_body];
+    }
+    return @{$self->{_parsed_document}}
 }
 
 =head3 get_footnote
@@ -535,6 +538,44 @@ sub _remove_nulls {
         unless ($el->type eq 'null') {
             push @out, $el;
         }
+    }
+    $self->parsed_body(\@out);
+}
+
+sub _sanity_check {
+    my $self = shift;
+    my @els = $self->parsed_body;
+    my @pile;
+    my @out;
+    while (my $el = shift(@els)) {
+        if ($el->type eq 'startblock') {
+            push @pile, $el->block;
+            die "Uh?\n" unless $el->block;
+        }
+        elsif ($el->type eq 'stopblock') {
+            my $exp = pop @pile;
+            unless ($exp eq $el->block) {
+                warn "Couldn't retrieve " . $el->block . "from the pile\n";
+                # put it back
+                push @pile, $exp;
+                # so what to do here? just removed it
+                next;
+            }
+        }
+        elsif (@pile and $el->should_close_blocks) {
+            while (@pile) {
+                my $block = shift(@pile);
+                # force the closing
+                push @out, Text::AMuse::Element->new('</$block>');
+            }
+        }
+        push @out, $el;
+    }
+    # do we still have things into the pile?
+    while (@pile) {
+        my $block = shift(@pile);
+        # force the closing
+        push @out, Text::AMuse::Element->new('</$block>');
     }
     $self->parsed_body(\@out);
 }

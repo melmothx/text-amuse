@@ -390,6 +390,21 @@ sub can_be_regular {
 }
 
 
+=head3 should_close_blocks
+
+=cut
+
+sub should_close_blocks {
+    my $self = shift;
+    return 0 if $self->type eq 'regular';
+    return 1 if $self->type =~ m/h[1-5]/;
+    return 1 if $self->block eq 'example';
+    return 1 if $self->block eq 'verse';
+    return 1 if $self->block eq 'table';
+    return 0;
+}
+
+
 =head3 add_to_string($string, $other_string, [...])
 
 Append (just concatenate) the given strings to the string attribute.
