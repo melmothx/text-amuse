@@ -51,6 +51,12 @@ sub _reset_rawline {
     $self->{rawline} = $line;
 }
 
+=head3 will_not_merge
+
+Attribute to mark if an element cannot be further merged
+
+=cut
+
 sub will_not_merge {
     my ($self, $arg) = @_;
     if (defined $arg) {
@@ -313,7 +319,7 @@ sub is_regular_maybe {
     }
 }
 
-=sub can_merge_next 
+=head3 can_merge_next 
 
 Return true if the element will merge the next one
 
@@ -333,7 +339,7 @@ sub can_merge_next {
     }
 }
 
-=sub can_be_merged 
+=head3 can_be_merged 
 
 Return true if the element will merge the next one. Only regular strings.
 
@@ -347,7 +353,7 @@ sub can_be_merged {
     }
 }
 
-=sub can_be_in_list
+=head3 can_be_in_list
 
 Return true if the element can be inside a list
 
