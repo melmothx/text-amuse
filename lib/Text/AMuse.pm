@@ -170,27 +170,38 @@ sub manage_regular {
 
 sub manage_header {
     my ($self, $format, $el) = @_;
-    return "Header " . $el->type . " " . $format . ": " . $el->string . "\n";
+    return $self->inlineblk(start => $format => $el->type) .
+      $self->manage_regular($format, $el) .
+        $self->inlineblk(stop => $format => $el->type);
 }
 
 sub manage_verse {
     my ($self, $format, $el) = @_;
-    return "Verse: $format: " . $el->string . "\n";
+    my $body = $el->string;
+    # process
+    return $self->inlineblk(start => $format => $el->type) .
+      $body . $self->inlineblk(stop => $format => $el->type);
 }
 
 sub manage_comment {
     my ($self, $format, $el) = @_;
-    return "Comment: $format: " . $el->string . "\n";
+    my $body = $el->removed;
+    return $self->inlineblk(start => $format => $el->type) .
+      $body . $self->inlineblk(stop => $format => $el->type);
 }
 
 sub manage_table {
     my ($self, $format, $el) = @_;
-    return "Table: $format: " . $el->string . "\n";
+    my $body = $el->string;
+    # process
+    return $body;
 }
 
 sub manage_example {
     my ($self, $format, $el) = @_;
-    return "Example: $format: " . $el->string . "\n";
+    my $body = $el->string;
+    return $self->inlineblk(start => $format => $el->type) .
+      $body . $self->inlineblk(stop => $format => $el->type);
 }
 
 
