@@ -205,6 +205,14 @@ sub manage_example {
 }
 
 
+=head1 HELPERS
+
+Methods providing some fixed values
+
+=cut
+
+
+
 sub inline_table {
     my $self = shift;
     unless (defined $self->{_inline_table}) {
@@ -481,6 +489,73 @@ sub blk_table {
     return $self->{_blk_table}
 }
 
+
+
+
+sub link_re {
+    my $self = shift;
+    unless (defined $self->{_link_re}) {
+        $self->{_link_re} = qr{\[\[[^\[].*?\]\]};
+    }
+    return $self->{_link_re};
+}
+
+sub image_re {
+    my $self = shift;
+    unless (defined $self->{_image_re}) {
+        $self->{_image_re} = qr{([0-9a-zA-Z/-]+\.(png|jpe?g))};
+    }
+    return $self->{_image_re};
+}
+
+sub url_re {
+    my $self = shift;
+    unless (defined $self->{_url_re}) {
+        $self->{_url_re} = qr!(www\.|https?:\/\/)
+                              [\w\-\.]+\.(\w+) # domain
+                              (:\d+)* # the port
+                              (/\S*?\w)? # everything else, but start
+                                         # with a slash and end with a
+                                         # a \w, and don't tolerate spaces
+                             !x;
+    }
+    return $self->{_url_re};
+}
+
+sub br_hash {
+    my $self = shift;
+    unless (defined $self->{_br_hash}) {
+        $self->{_br_hash} = '49777d285f86e8b252431fdc1a78b92459704911';
+    }
+    return $self->{_br_hash};
+}
+
+sub tag_hash {
+    my $self = shift;
+    unless (defined $self->{_tag_hash}) {
+        $self->{_tag_hash} =
+          {
+           'em' => '93470662f625a56cd4ab62d9d820a77e6468638e',
+           'sub' => '5d85613a56c124e3a3ff8ce6fc95d10cdcb5001e',
+           'del' => 'fea453f853c8645b085126e6517eab38dfaa022f',
+           'strike' => 'afe5fd4ff1a85caa390fd9f36005c6f785b58cb4',
+           'strong' => '0117691d0201f04aa02f586b774c190802d47d8c',
+           'sup' => '3844b17b367801f41a3ff27aab7d5ca297c2b984',
+           'code' => 'e6fb06210fafc02fd7479ddbed2d042cc3a5155e',
+          };
+    }
+    return $self->{_tag_hash};
+}
+
+sub reverse_tag_hash {
+    my $self = shift;
+    unless (defined $self->{_reverse_tag_hash}) {
+        my %hash = %{ $self->tag_hash };
+        my %reverse = reverse %hash;
+        $self->{_reverse_tag_hash} = \%reverse;
+    }
+    return $self->{_reverse_tag_hash};
+}
 
 
 =head1 AUTHOR
