@@ -140,17 +140,28 @@ sub process {
 
 
 sub blkstring {
-    my ($self, $start_stop, $format, $block) = @_;
+    my ($self, @args) = @_;
+    return $self->_get_block_string(@args, $self->blk_table);
+}
+
+sub inlineblk {
+    my ($self, @args) = @_;
+    return $self->_get_block_string(@args, $self->inline_table);
+}
+
+sub _get_block_string {
+    my ($self, $start_stop, $format, $block, $table) = @_;
+    die "Wrong usage! Missing params $start_stop, $format, $block, $table\n"
+      unless ($start_stop && $format && $block && $table);
     die "Wrong usage!\n" unless ($start_stop eq 'stop' or
                                  $start_stop eq 'start');
     die "Wrong usage!\n" unless ($format eq 'ltx' or
                                  $format eq 'html');
-
-    my $string = $self->blk_table->{$block}->{$start_stop}->{$format};
-    die "$start_stop $block doesn't exist\n" . Dumper($self->blk_table) 
-      unless  $string;
-    return $string;
+    die "Table is missing an element $start_stop $format $block "
+      unless exists $table->{$block}->{$start_stop}->{$format};
+    return $table->{$block}->{$start_stop}->{$format};
 }
+
 
 sub manage_regular {
     my ($self, $format, $el) = @_;
