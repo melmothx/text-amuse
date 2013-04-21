@@ -16,6 +16,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
+        'Test::Memory::Cycle' => 0,
     },
     PREREQ_PM => {
         #'ABC'              => 1.6,
