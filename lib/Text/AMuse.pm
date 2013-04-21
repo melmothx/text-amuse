@@ -165,8 +165,164 @@ sub _get_block_string {
 
 sub manage_regular {
     my ($self, $format, $el) = @_;
-    return "String $format: " . $el->string . "\n";
+    my $string = $el->string;
+    return "" unless defined $string;
+    my $linkre = $self->link_re;
+    # split at [[ ]] to avoid the mess
+    my @pieces = split /($linkre)/, $el->string;
+    my @out;
+    while (@pieces) {
+        my $l = shift @pieces;
+        if ($l =~ m/^$linkre$/s) {
+            push @out, $self->linkify_links($format, $l);
+        } else {
+            next if $l eq ""; # no text!
+
+            # convert the muse markup to tags
+            $l = $self->muse_inline_syntax_to_tags($l);
+
+            # here we have different routines
+            if ($format eq 'ltx') {
+                $l = $self->escape_tex($l);
+                $l = $self->tex_replace_ldots($l);
+                $l = $self->muse_inline_syntax_to_ltx($l);
+            }
+            elsif ($format eq 'html') {
+                $l = $self->escape_html($l);
+            }
+            else {
+                die "Wrong format $format for $l in manage_regular\n";
+            }
+        }
+        push @out, $l;
+    }
+    return join("", @out);
 }
+
+sub escape_tex {
+    my ($self, $string) = @_;
+    $string =~ s/\\/\\textbackslash{}/g;
+    $string =~ s/#/\\#/g ;
+    $string =~ s/\$/\\\$/g;
+    $string =~ s/%/\\%/g;
+    $string =~ s/&/\\&/g;
+    $string =~ s/_/\\_/g ;
+    $string =~ s/{/\\{/g ;
+    $string =~ s/}/\\}/g ;
+    $string =~ s/\\textbackslash\\{\\}/\\textbackslash{}/g;
+    $string =~ s/~/\\textasciitilde{}/g ;
+    $string =~ s/\^/\\^{}/g ;
+    $string =~ s/\|/\\textbar{}/g;
+    return $string;
+}
+
+sub tex_replace_ldots {
+    my ($self, $string) = @_;
+    my $ldots = "\\dots{}";
+    $string =~ s/\.{3,4}/$ldots/g ;
+    $string =~ s/\x{2026}/$ldots/g;
+    return $string;
+}
+
+
+sub escape_all_html {
+    my ($self, $string) = @_;
+    $string =~ s/&/&amp;/g;
+    $string =~ s/</&lt;/g;
+    $string =~ s/>/&gt;/g;
+    $string =~ s/"/&quot;/g;
+    $string =~ s/'/&#x27;/g;
+    return $string;
+}
+
+sub muse_inline_syntax_to_ltx {
+    my ($self, $string) = @_;
+    $string =~ s!<strong>(.+?)</strong>!\\textbf{$1}!gs;
+    $string =~ s!<em>(.+?)</em>!\\emph{$1}!gs;
+    $string =~ s!<code>(.+?)</code>!\\texttt{$1}!gs;
+    # the same
+    $string =~ s!<strike>(.+?)</strike>!\\sout{$1}!gs;
+    $string =~ s!<del>(.+?)</del>!\\sout{$1}!gs;
+    $string =~ s!<sup>(.+?)</sup>!\\textsuperscript{$1}!gs;
+    $string =~ s!<sub>(.+?)</sub>!\\textsubscript{$1}!gs;
+    $string =~ s!^[\s]*<br ?/?>[\s]*$!\n\\bigskip\n!gm;
+    $string =~ s!<br ?/?>!\\forcelinebreak !gs;
+    return $string;
+}
+
+sub escape_html {
+    my ($self, $string) = @_;
+    $string = $self->remove_permitted_html($string);
+    $string = $self->escape_all_html($string);
+    $string = $self->restore_permitted_html($string);
+    return $string;
+}
+
+sub remove_permitted_html {
+    my ($self, $string) = @_;
+    foreach my $tag (keys %{ $self->tag_hash }) {
+        # only matched pairs, so we avoid a lot of problems
+        # we also use private unicode codepoints to mark start and end
+        my $marker = $self->tag_hash->{$tag};
+        my $startm = "\x{f0001}${marker}\x{f0002}";
+        my $stopm  = "\x{f0003}${marker}\x{f0004}";
+        $string =~ s!<$tag>
+                     (.*?)
+                     </$tag>
+                    !$startm$1$stopm!gsx;
+    };
+    my $brhash = $self->br_hash;
+    $string =~ s!<br */*>!\x{f0001}$brhash\x{f0002}!gs;
+    return $string;
+}
+
+sub restore_permitted_html {
+    my ($self, $string) = @_;
+    foreach my $hash (keys %{ $self->reverse_tag_hash }) {
+        my $orig = $self->reverse_tag_hash->{$hash};
+        $string =~ s!\x{f0001}$hash\x{f0002}!<$orig>!gs;
+        $string =~ s!\x{f0003}$hash\x{f0004}!</$orig>!gs;
+    }
+    my $brhash = $self->br_hash;
+    $string =~ s!\x{f0001}$brhash\x{f0002}!<br />!gs;
+    return $string;
+}
+
+
+
+sub muse_inline_syntax_to_tags {
+    my ($self, $string) = @_;
+    # first, add a space around, so we don't need to check for ^ and $
+    $string = " " . $string . " ";
+    # the *, something not a space, the match (no * inside), something
+    # not a space, the *
+    my $something = qr{\*(?=\S)([^\*]+?)(?<=\S)\*};
+    # the same, but for =
+    my $somethingeq = qr{\=(?=\S)([^\=]+?)(?<=\S)\=};
+
+    # before and after the *, something not a word and not an *
+    $string =~ s{(?<=[^\*\w])\*\*
+                 $something
+                 \*\*(?=[^\*\w])}
+                {<strong><em>$1</em></strong>}gsx;
+    $string =~ s{(?<=[^\*\w])\*
+                 $something
+                 \*(?=[^\*\w])}
+                {<strong>$1</strong>}gsx;
+    $string =~ s{(?<=[^\*\w])
+                 $something
+                 (?=[^\*\w])}
+                {<em>$1</em>}gsx;
+    $string =~ s{(?<=[^\=\w])
+                 $somethingeq
+                 (?=[^\=\w])}
+                {<code>$1</code>}gsx;
+    # the full line without the 2 spaces added;
+    my $l = (length $string) - 2;
+    # return the string, starting from 1 and for the length of the string.
+    return substr($string, 1, $l);
+}
+
 
 sub manage_header {
     my ($self, $format, $el) = @_;
@@ -557,7 +713,6 @@ sub reverse_tag_hash {
     }
     return $self->{_reverse_tag_hash};
 }
-
 
 =head1 AUTHOR
 

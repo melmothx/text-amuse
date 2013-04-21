@@ -1,0 +1,7 @@
+#title Inline
+
+*em* <br> **strong** <br> ***emStrong*** =code= <em>em</em>
+<strong>strong</strong> <em><strong>EmStrong</em></strong>
+*em* **strong** ***emStrong*** =code= <em>em</em>
+<strong>strong</strong> <em><strong>EmStrong</em></strong>
+
