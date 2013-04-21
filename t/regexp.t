@@ -15,12 +15,12 @@ foreach my $url ("http://example.org",
                  "http://example.org:23423",
                  "http://example.org:23423/",
                  "http://example.org/?q=234&b=asdlklfj#helllo") {
-    ok($url =~ $document->url_re, "$url matches url");
+    ok($url =~ $document->output->url_re, "$url matches url");
     my $matched = $1;
     is($matched, $url, "$url is an url");
     foreach my $puct (")", ".", ";", "}", "]", " ", "\n") {
         my $string = $puct . $url . $puct;
-        ok($string =~ $document->url_re, "$string matches");
+        ok($string =~ $document->output->url_re, "$string matches");
         is($1, $url, "$url eq $1");
     }
 }
