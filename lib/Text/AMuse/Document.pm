@@ -219,13 +219,20 @@ sub document {
 =head3 get_footnote
 
 Accessor to the internal footnotes hash. You can access the footnote
-with a numerical argument.
+with a numerical argument or even with a string like [123]
 
 =cut
 
 sub get_footnote {
     my ($self, $arg) = @_;
     return undef unless $arg;
+    # ignore the brackets, if they are passed
+    if ($arg =~ m/([0-9]+)/) {
+        $arg = $1;
+    }
+    else {
+        return undef;
+    }
     if (exists $self->_raw_footnotes->{$arg}) {
         return $self->_raw_footnotes->{$arg};
     }

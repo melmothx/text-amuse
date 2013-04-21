@@ -11,7 +11,7 @@ my $document =
 
 ok($document->as_html);
 ok($document->as_latex);
-# print $document->as_latex;
+print $document->as_latex;
 
 $document =
   Text::AMuse->new(file => catfile(t => testfiles => 'inline.muse'),
@@ -35,3 +35,9 @@ TEX
 is($document->as_html, $exphtml);
 is($document->as_latex, $exptex);
 done_testing;
+
+$document = Text::AMuse->new(file => catfile(t => testfiles => 'footnotes.muse'),
+                             debug => 0);
+
+print $document->as_latex;
+

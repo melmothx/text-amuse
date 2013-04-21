@@ -64,6 +64,8 @@ sub document {
 
 =head3 output
 
+Accesso to the L<Text::AMuse::Output> object
+
 =cut
 
 sub output {
@@ -80,7 +82,7 @@ sub output {
 
 =head3 as_html
 
-Output the HTML document
+Output the HTML document (and cache it in the object)
 
 =cut
 
@@ -94,7 +96,7 @@ sub as_html {
 
 =head3 as_latex
 
-Output the (Xe)LaTeX document
+Output the (Xe)LaTeX document (and cache it in the object)
 
 =cut
 

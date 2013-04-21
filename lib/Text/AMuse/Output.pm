@@ -6,12 +6,13 @@ use utf8;
 sub new {
     my $class = shift;
     my %opts = @_;
+    die "Missing document object!\n" unless $opts{document};
     my $self = \%opts;
     bless $self, $class;
 }
 
 sub document {
-    return shift->{document}
+    return shift->{document};
 }
 
 
@@ -26,6 +27,7 @@ Return the string for format C<$type>, where $type can be "ltx" or
 sub process {
     my ($self, $format) = @_;
     my @pieces;
+    # loop over the parsed elements
     foreach my $el ($self->document->document) {
         if ($el->type eq 'startblock') {
             die "startblock with string passed!: " . $el->string if $el->string;
@@ -90,11 +92,17 @@ sub _get_block_string {
 
 sub manage_regular {
     my ($self, $format, $el) = @_;
-    my $string = $el->string;
+    my $string;
+    # we can accept even plain string;
+    if (ref($el) eq "") {
+        $string = $el;
+    } else {
+        $string = $el->string
+    }
     return "" unless defined $string;
     my $linkre = $self->link_re;
     # split at [[ ]] to avoid the mess
-    my @pieces = split /($linkre)/, $el->string;
+    my @pieces = split /($linkre)/, $string;
     my @out;
     while (@pieces) {
         my $l = shift @pieces;
@@ -119,9 +127,56 @@ sub manage_regular {
                 die "Wrong format $format for $l in manage_regular\n";
             }
         }
+        $l = $self->inline_footnotes($format, $l);
         push @out, $l;
     }
     return join("", @out);
+}
+
+sub inline_footnotes {
+    my $self = shift;
+    my ($format, $string) = @_;
+    my @output;
+    die "Wrong format $format" unless ($format eq 'ltx' or
+                                       $format eq 'html');
+    my $footnotere = $self->footnote_re;
+    return $string unless $string =~ m/($footnotere)/;
+    my @pieces = split /( *$footnotere)/, $string;
+    while (@pieces) {
+        my $piece = shift @pieces;
+        if ($piece =~ m/^( *)\[([0-9]+)\]$/s) {
+            my $space = $1 || "";
+            my $fn_num = $2;
+            my $footnote = $self->document->get_footnote($fn_num);
+            # here we have a bit of recursion, but it should be safe
+            if (defined $footnote) {
+                $footnote = $self->manage_regular($format, $footnote);
+                if ($format eq "ltx") {
+                    $footnote =~ s/\n/ /gs;
+                    $footnote =~ s/ +$//s;
+                    push @output, '\footnote{' . $footnote . '}';
+                }
+                elsif ($format eq "html") {
+                    push @output,
+                      "$space<a href=\"#fn${fn_num}\"". " "
+                        . "class=\"footnote\"" . " "
+                          . "id=\"fn_back${fn_num}\"" . ">["
+                            . $fn_num . "]</a>";
+                }
+                else {
+                    die "unknow type $format";
+                }
+            }
+            else {
+                warn "Missing footnote [$fn_num] in $string";
+                push @output, $piece;
+            }
+        }
+        else {
+            push @output, $piece;
+        }
+    }
+    return join("", @output);
 }
 
 sub escape_tex {
@@ -251,9 +306,12 @@ sub muse_inline_syntax_to_tags {
 
 sub manage_header {
     my ($self, $format, $el) = @_;
+    my $body = $self->manage_regular($format, $el);
+    # remove trailing spaces and \n
+    chomp $body;
     return $self->inlineblk(start => $format => $el->type) .
-      $self->manage_regular($format, $el) .
-        $self->inlineblk(stop => $format => $el->type);
+      $body .
+        $self->inlineblk(stop => $format => $el->type) . "\n";
 }
 
 sub manage_verse {
@@ -275,7 +333,7 @@ sub manage_table {
     my ($self, $format, $el) = @_;
     my $body = $el->string;
     # process
-    return $body;
+    return "\nTable\n" . $body . "\nEndTable";
 }
 
 sub manage_example {
@@ -602,6 +660,14 @@ sub url_re {
                              !x;
     }
     return $self->{_url_re};
+}
+
+sub footnote_re {
+    my $self = shift;
+    unless (defined $self->{_footnote_re}) {
+        $self->{_footnote_re} = qr{\[[0-9]+\]};
+    }
+    return $self->{_footnote_re};
 }
 
 sub br_hash {

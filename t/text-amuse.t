@@ -145,7 +145,7 @@ is($parsed[14]->type, "regular");
 is($parsed[16]->string, "Verse will not merge (of course)\n");
 is($parsed[16]->type, "verse");
 
-is($parsed[17]->string, "and we continue without merging (ugly but valid)\n");
+is($parsed[17]->string, "and we continue without merging (ugly but valid) [1]\n");
 is($parsed[17]->type, "regular");
 
 is($parsed[19]->string, "nor the example\n");

@@ -23,7 +23,7 @@ we continue without merging (ugly but valid)
 <verse>
 Verse will not merge (of course)
 </verse>
-and we continue without merging (ugly but valid)
+and we continue without merging (ugly but valid) [1]
 
 <example>
 nor the example

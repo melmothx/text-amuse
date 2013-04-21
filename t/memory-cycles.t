@@ -6,14 +6,15 @@ use File::Spec::Functions;
 use Data::Dumper;
 use Test::Memory::Cycle;
 
-plan tests => 3;
+plan tests => 6;
 
-my $document =
-  Text::AMuse->new(file => catfile(t => testfiles => 'packing.muse'),
-                   debug => 0);
-
-ok($document->as_html);
-ok($document->as_latex);
-
-memory_cycle_ok($document);
-
+my $document;
+foreach my $file (qw/packing.muse
+                     footnotes.muse/) {
+    $document =
+      Text::AMuse->new(file => catfile(t => testfiles => $file),
+                       debug => 1);
+    ok($document->as_html);
+    ok($document->as_latex);
+    memory_cycle_ok($document)
+}
