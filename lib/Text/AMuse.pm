@@ -511,12 +511,13 @@ sub image_re {
 sub url_re {
     my $self = shift;
     unless (defined $self->{_url_re}) {
-        $self->{_url_re} = qr!(www\.|https?:\/\/)
-                              [\w\-\.]+\.(\w+) # domain
-                              (:\d+)* # the port
-                              (/\S*?\w)? # everything else, but start
-                                         # with a slash and end with a
-                                         # a \w, and don't tolerate spaces
+        $self->{_url_re} = qr!((www\.|https?:\/\/)
+                              \w[\w\-\.]+\.\w+ # domain
+                              (:\d+)? # the port
+                              # everything else, but start with a
+                              # slash and end with a a \w, and don't
+                              # tolerate spaces
+                              (/(\S*\w)?)?)
                              !x;
     }
     return $self->{_url_re};
