@@ -2,13 +2,13 @@ use 5.010001;
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse;
+use Text::AMuse::Document;
 use File::Spec::Functions;
 use Data::Dumper;
 
 plan tests => 1;
 
-my $list = Text::AMuse->new(file => catfile(t => testfiles => 'unroll.muse'));
+my $list = Text::AMuse::Document->new(file => catfile(t => testfiles => 'unroll.muse'));
 
 my @got;
 

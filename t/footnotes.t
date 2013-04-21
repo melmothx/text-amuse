@@ -2,13 +2,13 @@ use 5.010001;
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse;
+use Text::AMuse::Document;
 use File::Spec::Functions;
 use Data::Dumper;
 
 plan tests => 6;
 
-my $fn = Text::AMuse->new(file => catfile(t => testfiles => 'footnotes.muse'));
+my $fn = Text::AMuse::Document->new(file => catfile(t => testfiles => 'footnotes.muse'));
 
 my @got = $fn->document;
 
