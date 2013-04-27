@@ -897,7 +897,7 @@ sub link_re {
 sub image_re {
     my $self = shift;
     unless (defined $self->{_image_re}) {
-        $self->{_image_re} = qr{([0-9a-zA-Z/-]+\.(png|jpe?g))};
+        $self->{_image_re} = qr{([0-9A-Za-z_-]+\.(png|jpe?g))};
     }
     return $self->{_image_re};
 }
