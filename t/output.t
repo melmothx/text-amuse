@@ -2,9 +2,9 @@ use strict;
 use warnings;
 use Test::More;
 use Text::AMuse;
-use File::Spec::Functions;
+use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
-use t::Utils qw/read_file/;
+use t::Utils qw/read_file write_to_file/;
 
 my $document =
   Text::AMuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -58,5 +58,7 @@ sub test_testfile {
     my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
     my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
     is ($document->as_latex, $latex, "LaTex for $base OK");
+    write_to_file(catfile(tmpdir() => "$base.out.html"), $document->as_html);
+    write_to_file(catfile(tmpdir() => "$base.out.ltx"), $document->as_latex);
     is ($document->as_html, $html, "HTML for $base OK");
 }

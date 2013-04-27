@@ -10,7 +10,7 @@ our @EXPORT_OK = qw/write_to_file
 
 
 sub write_to_file {
-    my ($file, @stuff);
+    my ($file, @stuff) = @_;
     open (my $fh, ">:encoding(utf-8)", $file) or die "Couldn't open $file $!";
     print $fh @stuff;
     close $fh;
