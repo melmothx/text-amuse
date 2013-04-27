@@ -10,4 +10,4 @@ BEGIN {
     use_ok( 'Text::Amuse' ) || print "Bail out!\n";
 }
 
-diag( "Testing Text::Amuse $Text::AMuse::VERSION, Perl $], $^X" );
+diag( "Testing Text::Amuse $Text::Amuse::VERSION, Perl $], $^X" );
