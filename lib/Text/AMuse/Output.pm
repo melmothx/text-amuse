@@ -86,7 +86,7 @@ sub manage_html_footnote {
     my ($self, $num) = @_;
     return unless $num;
     my $chunk = qq{\n<p class="fnline"><a class="footnotebody"} . " "
-      . qq{href="#fn_back$num" id="fn$num">[$num]</a>} .
+      . qq{href="#fn_back$num" id="fn$num">[$num]</a> } .
         $self->manage_regular(html => $self->document->get_footnote($num)) .
           qq{</p>\n};
 }
