@@ -99,8 +99,8 @@ is($parsed[3]->string,
 is($parsed[4]->type, "h2", "h2 ok");
 is($parsed[9]->type, "verse", "another verse");
 my $exppoetry = <<'EOF';
-A line of Emacs verse;
-  forgive its being so terse.
+A line of Emacs verse; [2]
+  forgive its being so terse. [3]
 
 In terms of terse verse,
         you could do worse. [1]
