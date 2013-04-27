@@ -15,6 +15,21 @@ sub document {
     return shift->{document};
 }
 
+sub add_footnote {
+    my ($self, $num) = @_;
+    return unless $num;
+    warn "no footnote found!" unless $self->document->get_footnote($num);
+    unless (defined $self->{_fn_list}) {
+        $self->{_fn_list} = [];
+    }
+    push @{$self->{_fn_list}}, $num;
+}
+
+sub flush_footnotes {
+    my $self = shift;
+    return unless (defined $self->{_fn_list});
+    return @{$self->{_fn_list}};
+}
 
 =head3 process ($type)
 
@@ -38,7 +53,7 @@ sub process {
             push @pieces, $self->blkstring(stop => $format => $el->block);
         }
         elsif ($el->type eq 'regular') {
-            push @pieces, $self->manage_regular($format => $el);
+            push @pieces, $self->manage_paragraph($format => $el);
         }
         elsif ($el->type =~ m/h[1-6]/) {
             push @pieces, $self->manage_header($format => $el);
@@ -60,9 +75,20 @@ sub process {
         }
     }
     if ($format eq 'html') {
-        # flush the footnotes, which are not embedded in the lines
+        foreach my $fn ($self->flush_footnotes) {
+            push @pieces, $self->manage_html_footnote($fn);
+        }
     }
     return join("", @pieces);
+}
+
+sub manage_html_footnote {
+    my ($self, $num) = @_;
+    return unless $num;
+    my $chunk = qq{\n<p class="fnline"><a class="footnotebody"} . " "
+      . qq{href="#fn_back$num id="fn$num">[$num]</a>} .
+        $self->manage_regular(html => $self->document->get_footnote($num)) .
+          qq{</p>\n};
 }
 
 
@@ -157,6 +183,8 @@ sub inline_footnotes {
                     push @output, '\footnote{' . $footnote . '}';
                 }
                 elsif ($format eq "html") {
+                    # in html, just remember the number
+                    $self->add_footnote($fn_num);
                     push @output,
                       "$space<a href=\"#fn${fn_num}\"". " "
                         . "class=\"footnote\"" . " "
@@ -304,6 +332,14 @@ sub muse_inline_syntax_to_tags {
 }
 
 
+sub manage_paragraph {
+    my ($self, $format, $el) = @_;
+    my $body = $self->manage_regular($format, $el);
+    chomp $body;
+    return $self->inlineblk(start => $format => "p") .
+      $body . $self->inlineblk(stop => $format => "p");
+}
+
 sub manage_header {
     my ($self, $format, $el) = @_;
     my $body = $self->manage_regular($format, $el);
@@ -356,6 +392,15 @@ sub inline_table {
     my $self = shift;
     unless (defined $self->{_inline_table}) {
         $self->{_inline_table} = {
+                                  p =>  { start => {
+                                                    ltx => "\n",
+                                                    html => "\n<p>",
+                                                   },
+                                          stop => {
+                                                   ltx => "\n\n",
+                                                   html => "</p>\n",
+                                                  },
+                                        },
                                   h1 => {
                                          start => {
                                                    ltx => "\\part{",
