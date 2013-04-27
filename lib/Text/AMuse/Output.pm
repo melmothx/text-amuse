@@ -3,6 +3,52 @@ use strict;
 use warnings;
 use utf8;
 
+=head2 Basic LaTeX preamble
+
+\documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{scrbook}
+\usepackage{graphicx}
+\usepackage{alltt}
+\usepackage{verbatim}
+\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
+\usepackage{bookmark}
+\usepackage[stable]{footmisc}
+\usepackage{enumerate}
+\usepackage{longtable}
+\usepackage[normalem]{ulem}
+
+% avoid breakage on multiple <br><br> and avoid the next [] to be eaten
+\newcommand*{\forcelinebreak}{~\\\relax}
+
+\newcommand*{\hairline}{%
+  \bigskip%
+  \noindent \hrulefill%
+  \bigskip%
+}
+
+% reverse indentation for biblio and play
+
+\newenvironment{amusebiblio}{
+  \leftskip=\parindent
+  \parindent=-\parindent
+  \bigskip
+}{\bigskip}
+
+\newenvironment{amuseplay}{
+  \leftskip=\parindent
+  \parindent=-\parindent
+  \bigskip
+}{\bigskip}
+
+
+
+
+
+=cut
+
+
+
+
+
 sub new {
     my $class = shift;
     my %opts = @_;
@@ -363,33 +409,46 @@ sub manage_header {
 
 sub manage_verse {
     my ($self, $format, $el) = @_;
-    my ($lead, $eol);
+    my ($lead, $eol, $stanzasep);
     if ($format eq 'html') {
         $lead = "&nbsp;";
         $eol = "<br />\n";
+        $stanzasep = "\n<br /><br />\n";
     }
     elsif ($format eq 'ltx') {
         $lead = "~";
         $eol = "\\forcelinebreak\n";
+        $stanzasep = "\n\n";
     }
     else {
         die "wtf $format?";
     }
+    my @stanza;
     my @out;
     my (@chunks) = split(/\n/, $el->string);
     foreach my $l (@chunks) {
-        if ($l =~ m/^( *)(.*)$/s) {
+        if ($l =~ m/^( *)(.+?)$/s) {
             my $leading = $lead x length($1);
             my $text = $self->manage_regular($format => $2);
-            push @out, $leading . $text;
+            push @stanza, $leading . $text;
+        }
+        elsif ($l =~ m/^\s*$/s) {
+            if (@stanza) {
+                push @out, join($eol, @stanza);
+                @stanza = ();
+            }
         }
         else {
             die "wtf?";
         }
     }
+    # flush the stanzas
+    if (@stanza) {
+        push @out, join($eol, @stanza);
+    }
     # process
     return $self->blkstring(start => $format => $el->type) .
-      join($eol, @out) . $self->blkstring(stop => $format => $el->type);
+      join($stanzasep, @out) . $self->blkstring(stop => $format => $el->type);
 }
 
 sub manage_comment {
