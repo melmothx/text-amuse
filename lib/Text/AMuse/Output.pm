@@ -64,7 +64,10 @@ sub document {
 sub add_footnote {
     my ($self, $num) = @_;
     return unless $num;
-    warn "no footnote found!" unless $self->document->get_footnote($num);
+    unless ($self->document->get_footnote($num)) {
+        warn "no footnote $num found!";
+        return;
+    }
     unless (defined $self->{_fn_list}) {
         $self->{_fn_list} = [];
     }
@@ -160,11 +163,15 @@ sub _get_block_string {
 sub manage_regular {
     my ($self, $format, $el) = @_;
     my $string;
+    my $recurse = 1;
     # we can accept even plain string;
     if (ref($el) eq "") {
         $string = $el;
     } else {
-        $string = $el->string
+        $string = $el->string;
+        if ($el->type eq 'footnote') {
+            $recurse = 0;
+        }
     }
     return "" unless defined $string;
     my $linkre = $self->link_re;
@@ -194,7 +201,9 @@ sub manage_regular {
                 die "Wrong format $format for $l in manage_regular\n";
             }
         }
-        $l = $self->inline_footnotes($format, $l);
+        if ($recurse) {
+            $l = $self->inline_footnotes($format, $l);
+        }
         push @out, $l;
     }
     return join("", @out);

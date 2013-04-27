@@ -18,3 +18,9 @@ foreach my $file (qw/packing.muse
     ok($document->as_latex);
     memory_cycle_ok($document)
 }
+
+$document =
+  Text::AMuse->new(file => catfile(t => testfiles => "recursiv.muse"));
+
+print $document->as_html;
+print $document->as_latex;
