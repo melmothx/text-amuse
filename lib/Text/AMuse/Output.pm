@@ -86,7 +86,7 @@ sub manage_html_footnote {
     my ($self, $num) = @_;
     return unless $num;
     my $chunk = qq{\n<p class="fnline"><a class="footnotebody"} . " "
-      . qq{href="#fn_back$num id="fn$num">[$num]</a>} .
+      . qq{href="#fn_back$num" id="fn$num">[$num]</a>} .
         $self->manage_regular(html => $self->document->get_footnote($num)) .
           qq{</p>\n};
 }
@@ -186,10 +186,8 @@ sub inline_footnotes {
                     # in html, just remember the number
                     $self->add_footnote($fn_num);
                     push @output,
-                      "$space<a href=\"#fn${fn_num}\"". " "
-                        . "class=\"footnote\"" . " "
-                          . "id=\"fn_back${fn_num}\"" . ">["
-                            . $fn_num . "]</a>";
+                      qq{$space<a href="#fn${fn_num}" class="footnote" } .
+                        qq{id="fn_back${fn_num}">[$fn_num]</a>};
                 }
                 else {
                     die "unknow type $format";
@@ -365,10 +363,33 @@ sub manage_header {
 
 sub manage_verse {
     my ($self, $format, $el) = @_;
-    my $body = $el->string;
+    my ($lead, $eol);
+    if ($format eq 'html') {
+        $lead = "&nbsp;";
+        $eol = "<br />\n";
+    }
+    elsif ($format eq 'ltx') {
+        $lead = "~";
+        $eol = "\\forcelinebreak\n";
+    }
+    else {
+        die "wtf $format?";
+    }
+    my @out;
+    my (@chunks) = split(/\n/, $el->string);
+    foreach my $l (@chunks) {
+        if ($l =~ m/^( *)(.*)$/s) {
+            my $leading = $lead x length($1);
+            my $text = $self->manage_regular($format => $2);
+            push @out, $leading . $text;
+        }
+        else {
+            die "wtf?";
+        }
+    }
     # process
     return $self->blkstring(start => $format => $el->type) .
-      $body . $self->blkstring(stop => $format => $el->type);
+      join($eol, @out) . $self->blkstring(stop => $format => $el->type);
 }
 
 sub manage_comment {
@@ -504,12 +525,12 @@ sub blk_table {
                                   verse => {
                                             start => {
                                                       tex => "\n\n\\startawikiverse\n",
-                                                      html => "<pre class=\"verse\">\n",
+                                                      html => "<div class=\"verse\">\n",
                                                       ltx => "\n\n\\begin{verse}\n",
                                                      },
                                             stop => {
                                                      tex => "\\stopawikiverse\n\n",
-                                                     html => "</pre>\n",
+                                                     html => "\n</div>\n",
                                                      ltx => "\n\\end{verse}\n\n",
                                                     },
                                            },
