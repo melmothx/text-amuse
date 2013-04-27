@@ -53,12 +53,19 @@ sub new {
     my $class = shift;
     my %opts = @_;
     die "Missing document object!\n" unless $opts{document};
-    my $self = \%opts;
+    die "Missing or wrong format!\n" unless ($opts{format} and ($opts{format} eq 'ltx' or
+                                                                $opts{format} eq 'html'));
+    my $self = { document => $opts{document},
+                 fmt => $opts{format} };
     bless $self, $class;
 }
 
 sub document {
     return shift->{document};
+}
+
+sub fmt {
+    return shift->{fmt};
 }
 
 sub add_footnote {
@@ -77,53 +84,54 @@ sub add_footnote {
 sub flush_footnotes {
     my $self = shift;
     return unless (defined $self->{_fn_list});
-    return @{$self->{_fn_list}};
+    # if we flush, we flush and forget, so we don't collect them again
+    # on the next call
+    return @{delete $self->{_fn_list}};
 }
 
-=head3 process ($type)
+=head3 process
 
-Return the string for format C<$type>, where $type can be "ltx" or
-"html".
+Return the string for the format defined in the constructor
 
 =cut
 
 
 sub process {
-    my ($self, $format) = @_;
+    my $self = shift;
     my @pieces;
     # loop over the parsed elements
     foreach my $el ($self->document->document) {
         if ($el->type eq 'startblock') {
             die "startblock with string passed!: " . $el->string if $el->string;
-            push @pieces, $self->blkstring(start => $format => $el->block);
+            push @pieces, $self->blkstring(start => $el->block);
         }
         elsif ($el->type eq 'stopblock') {
             die "stopblock with string passed!:" . $el->string if $el->string;
-            push @pieces, $self->blkstring(stop => $format => $el->block);
+            push @pieces, $self->blkstring(stop => $el->block);
         }
         elsif ($el->type eq 'regular') {
-            push @pieces, $self->manage_paragraph($format => $el);
+            push @pieces, $self->manage_paragraph($el);
         }
         elsif ($el->type =~ m/h[1-6]/) {
-            push @pieces, $self->manage_header($format => $el);
+            push @pieces, $self->manage_header($el);
         }
         elsif ($el->type eq 'verse') {
-            push @pieces, $self->manage_verse($format => $el);
+            push @pieces, $self->manage_verse($el);
         }
         elsif ($el->type eq 'comment') {
-            push @pieces, $self->manage_comment($format => $el);
+            push @pieces, $self->manage_comment($el);
         }
         elsif ($el->type eq 'table') {
-            push @pieces, $self->manage_table($format => $el);
+            push @pieces, $self->manage_table($el);
         }
         elsif ($el->type eq 'example') {
-            push @pieces, $self->manage_example($format => $el);
+            push @pieces, $self->manage_example($el);
         }
         else {
             die "Unrecognized element: " . Dumper($el);
         }
     }
-    if ($format eq 'html') {
+    if ($self->fmt eq 'html') {
         foreach my $fn ($self->flush_footnotes) {
             push @pieces, $self->manage_html_footnote($fn);
         }
@@ -136,32 +144,26 @@ sub manage_html_footnote {
     return unless $num;
     my $chunk = qq{\n<p class="fnline"><a class="footnotebody"} . " "
       . qq{href="#fn_back$num" id="fn$num">[$num]</a> } .
-        $self->manage_regular(html => $self->document->get_footnote($num)) .
+        $self->manage_regular($self->document->get_footnote($num)) .
           qq{</p>\n};
 }
 
 
-sub blkstring {
-    my ($self, @args) = @_;
-    return $self->_get_block_string(@args, $self->blk_table);
-}
-
-sub _get_block_string {
-    my ($self, $start_stop, $format, $block, $table) = @_;
-    die "Wrong usage! Missing params $start_stop, $format, $block, $table\n"
-      unless ($start_stop && $format && $block && $table);
+sub blkstring  {
+    my ($self, $start_stop, $block) = @_;
+    die "Wrong usage! Missing params $start_stop, $block"
+      unless ($start_stop && $block);
     die "Wrong usage!\n" unless ($start_stop eq 'stop' or
                                  $start_stop eq 'start');
-    die "Wrong usage!\n" unless ($format eq 'ltx' or
-                                 $format eq 'html');
-    die "Table is missing an element $start_stop $format $block "
-      unless exists $table->{$block}->{$start_stop}->{$format};
-    return $table->{$block}->{$start_stop}->{$format};
+    my $table = $self->blk_table;
+    die "Table is missing an element $start_stop  $block "
+      unless exists $table->{$block}->{$start_stop}->{$self->fmt};
+    return $table->{$block}->{$start_stop}->{$self->fmt};
 }
 
 
 sub manage_regular {
-    my ($self, $format, $el) = @_;
+    my ($self, $el) = @_;
     my $string;
     my $recurse = 1;
     # we can accept even plain string;
@@ -181,7 +183,7 @@ sub manage_regular {
     while (@pieces) {
         my $l = shift @pieces;
         if ($l =~ m/^$linkre$/s) {
-            push @out, $self->linkify_links($format, $l);
+            push @out, $self->linkify_links($l);
         } else {
             next if $l eq ""; # no text!
 
@@ -189,20 +191,17 @@ sub manage_regular {
             $l = $self->muse_inline_syntax_to_tags($l);
 
             # here we have different routines
-            if ($format eq 'ltx') {
+            if ($self->fmt eq 'ltx') {
                 $l = $self->escape_tex($l);
                 $l = $self->tex_replace_ldots($l);
                 $l = $self->muse_inline_syntax_to_ltx($l);
             }
-            elsif ($format eq 'html') {
+            elsif ($self->fmt eq 'html') {
                 $l = $self->escape_html($l);
-            }
-            else {
-                die "Wrong format $format for $l in manage_regular\n";
             }
         }
         if ($recurse) {
-            $l = $self->inline_footnotes($format, $l);
+            $l = $self->inline_footnotes($l);
         }
         push @out, $l;
     }
@@ -210,11 +209,8 @@ sub manage_regular {
 }
 
 sub inline_footnotes {
-    my $self = shift;
-    my ($format, $string) = @_;
+    my ($self, $string) = @_;
     my @output;
-    die "Wrong format $format" unless ($format eq 'ltx' or
-                                       $format eq 'html');
     my $footnotere = $self->footnote_re;
     return $string unless $string =~ m/($footnotere)/;
     my @pieces = split /( *$footnotere)/, $string;
@@ -226,21 +222,18 @@ sub inline_footnotes {
             my $footnote = $self->document->get_footnote($fn_num);
             # here we have a bit of recursion, but it should be safe
             if (defined $footnote) {
-                $footnote = $self->manage_regular($format, $footnote);
-                if ($format eq "ltx") {
+                $footnote = $self->manage_regular($footnote);
+                if ($self->fmt eq "ltx") {
                     $footnote =~ s/\n/ /gs;
                     $footnote =~ s/ +$//s;
                     push @output, '\footnote{' . $footnote . '}';
                 }
-                elsif ($format eq "html") {
+                elsif ($self->fmt eq "html") {
                     # in html, just remember the number
                     $self->add_footnote($fn_num);
                     push @output,
                       qq{$space<a href="#fn${fn_num}" class="footnote" } .
                         qq{id="fn_back${fn_num}">[$fn_num]</a>};
-                }
-                else {
-                    die "unknow type $format";
                 }
             }
             else {
@@ -256,15 +249,12 @@ sub inline_footnotes {
 }
 
 sub safe {
-    my ($self, $format, $string) = @_;
-    if ($format eq 'ltx') {
+    my ($self, $string) = @_;
+    if ($self->fmt eq 'ltx') {
         return $self->escape_tex($string);
     }
-    elsif ($format eq 'html') {
+    elsif ($self->fmt eq 'html') {
         return $self->escape_all_html($string);
-    }
-    else {
-        die "Wtf?"
     }
 }
 
@@ -394,38 +384,35 @@ sub muse_inline_syntax_to_tags {
 
 
 sub manage_paragraph {
-    my ($self, $format, $el) = @_;
-    my $body = $self->manage_regular($format, $el);
+    my ($self, $el) = @_;
+    my $body = $self->manage_regular($el);
     chomp $body;
-    return $self->blkstring(start => $format => "p") .
-      $body . $self->blkstring(stop => $format => "p");
+    return $self->blkstring(start  => "p") .
+      $body . $self->blkstring(stop => "p");
 }
 
 sub manage_header {
-    my ($self, $format, $el) = @_;
-    my $body = $self->manage_regular($format, $el);
+    my ($self, $el) = @_;
+    my $body = $self->manage_regular($el);
     # remove trailing spaces and \n
     chomp $body;
-    return $self->blkstring(start => $format => $el->type) .
+    return $self->blkstring(start => $el->type) .
       $body .
-        $self->blkstring(stop => $format => $el->type) . "\n";
+        $self->blkstring(stop => $el->type) . "\n";
 }
 
 sub manage_verse {
-    my ($self, $format, $el) = @_;
+    my ($self, $el) = @_;
     my ($lead, $eol, $stanzasep);
-    if ($format eq 'html') {
+    if ($self->fmt eq 'html') {
         $lead = "&nbsp;";
         $eol = "<br />\n";
         $stanzasep = "\n<br /><br />\n";
     }
-    elsif ($format eq 'ltx') {
+    elsif ($self->fmt eq 'ltx') {
         $lead = "~";
         $eol = "\\forcelinebreak\n";
         $stanzasep = "\n\n";
-    }
-    else {
-        die "wtf $format?";
     }
     my @stanza;
     my @out;
@@ -433,7 +420,7 @@ sub manage_verse {
     foreach my $l (@chunks) {
         if ($l =~ m/^( *)(.+?)$/s) {
             my $leading = $lead x length($1);
-            my $text = $self->manage_regular($format => $2);
+            my $text = $self->manage_regular($2);
             push @stanza, $leading . $text;
         }
         elsif ($l =~ m/^\s*$/s) {
@@ -451,25 +438,25 @@ sub manage_verse {
         push @out, join($eol, @stanza);
     }
     # process
-    return $self->blkstring(start => $format => $el->type) .
-      join($stanzasep, @out) . $self->blkstring(stop => $format => $el->type);
+    return $self->blkstring(start => $el->type) .
+      join($stanzasep, @out) . $self->blkstring(stop => $el->type);
 }
 
 sub manage_comment {
-    my ($self, $format, $el) = @_;
-    my $body = $self->safe($format => $el->removed);
+    my ($self, $el) = @_;
+    my $body = $self->safe($el->removed);
     chomp $body;
-    return $self->blkstring(start => $format => $el->type) .
-      $body . $self->blkstring(stop => $format => $el->type);
+    return $self->blkstring(start => $el->type) .
+      $body . $self->blkstring(stop => $el->type);
 }
 
 sub manage_table {
-    my ($self, $format, $el) = @_;
+    my ($self, $el) = @_;
     my $thash = $self->_split_table_in_hash($el->string);
-    if ($format eq 'html') {
+    if ($self->fmt eq 'html') {
         return $self->manage_table_html($thash);
     }
-    elsif ($format eq 'ltx') {
+    elsif ($self->fmt eq 'ltx') {
         return $self->manage_table_ltx($thash);
     }
     else {
@@ -487,7 +474,7 @@ sub manage_table_html {
     # the hash is always defined
     if ($table->{caption} ne "") {
         push @out, "<caption>"
-          . $self->manage_regular(html => $table->{caption})
+          . $self->manage_regular($table->{caption})
             . "</caption>";
     }
 
@@ -501,7 +488,7 @@ sub manage_table_html {
             while (@$cells) {
                 my $cell = shift @$cells;
                 push @out, $map->{$tablepart}->{bcell},
-                  $self->manage_regular(html => $cell),
+                  $self->manage_regular($cell),
                     $map->{$tablepart}->{ecell},
                 }
             push @out, $map->{etr};
@@ -530,7 +517,7 @@ sub manage_table_ltx {
             }
             foreach my $cell (@$rt) {
                 # escape all!
-                push @row, $self->manage_regular(ltx => $cell);
+                push @row, $self->manage_regular($cell);
             }
             my $texrow = join(q{ & }, @row);
             push @{$out->{$t}}, $texrow . "  \\\\\n"
@@ -594,11 +581,12 @@ sub _split_table_in_hash {
 
 
 sub manage_example {
-    my ($self, $format, $el) = @_;
-    my $body = $self->safe($format => $el->string);
-    return $self->blkstring(start => $format => $el->type) .
-      $body . $self->blkstring(stop => $format => $el->type);
+    my ($self, $el) = @_;
+    my $body = $self->safe($el->string);
+    return $self->blkstring(start => $el->type) .
+      $body . $self->blkstring(stop => $el->type);
 }
+
 
 
 =head1 HELPERS

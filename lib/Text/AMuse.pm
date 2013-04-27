@@ -62,24 +62,6 @@ sub document {
 }
 
 
-=head3 output
-
-Accesso to the L<Text::AMuse::Output> object
-
-=cut
-
-sub output {
-    my $self = shift;
-    unless (defined $self->{_output_obj}) {
-        $self->{_output_obj} =
-          Text::AMuse::Output->new(
-                                   document => $self->document
-                                  );
-    }
-    return $self->{_output_obj};
-}
-
-
 =head3 as_html
 
 Output the HTML document (and cache it in the object)
@@ -89,9 +71,13 @@ Output the HTML document (and cache it in the object)
 sub as_html {
     my $self = shift;
     unless (defined $self->{_html_doc}) {
-        $self->{_html_doc} = $self->output->process("html");
+        $self->{_html_doc} =
+          Text::AMuse::Output->new(
+                                   document => $self->document,
+                                   format => 'html',
+                                  );
     }
-    return $self->{_html_doc} || "";
+    return $self->{_html_doc}->process;
 }
 
 =head3 as_latex
@@ -103,9 +89,13 @@ Output the (Xe)LaTeX document (and cache it in the object)
 sub as_latex {
     my $self = shift;
     unless (defined $self->{_ltx_doc}) {
-        $self->{_ltx_doc} = $self->output->process("ltx");
+        $self->{_ltx_doc} =
+          Text::AMuse::Output->new(
+                                   document => $self->document,
+                                   format => 'ltx',
+                                  );
     }
-    return $self->{_ltx_doc} || "";
+    return $self->{_ltx_doc}->process;
 }
 
 

@@ -1,12 +1,14 @@
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse;
+use Text::AMuse::Output;
 use File::Spec::Functions;
 use Data::Dumper;
 
-my $document =
-  Text::AMuse->new(file => catfile(t => testfiles => 'packing.muse'));
+my $obj = Text::AMuse::Output->new(
+                                   document => [],
+                                   format => "html",
+                                  );
 
 foreach my $url ("http://example.org",
                  "http://example.org/",
@@ -15,12 +17,12 @@ foreach my $url ("http://example.org",
                  "http://example.org:23423",
                  "http://example.org:23423/",
                  "http://example.org/?q=234&b=asdlklfj#helllo") {
-    ok($url =~ $document->output->url_re, "$url matches url");
+    ok($url =~ $obj->url_re, "$url matches url");
     my $matched = $1;
     is($matched, $url, "$url is an url");
     foreach my $puct (")", ".", ";", "}", "]", " ", "\n") {
         my $string = $puct . $url . $puct;
-        ok($string =~ $document->output->url_re, "$string matches");
+        ok($string =~ $obj->url_re, "$string matches");
         is($1, $url, "$url eq $1");
     }
 }
