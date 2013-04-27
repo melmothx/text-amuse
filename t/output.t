@@ -46,7 +46,7 @@ test_testfile("footnotes");
 test_testfile("verse");
 test_testfile("example-3");
 test_testfile("table");
-# test_testfile("links");
+test_testfile("links");
 done_testing;
 
 

@@ -183,7 +183,8 @@ sub manage_regular {
     while (@pieces) {
         my $l = shift @pieces;
         if ($l =~ m/^$linkre$/s) {
-            push @out, $self->linkify_links($l);
+            push @out, $self->linkify($l);
+            next;
         } else {
             next if $l eq ""; # no text!
 
@@ -588,6 +589,106 @@ sub manage_example {
 }
 
 
+=head2 Links management
+
+=head3 linkify($link)
+
+Here we see if it's a single one or a link/desc pair. Then dispatch
+
+=cut
+
+
+sub linkify {
+    my ($self, $link) = @_;
+    die "no link passed" unless defined $link;
+    if ($link =~ m/^\[\[
+                     \s*
+                     (.+?) # link
+                     \s*
+                     \]\[
+                     \s*
+                     (.+?) # desc
+                     \s*
+                     \]\]$
+                    /sx) {
+        return $self->format_links($1, $2);
+    }
+
+    elsif ($link =~ m/\[\[
+		   \s*
+		   (.+?) # link
+		   \s*
+		   \]\]/sx) {
+        return $self->format_single_link($1);
+    }
+
+    else {
+        die "Wtf??? $link"
+    }
+}
+
+sub format_links {
+    my ($self, $link, $desc) = @_;
+    $desc = $self->manage_regular($desc);
+    my $imagere = $self->image_re;
+    # first the images
+    if ($link =~ m/^$imagere$/) {
+        if ($self->fmt eq 'html') {
+            return qq{<div class="image">\n} .
+              qq{<img src="$link" alt="$link" class="embedimg" />\n} .
+                qq{<div class="caption">$desc</div>\n</div>};
+            }
+        elsif ($self->fmt eq 'ltx') {
+            return qq/\n\\begin{figure}[ht]\n/ .
+              qq/\\centering\n/ .
+                qq/\\includegraphics/ .
+                  qq/[width=\\textwidth]{$link}\n/ .
+                    qq/\\bigskip\n $desc/ .
+                      qq/\n\\end{figure}\n/;
+        }
+    }
+    # links
+    if ($self->fmt eq 'html') {
+        $link = $self->escape_all_html($link);
+        return qq{<a href="$link">$desc</a>};
+    }
+    elsif ($self->fmt eq 'ltx') {
+        return qq/\\href{/ .
+          $self->_url_safe_escape_latex($link) .
+            qq/}{$desc}/;
+    }
+}
+
+sub format_single_link {
+    my ($self, $link) = @_;
+    my $imagere = $self->image_re;
+    # the re matches only clean names, no need to escape anything
+    if ($link =~ m/^$imagere$/) {
+        if ($self->fmt eq 'html') {
+            return qq{<img src="$link" alt="$link" class="embedimg" />};
+        }
+        elsif ($self->fmt eq 'ltx') {
+            return qq/\n\\begin{figure}[ht]\n/ . qq/\\includegraphics/ .
+              qq/[width=\\textwidth]{$link}/ . qq/\n\\end{figure}\n/;
+        }
+    }
+    if ($self->fmt eq 'html') {
+        $link = $self->escape_all_html($link);
+        return qq{<a href="$link">$link</a>};
+    }
+    elsif ($self->fmt eq 'ltx') {
+        return "\\url{" . $self->_url_safe_escape_latex($link) . "}";
+    }
+}
+
+sub _url_safe_escape_latex {
+  my ($self, $string) = @_;
+  utf8::encode($string);
+  $string =~ s/([^0-9a-zA-Z\.\/\:_\%\&\#\?\=\-])
+	      /sprintf("%%%02X", ord ($1))/gesx;
+  return $self->safe($string);
+}
+
 
 =head1 HELPERS
 
@@ -885,7 +986,7 @@ sub link_re {
 sub image_re {
     my $self = shift;
     unless (defined $self->{_image_re}) {
-        $self->{_image_re} = qr{([0-9A-Za-z_-]+\.(png|jpe?g))};
+        $self->{_image_re} = qr{(\w[0-9A-Za-z/-]+\.(png|jpe?g))};
     }
     return $self->{_image_re};
 }
