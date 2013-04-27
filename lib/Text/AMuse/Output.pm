@@ -207,6 +207,19 @@ sub inline_footnotes {
     return join("", @output);
 }
 
+sub safe {
+    my ($self, $format, $string) = @_;
+    if ($format eq 'ltx') {
+        return $self->escape_tex($string);
+    }
+    elsif ($format eq 'html') {
+        return $self->escape_all_html($string);
+    }
+    else {
+        die "Wtf?"
+    }
+}
+
 sub escape_tex {
     my ($self, $string) = @_;
     $string =~ s/\\/\\textbackslash{}/g;
@@ -354,15 +367,16 @@ sub manage_verse {
     my ($self, $format, $el) = @_;
     my $body = $el->string;
     # process
-    return $self->inlineblk(start => $format => $el->type) .
-      $body . $self->inlineblk(stop => $format => $el->type);
+    return $self->blkstring(start => $format => $el->type) .
+      $body . $self->blkstring(stop => $format => $el->type);
 }
 
 sub manage_comment {
     my ($self, $format, $el) = @_;
-    my $body = $el->removed;
-    return $self->inlineblk(start => $format => $el->type) .
-      $body . $self->inlineblk(stop => $format => $el->type);
+    my $body = $self->safe($format => $el->removed);
+    chomp $body;
+    return $self->blkstring(start => $format => $el->type) .
+      $body . $self->blkstring(stop => $format => $el->type);
 }
 
 sub manage_table {
@@ -375,8 +389,8 @@ sub manage_table {
 sub manage_example {
     my ($self, $format, $el) = @_;
     my $body = $el->string;
-    return $self->inlineblk(start => $format => $el->type) .
-      $body . $self->inlineblk(stop => $format => $el->type);
+    return $self->blkstring(start => $format => $el->type) .
+      $body . $self->blkstring(stop => $format => $el->type);
 }
 
 
@@ -452,6 +466,15 @@ sub inline_table {
                                                  }
                                         },
 
+                                 };
+    }
+    return $self->{_inline_table};
+}
+
+sub blk_table {
+    my $self = shift;
+    unless (defined $self->{_blk_table}) {
+        $self->{_blk_table} = {
                                   example => { 
                                               start => { 
                                                         tex => "{\n\\startlines[space=on,style=\\tt]\n",
@@ -474,7 +497,7 @@ sub inline_table {
                                                        },
                                               stop => {
                                                        tex => "\n\\stopcomment\n",
-                                                       html => "\n<span class=\"commentmarker\">END_COMMENT}}:</span></div><!-- stop comment -->\n",  
+                                                       html => "\n<span class=\"commentmarker\">END_COMMENT}}:</span>\n</div>\n<!-- stop comment -->\n",  
                                                        ltx => "\n\\end{comment}\n\n",
                                                       },
                                              },
@@ -490,15 +513,6 @@ sub inline_table {
                                                      ltx => "\n\\end{verse}\n\n",
                                                     },
                                            },
-                                 };
-    }
-    return $self->{_inline_table};
-}
-
-sub blk_table {
-    my $self = shift;
-    unless (defined $self->{_blk_table}) {
-        $self->{_blk_table} = {
                                quote => {
                                          start => {
                                                    tex => "\n\\startblockquote\n",
