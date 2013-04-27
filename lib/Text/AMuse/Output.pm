@@ -143,11 +143,6 @@ sub blkstring {
     return $self->_get_block_string(@args, $self->blk_table);
 }
 
-sub inlineblk {
-    my ($self, @args) = @_;
-    return $self->_get_block_string(@args, $self->inline_table);
-}
-
 sub _get_block_string {
     my ($self, $start_stop, $format, $block, $table) = @_;
     die "Wrong usage! Missing params $start_stop, $format, $block, $table\n"
@@ -393,8 +388,8 @@ sub manage_paragraph {
     my ($self, $format, $el) = @_;
     my $body = $self->manage_regular($format, $el);
     chomp $body;
-    return $self->inlineblk(start => $format => "p") .
-      $body . $self->inlineblk(stop => $format => "p");
+    return $self->blkstring(start => $format => "p") .
+      $body . $self->blkstring(stop => $format => "p");
 }
 
 sub manage_header {
@@ -402,9 +397,9 @@ sub manage_header {
     my $body = $self->manage_regular($format, $el);
     # remove trailing spaces and \n
     chomp $body;
-    return $self->inlineblk(start => $format => $el->type) .
+    return $self->blkstring(start => $format => $el->type) .
       $body .
-        $self->inlineblk(stop => $format => $el->type) . "\n";
+        $self->blkstring(stop => $format => $el->type) . "\n";
 }
 
 sub manage_verse {
@@ -481,11 +476,10 @@ Methods providing some fixed values
 =cut
 
 
-
-sub inline_table {
+sub blk_table {
     my $self = shift;
-    unless (defined $self->{_inline_table}) {
-        $self->{_inline_table} = {
+    unless (defined $self->{_blk_table}) {
+        $self->{_blk_table} = {
                                   p =>  { start => {
                                                     ltx => "\n",
                                                     html => "\n<p>",
@@ -545,16 +539,6 @@ sub inline_table {
                                                   html => "</h6>\n"
                                                  }
                                         },
-
-                                 };
-    }
-    return $self->{_inline_table};
-}
-
-sub blk_table {
-    my $self = shift;
-    unless (defined $self->{_blk_table}) {
-        $self->{_blk_table} = {
                                   example => { 
                                               start => { 
                                                         tex => "{\n\\startlines[space=on,style=\\tt]\n",
