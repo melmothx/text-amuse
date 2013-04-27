@@ -505,6 +505,49 @@ sub manage_table_html {
 
 sub manage_table_ltx {
     my ($self, $table) = @_;
+
+    my $total = 0;
+    my $out = {
+               body => [],
+               head => [],
+               foot => [],
+              };
+    foreach my $t (qw/body head foot/) {
+        foreach my $rt (@{$table->{$t}}) {
+            my @row;
+            # update the counter
+            if (@$rt > $total) {
+                $total = scalar @$rt;
+            }
+            foreach my $cell (@$rt) {
+                # escape all!
+                push @row, $self->manage_regular(ltx => $cell);
+            }
+            my $texrow = join(q{ & }, @row);
+            push @{$out->{$t}}, $texrow . "  \\\\\n"
+        }
+    }
+    # then we loop over what we have. First head, then body, and
+    # finally foot print "found $total fields\n";
+    
+    my $textable = "\\begin{table}[htp]\n\\centering\n\\begin{tabular}{" ;
+      $textable .= "|c" x $total; $textable .= "|}\n";
+    if (my @head = @{$out->{head}}) {
+        $textable .= "\\hline\n" . join("", @head);
+    }
+    if (my @body = @{$out->{body}}) {
+        $textable .= "\\hline\n" . join("", @body);
+    }
+    if (my @foot = @{$out->{foot}}) {
+        $textable .= "\\hline\n" . join("", @foot);
+    }
+    $textable .= "\\hline\n\\end{tabular}\n";
+    if (my $caption = $table->{caption}) {
+        $textable .= "\n" . $caption . "\n\n";
+    }
+    $textable .= "\\end{table}\n";
+    # print $textable;
+    return $textable;
 }
 
 
