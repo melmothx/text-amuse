@@ -43,9 +43,8 @@ is($document->as_latex, $exptex);
 
 test_testfile("comments");
 test_testfile("footnotes");
-
 test_testfile("verse");
-
+test_testfile("example-3");
 done_testing;
 
 
@@ -53,12 +52,10 @@ sub test_testfile {
     my $base = shift;
     $document = Text::AMuse->new(file => catfile(t => testfiles => "$base.muse"),
                                  debug => 0);
-    print $document->as_latex;
-    print $document->as_html;
+    write_to_file(catfile(tmpdir() => "$base.out.html"), $document->as_html);
+    write_to_file(catfile(tmpdir() => "$base.out.ltx"), $document->as_latex);
     my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
     my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
     is ($document->as_latex, $latex, "LaTex for $base OK");
-    write_to_file(catfile(tmpdir() => "$base.out.html"), $document->as_html);
-    write_to_file(catfile(tmpdir() => "$base.out.ltx"), $document->as_latex);
     is ($document->as_html, $html, "HTML for $base OK");
 }

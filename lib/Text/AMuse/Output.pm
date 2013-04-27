@@ -468,7 +468,7 @@ sub manage_table {
 
 sub manage_example {
     my ($self, $format, $el) = @_;
-    my $body = $el->string;
+    my $body = $self->safe($format => $el->string);
     return $self->blkstring(start => $format => $el->type) .
       $body . $self->blkstring(stop => $format => $el->type);
 }
