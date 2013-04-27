@@ -45,6 +45,7 @@ test_testfile("comments");
 test_testfile("footnotes");
 test_testfile("verse");
 test_testfile("example-3");
+test_testfile("table");
 done_testing;
 
 

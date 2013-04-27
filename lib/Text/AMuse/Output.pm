@@ -456,10 +456,90 @@ sub manage_comment {
 
 sub manage_table {
     my ($self, $format, $el) = @_;
-    my $body = $el->string;
-    # process
-    return "\nTable\n" . $body . "\nEndTable";
+    my $thash = $self->_split_table_in_hash($el->string);
+    if ($format eq 'html') {
+        return $self->manage_table_html($thash);
+    }
+    elsif ($format eq 'ltx') {
+        return $self->manage_table_ltx($thash);
+    }
+    else {
+        die "wtf?"
+    }
 }
+
+sub manage_table_html {
+    my ($self, $table) = @_;
+    my @out;
+    my $map = $self->html_table_mapping;
+    # here it's full of hardcoded things, but it can't be done differently
+    push @out, "\n<table>";
+
+    # the hash is always defined
+    if ($table->{caption} ne "") {
+        push @out, "<caption>"
+          . $self->manage_regular(html => $table->{caption})
+            . "</caption>";
+    }
+
+    foreach my $tablepart (qw/head foot body/) {
+        next unless @{$table->{$tablepart}};
+        push @out, $map->{$tablepart}->{b};
+        while (@{$table->{$tablepart}}) {
+            my $cells = shift @{$table->{$tablepart}};
+
+            push @out, $map->{btr};
+            while (@$cells) {
+                my $cell = shift @$cells;
+                push @out, $map->{$tablepart}->{bcell},
+                  $self->manage_regular(html => $cell),
+                    $map->{$tablepart}->{ecell},
+                }
+            push @out, $map->{etr};
+        }
+        push @out, $map->{$tablepart}->{e};
+    }
+    push @out, "</table>\n";
+    return join("\n", @out);
+}
+
+sub manage_table_ltx {
+    my ($self, $table) = @_;
+}
+
+
+
+
+sub _split_table_in_hash {
+    my ($self, $table) = @_;
+    return {} unless $table;
+    my $output = {
+                  "caption" => "",
+                  "body" => [],
+                  "head" => [],
+                  "foot" => [],
+                 };
+    foreach my $row (split "\n", $table) {
+        if ($row =~ m/^\s*\|\+\s*(.+?)\s*\+\|\s*$/) {
+            $output->{caption} = $1;
+            next
+        }
+        # clean up the chunk
+        $row =~ s/^\s*\|+(.+?)\|+\s*$/$1/gm;
+        if ($row =~ m/\|\|\|/) {
+            my @fcells = split /\|+/, $row;
+            push @{$output->{foot}}, \@fcells;
+        } elsif ($row =~ m/\|\|/) {
+            my @hcells = split /\|+/, $row;
+            push @{$output->{head}}, \@hcells;
+        } else {
+            my @cells = split /\|+/, $row;
+            push @{$output->{body}}, \@cells;
+        }
+    }
+    return $output;
+}
+
 
 sub manage_example {
     my ($self, $format, $el) = @_;
@@ -829,6 +909,30 @@ sub reverse_tag_hash {
 }
 
 
-
+sub html_table_mapping {
+    my $self = shift;
+    return {
+            head => {
+                     b => " <thead>",
+                     e => " </thead>",
+                     bcell => "   <th>",
+                     ecell => "   </th>",
+                    },
+            foot => {
+                     b => " <tfoot>",
+                     e => " </tfoot>",
+                     bcell => "   <td>",
+                     ecell => "   </td>",
+                    },
+            body => {
+                     b => " <tbody>",
+                     e => " </tbody>",
+                     bcell => "   <td>",
+                     ecell => "   </td>",
+                    },
+            btr => "  <tr>",
+            etr => "  </tr>",
+           };
+}
 
 1;
