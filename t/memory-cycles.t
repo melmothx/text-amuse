@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse;
+use Text::Amuse;
 use File::Spec::Functions;
 use Data::Dumper;
 use Test::Memory::Cycle;
@@ -12,7 +12,7 @@ my $document;
 foreach my $file (qw/packing.muse
                      footnotes.muse/) {
     $document =
-      Text::AMuse->new(file => catfile(t => testfiles => $file),
+      Text::Amuse->new(file => catfile(t => testfiles => $file),
                        debug => 1);
     ok($document->as_html);
     ok($document->as_latex);
@@ -20,7 +20,7 @@ foreach my $file (qw/packing.muse
 }
 
 $document =
-  Text::AMuse->new(file => catfile(t => testfiles => "recursiv.muse"));
+  Text::Amuse->new(file => catfile(t => testfiles => "recursiv.muse"));
 
 print $document->as_html;
 print $document->as_latex;

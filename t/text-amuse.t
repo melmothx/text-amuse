@@ -2,7 +2,7 @@ use 5.010001;
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse::Document;
+use Text::Amuse::Document;
 use File::Spec::Functions;
 use Data::Dumper;
 
@@ -11,7 +11,7 @@ plan tests => 81;
 diag "Constructor";
 
 my $testfile = catfile(t => testfiles =>  'prova.muse');
-my $muse = Text::AMuse::Document->new(file => $testfile, debug => 1);
+my $muse = Text::Amuse::Document->new(file => $testfile, debug => 1);
 
 is($muse->filename, $testfile, "filename ok");
 my @expected = (
@@ -47,7 +47,7 @@ foreach my $el ($muse->parsed_body) {
 }
 
 my $example =
-  Text::AMuse::Document->new(file => catfile(t => testfiles => 'example.muse'));
+  Text::Amuse::Document->new(file => catfile(t => testfiles => 'example.muse'));
 
 $example->_catch_example;
 my @parsed = $example->parsed_body;
@@ -58,7 +58,7 @@ is($parsed[2]->string, "", "Third is empty");
 is($parsed[3]->type, "example", "Type set to example");
 is($parsed[4]->string, "", "Last is empty");
 
-$example = Text::AMuse::Document->new(file => catfile(t => testfiles => 'example-2.muse'));
+$example = Text::Amuse::Document->new(file => catfile(t => testfiles => 'example-2.muse'));
 
 $example->_catch_example;
 @parsed = $example->parsed_body;
@@ -85,7 +85,7 @@ is($parsed[3]->string, $expected_example, "Content looks ok");
 
 # dump_content($example);
 
-my $poetry = Text::AMuse::Document->new(file => testfile("verse.muse"),
+my $poetry = Text::Amuse::Document->new(file => testfile("verse.muse"),
                               debug => 1);
 
 $poetry->_catch_example;
@@ -115,7 +115,7 @@ is($parsed[10]->string, "The author\n", "Footnote ok");
 # print $parsed[9]->string;
 # dump_content($poetry);
 
-my $packs = Text::AMuse::Document->new(file => catfile(t => testfiles => 'packing.muse'));
+my $packs = Text::Amuse::Document->new(file => catfile(t => testfiles => 'packing.muse'));
 $packs->_catch_example;
 $packs->_catch_verse;
 $packs->_pack_lines;

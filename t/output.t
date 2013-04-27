@@ -1,19 +1,19 @@
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse;
+use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
 use t::Utils qw/read_file write_to_file/;
 
 my $document =
-  Text::AMuse->new(file => catfile(t => testfiles => 'packing.muse'),
+  Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
                    debug => 0);
 
 ok($document->as_html);
 ok($document->as_latex);
 $document =
-  Text::AMuse->new(file => catfile(t => testfiles => 'inline.muse'),
+  Text::Amuse->new(file => catfile(t => testfiles => 'inline.muse'),
                    debug => 0);
 
 my $exphtml = << 'HTML';
@@ -52,7 +52,7 @@ done_testing;
 
 sub test_testfile {
     my $base = shift;
-    $document = Text::AMuse->new(file => catfile(t => testfiles => "$base.muse"),
+    $document = Text::Amuse->new(file => catfile(t => testfiles => "$base.muse"),
                                  debug => 0);
     write_to_file(catfile(tmpdir() => "$base.out.html"), $document->as_html);
     write_to_file(catfile(tmpdir() => "$base.out.ltx"), $document->as_latex);

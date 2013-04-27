@@ -1,4 +1,4 @@
-package Text::AMuse::Output;
+package Text::Amuse::Output;
 use strict;
 use warnings;
 use utf8;

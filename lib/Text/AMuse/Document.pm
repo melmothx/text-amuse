@@ -1,9 +1,9 @@
-package Text::AMuse::Document;
+package Text::Amuse::Document;
 
 use 5.010001;
 use strict;
 use warnings;
-use Text::AMuse::Element;
+use Text::Amuse::Element;
 
 =head1 METHODS
 
@@ -154,7 +154,7 @@ sub raw_body {
 =head2 parsed_body (internal, but documented)
 
 Accessor to the list of parsed lines. Each line will come as a
-L<Text::AMuse::Element> object
+L<Text::Amuse::Element> object
 
 The first block is guaranteed to be a null block
 
@@ -168,9 +168,9 @@ sub parsed_body {
     return @{$self->{parsed_body}} if defined $self->{parsed_body};
     $self->_debug("Parsing body");
     # be sure to start with a null block
-    my @parsed = (Text::AMuse::Element->new("")); 
+    my @parsed = (Text::Amuse::Element->new("")); 
     foreach my $l ($self->raw_body) {
-        push @parsed, Text::AMuse::Element->new($l);
+        push @parsed, Text::Amuse::Element->new($l);
     }
     $self->{parsed_body} = \@parsed;
     return @{$self->{parsed_body}};
@@ -348,7 +348,7 @@ sub _process_lists {
             while (@listpile) {
                 my $pending = pop(@listpile)->{block};
                 # we create an element to close all
-                push @out, Text::AMuse::Element->new("</$pending>");
+                push @out, Text::Amuse::Element->new("</$pending>");
             }
             # push the element
             push @out, $el;
@@ -377,8 +377,8 @@ sub _process_lists {
                               indentation => $el->indentation };
             push @listpile, { block => "li",
                               indentation => $el->indentation };
-            push @out, Text::AMuse::Element->new("<$block>");
-            push @out, Text::AMuse::Element->new("<li>");
+            push @out, Text::Amuse::Element->new("<$block>");
+            push @out, Text::Amuse::Element->new("<li>");
             # change the type, it's a paragraph now
             $el->type('regular');
             push @out, $el;
@@ -399,7 +399,7 @@ sub _process_lists {
             # and while it's minor, pop the pile
             while ($el->indentation < $listpile[$#listpile]->{indentation}) {
                 my $pending = pop(@listpile)->{block};
-                push @out, Text::AMuse::Element->new("</$pending>");
+                push @out, Text::Amuse::Element->new("</$pending>");
             }
             # all done
             push @out, $el;
@@ -414,8 +414,8 @@ sub _process_lists {
         if ($el->indentation == $listpile[$#listpile]->{indentation}) {
             # if the indentation is equal, we don't need to touch the pile,
             # as it was useless to pop and push the same li element.
-            push @out, Text::AMuse::Element->new("</li>");
-            push @out, Text::AMuse::Element->new("<li>");
+            push @out, Text::Amuse::Element->new("</li>");
+            push @out, Text::Amuse::Element->new("<li>");
             push @out, $el;
             next;
         }
@@ -426,8 +426,8 @@ sub _process_lists {
                               indentation => $el->indentation };
             push @listpile, { block => "li",
                               indentation => $el->indentation };
-            push @out, Text::AMuse::Element->new("<$block>");
-            push @out, Text::AMuse::Element->new("<li>");
+            push @out, Text::Amuse::Element->new("<$block>");
+            push @out, Text::Amuse::Element->new("<li>");
             push @out, $el;
             next;
         }
@@ -435,12 +435,12 @@ sub _process_lists {
         while(@listpile and
               $el->indentation < $listpile[$#listpile]->{indentation}) {
             my $pending = pop(@listpile)->{block};
-            push @out, Text::AMuse::Element->new("</$pending>");
+            push @out, Text::Amuse::Element->new("</$pending>");
         }
         # here we reached the desired level
         if (@listpile) {
-            push @out, Text::AMuse::Element->new("</li>");
-            push @out, Text::AMuse::Element->new("<li>");
+            push @out, Text::Amuse::Element->new("</li>");
+            push @out, Text::Amuse::Element->new("<li>");
         }
         # if by chance, we emptied all, something is wrong, so start anew.
         else {
@@ -449,8 +449,8 @@ sub _process_lists {
                               indentation => $el->indentation };
             push @listpile, { block => "li",
                               indentation => $el->indentation };
-            push @out, Text::AMuse::Element->new("<$block>");
-            push @out, Text::AMuse::Element->new("<li>");
+            push @out, Text::Amuse::Element->new("<$block>");
+            push @out, Text::Amuse::Element->new("<li>");
 
         }
         push @out, $el;
@@ -460,7 +460,7 @@ sub _process_lists {
     while (@listpile) {
         my $pending = pop(@listpile)->{block};
         # we create an element to close all
-        push @out, Text::AMuse::Element->new("</$pending>");
+        push @out, Text::Amuse::Element->new("</$pending>");
     }
     foreach my $check (@out) {
         die "Found a stray type!" . $check->string . ":" . $check->type
@@ -477,9 +477,9 @@ sub _unroll_blocks {
         if ($el->can_be_regular) {
             my $block = $el->block;
             $el->block("");
-            push @out, Text::AMuse::Element->new("<$block>");
+            push @out, Text::Amuse::Element->new("<$block>");
             push @out, $el;
-            push @out, Text::AMuse::Element->new("</$block>");
+            push @out, Text::Amuse::Element->new("</$block>");
         }
         else { push @out, $el }
     }
@@ -545,7 +545,7 @@ sub _sanity_check {
             while (@pile) {
                 my $block = shift(@pile);
                 warn "Forcing the closing of $block\n";
-                push @out, Text::AMuse::Element->new("</$block>");
+                push @out, Text::Amuse::Element->new("</$block>");
             }
         }
         push @out, $el;
@@ -555,7 +555,7 @@ sub _sanity_check {
         my $block = shift(@pile);
         $self->_debug("forcing the closing of $block");
         # force the closing
-        push @out, Text::AMuse::Element->new("</$block>");
+        push @out, Text::Amuse::Element->new("</$block>");
     }
     $self->parsed_body(\@out);
 }

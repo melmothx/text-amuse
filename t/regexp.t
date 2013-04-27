@@ -1,11 +1,11 @@
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse::Output;
+use Text::Amuse::Output;
 use File::Spec::Functions;
 use Data::Dumper;
 
-my $obj = Text::AMuse::Output->new(
+my $obj = Text::Amuse::Output->new(
                                    document => [],
                                    format => "html",
                                   );

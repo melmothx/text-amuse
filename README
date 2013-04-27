@@ -1,4 +1,4 @@
-Text-AMuse
+Text-Amuse
 
 The README is used to introduce the module and provide instructions on
 how to install the module, any machine dependencies it may have (for
@@ -26,21 +26,21 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc Text::AMuse
+    perldoc Text::Amuse
 
 You can also look for information at:
 
     RT, CPAN's request tracker (report bugs here)
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-AMuse
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Amuse
 
     AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Text-AMuse
+        http://annocpan.org/dist/Text-Amuse
 
     CPAN Ratings
-        http://cpanratings.perl.org/d/Text-AMuse
+        http://cpanratings.perl.org/d/Text-Amuse
 
     Search CPAN
-        http://search.cpan.org/dist/Text-AMuse/
+        http://search.cpan.org/dist/Text-Amuse/
 
 
 LICENSE AND COPYRIGHT

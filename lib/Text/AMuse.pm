@@ -1,15 +1,15 @@
-package Text::AMuse;
+package Text::Amuse;
 
 use 5.010001;
 use strict;
 use warnings;
 use Data::Dumper;
-use Text::AMuse::Document;
-use Text::AMuse::Output;
+use Text::Amuse::Document;
+use Text::Amuse::Output;
 
 =head1 NAME
 
-Text::AMuse - The great new Text::AMuse!
+Text::Amuse - The great new Text::AMuse!
 
 =head1 VERSION
 
@@ -26,9 +26,9 @@ Quick summary of what the module does.
 
 Perhaps a little code snippet.
 
-    use Text::AMuse;
+    use Text::Amuse;
 
-    my $foo = Text::AMuse->new();
+    my $foo = Text::Amuse->new();
     ...
 
 
@@ -36,7 +36,7 @@ Perhaps a little code snippet.
 
 =head3 new (file => $file)
 
-Create a new Text::AMuse object
+Create a new Text::Amuse object
 
 =cut
 
@@ -46,14 +46,14 @@ sub new {
     my $self = \%opts;
     # for now
     $self->{_document_obj} =
-      Text::AMuse::Document->new(file => $self->{file},
+      Text::Amuse::Document->new(file => $self->{file},
                                  debug => $self->{debug});
     bless $self, $class;
 }
 
 =head3 document
 
-Accessor to the L<Text::AMuse::Document> object
+Accessor to the L<Text::Amuse::Document> object
 
 =cut
 
@@ -72,7 +72,7 @@ sub as_html {
     my $self = shift;
     unless (defined $self->{_html_doc}) {
         $self->{_html_doc} =
-          Text::AMuse::Output->new(
+          Text::Amuse::Output->new(
                                    document => $self->document,
                                    format => 'html',
                                   );
@@ -90,7 +90,7 @@ sub as_latex {
     my $self = shift;
     unless (defined $self->{_ltx_doc}) {
         $self->{_ltx_doc} =
-          Text::AMuse::Output->new(
+          Text::Amuse::Output->new(
                                    document => $self->document,
                                    format => 'ltx',
                                   );
@@ -107,7 +107,7 @@ Marco Pessotto, C<< <melmothx at gmail.com> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-text-amuse at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-AMuse>.  I will be notified, and then you'll
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-Amuse>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -117,7 +117,7 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Text::AMuse
+    perldoc Text::Amuse
 
 
 You can also look for information at:
@@ -126,19 +126,19 @@ You can also look for information at:
 
 =item * RT: CPAN's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-AMuse>
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Text-Amuse>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/Text-AMuse>
+L<http://annocpan.org/dist/Text-Amuse>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/Text-AMuse>
+L<http://cpanratings.perl.org/d/Text-Amuse>
 
 =item * Search CPAN
 
-L<http://search.cpan.org/dist/Text-AMuse/>
+L<http://search.cpan.org/dist/Text-Amuse/>
 
 =back
 
@@ -189,4 +189,4 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut
 
-1; # End of Text::AMuse
+1; # End of Text::Amuse

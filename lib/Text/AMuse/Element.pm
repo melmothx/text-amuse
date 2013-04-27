@@ -1,4 +1,4 @@
-package Text::AMuse::Element;
+package Text::Amuse::Element;
 use strict;
 use warnings;
 use utf8;

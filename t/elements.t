@@ -2,7 +2,7 @@ use 5.010001;
 use strict;
 use warnings;
 use Test::More;
-use Text::AMuse::Element;
+use Text::Amuse::Element;
 
 plan tests => 264;
 
@@ -10,7 +10,7 @@ sub test_line {
     my $string = shift;
     my $exp = shift;
     print "Testing <$string>\n";
-    my $el = Text::AMuse::Element->new($string);
+    my $el = Text::Amuse::Element->new($string);
     is($el->type, $exp->{type}, "type ok: $exp->{type}");
     is($el->block, $exp->{block}, "block ok: $exp->{block}");
     is($el->removed, $exp->{removed}, "removed ok");
