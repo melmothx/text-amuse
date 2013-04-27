@@ -4,6 +4,7 @@ use Test::More;
 use Text::AMuse;
 use File::Spec::Functions;
 use Data::Dumper;
+use t::Utils qw/read_file/;
 
 my $document =
   Text::AMuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -39,32 +40,20 @@ TEX
 is($document->as_html, $exphtml);
 is($document->as_latex, $exptex);
 
-$document = Text::AMuse->new(file => catfile(t => testfiles => 'footnotes.muse'),
-                             debug => 0);
 
+test_testfile("comments");
+test_testfile("footnotes");
 
-$exptex = <<'TEX';
-
-Hello\footnote{first} two\footnote{second third} three\footnote{third}
-
-TEX
-
-$exphtml = <<'HTML';
-
-<p>Hello <a href="#fn1" class="footnote" id="fn_back1">[1]</a> two <a href="#fn2" class="footnote" id="fn_back2">[2]</a> three <a href="#fn3" class="footnote" id="fn_back3">[3]</a></p>
-
-<p class="fnline"><a class="footnotebody" href="#fn_back1 id="fn1">[1]</a>first
-</p>
-
-<p class="fnline"><a class="footnotebody" href="#fn_back2 id="fn2">[2]</a>second
-third
-</p>
-
-<p class="fnline"><a class="footnotebody" href="#fn_back3 id="fn3">[3]</a>third
-</p>
-HTML
-
-is($document->as_html, $exphtml);
-is($document->as_latex, $exptex);
 
 done_testing;
+
+
+sub test_testfile {
+    my $base = shift;
+    $document = Text::AMuse->new(file => catfile(t => testfiles => "$base.muse"),
+                                 debug => 0);
+    my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
+    my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
+    is ($document->as_latex, $latex);
+    is ($document->as_html, $html);
+}
