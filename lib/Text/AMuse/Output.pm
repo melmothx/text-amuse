@@ -928,7 +928,8 @@ sub footnote_re {
 sub br_hash {
     my $self = shift;
     unless (defined $self->{_br_hash}) {
-        $self->{_br_hash} = '49777d285f86e8b252431fdc1a78b92459704911';
+        my $random = sprintf('%u', rand(10000));
+        $self->{_br_hash} = '49777d285f86e8b252431fdc1a78b92459704911' . $random;
     }
     return $self->{_br_hash};
 }
@@ -936,15 +937,16 @@ sub br_hash {
 sub tag_hash {
     my $self = shift;
     unless (defined $self->{_tag_hash}) {
+        my $random = sprintf('%u', rand(10000));
         $self->{_tag_hash} =
           {
-           'em' => '93470662f625a56cd4ab62d9d820a77e6468638e',
-           'sub' => '5d85613a56c124e3a3ff8ce6fc95d10cdcb5001e',
-           'del' => 'fea453f853c8645b085126e6517eab38dfaa022f',
-           'strike' => 'afe5fd4ff1a85caa390fd9f36005c6f785b58cb4',
-           'strong' => '0117691d0201f04aa02f586b774c190802d47d8c',
-           'sup' => '3844b17b367801f41a3ff27aab7d5ca297c2b984',
-           'code' => 'e6fb06210fafc02fd7479ddbed2d042cc3a5155e',
+           'em' => '93470662f625a56cd4ab62d9d820a77e6468638e' . $random,
+           'sub' => '5d85613a56c124e3a3ff8ce6fc95d10cdcb5001e' . $random,
+           'del' => 'fea453f853c8645b085126e6517eab38dfaa022f' . $random,
+           'strike' => 'afe5fd4ff1a85caa390fd9f36005c6f785b58cb4' . $random,
+           'strong' => '0117691d0201f04aa02f586b774c190802d47d8c' . $random,
+           'sup' => '3844b17b367801f41a3ff27aab7d5ca297c2b984' . $random,
+           'code' => 'e6fb06210fafc02fd7479ddbed2d042cc3a5155e' . $random,
           };
     }
     return $self->{_tag_hash};
