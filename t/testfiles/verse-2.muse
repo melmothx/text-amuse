@@ -1,0 +1,7 @@
+#title verse 2
+
+> A line of Emacs verse;
+>   forgive its being so terse.
+>
+> In terms of terse verse,
+>   you could do worse.

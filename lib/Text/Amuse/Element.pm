@@ -204,6 +204,12 @@ sub _parse_string {
         $self->removed($1);
         $self->type("verse");
     }
+    # autofix
+    elsif ($l =~ m/^(\>)$/s) {
+        $self->string("\n");
+        $self->removed(">");
+        $self->type("verse");
+    }
     elsif ($l =~ m/\|/) {
         $self->type("table");
         $self->string($l);
@@ -347,7 +353,7 @@ Return true if the element will merge the next one. Only regular strings.
 sub can_be_merged {
     my $self = shift;
     return 0 if $self->will_not_merge;
-    if ($self->type eq 'regular') {
+    if ($self->type eq 'regular' or $self->type eq 'verse') {
         return 1
     }
 }
