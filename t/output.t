@@ -34,7 +34,7 @@ my $exptex = << 'TEX';
 \textbf{strong} \emph{\textbf{EmStrong}}
 
 
-<script>alert("hacked!")</script><em><strong>
+<script>alert("hacked!")<\Slash{}script><em><strong>
 
 TEX
 is($document->as_html, $exphtml);

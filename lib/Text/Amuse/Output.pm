@@ -39,9 +39,7 @@ use utf8;
   \bigskip
 }{\bigskip}
 
-
-
-
+\newcommand{\Slash}{\slash\hspace{0pt}}
 
 =cut
 
@@ -194,8 +192,9 @@ sub manage_regular {
             # here we have different routines
             if ($self->fmt eq 'ltx') {
                 $l = $self->escape_tex($l);
-                $l = $self->tex_replace_ldots($l);
+                $l = $self->ltx_replace_ldots($l);
                 $l = $self->muse_inline_syntax_to_ltx($l);
+                $l = $self->ltx_replace_slash($l);
             }
             elsif ($self->fmt eq 'html') {
                 $l = $self->escape_html($l);
@@ -276,11 +275,17 @@ sub escape_tex {
     return $string;
 }
 
-sub tex_replace_ldots {
+sub ltx_replace_ldots {
     my ($self, $string) = @_;
     my $ldots = "\\dots{}";
     $string =~ s/\.{3,4}/$ldots/g ;
     $string =~ s/\x{2026}/$ldots/g;
+    return $string;
+}
+
+sub ltx_replace_slash {
+    my ($self, $string) = @_;
+    $string =~ s!/!\\Slash{}!g;
     return $string;
 }
 
@@ -686,7 +691,8 @@ sub _url_safe_escape_latex {
   utf8::encode($string);
   $string =~ s/([^0-9a-zA-Z\.\/\:_\%\&\#\?\=\-])
 	      /sprintf("%%%02X", ord ($1))/gesx;
-  return $self->safe($string);
+  my $escaped = $self->safe($string);
+  return $escaped;
 }
 
 
