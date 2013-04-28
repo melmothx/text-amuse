@@ -20,6 +20,8 @@ sub make_html {
     my $file = shift;
     my $doc = Text::Amuse->new(file => $file);
     my %headers = $doc->header_as_html;
+    my $body = $doc->as_html;
+    my $toc = $doc->toc_as_html;
     my $html = <<"EOF";
 <!doctype html>
 <html>
@@ -161,22 +163,22 @@ div#tableofcontents{
     text-indent: -1em;
 }
 
-.toclevel2 {
+.toclevel1 {
 	font-weight: bold;
 	font-size:11pt
 }	
 
-.toclevel3 {
+.toclevel2 {
 	font-weight: bold;
 	font-size: 10pt;
 }
 
-.toclevel4 {
+.toclevel3 {
 	font-weight: normal;
 	font-size: 9pt;
 }
 
-.toclevel5 {
+.toclevel4 {
 	font-weight: normal;
 	font-size: 8pt;
 }
@@ -193,8 +195,8 @@ EOF
     foreach my $k (keys %headers) {
         $html .= "<div><strong>$k</strong>: $headers{$k}</div>";
     }
-    $html .= qq{</div><div class="thework">};
-    $html .= $doc->as_html;
+    $html .= qq{</div><div>$toc</div>\n<div class="thework">};
+    $html .= $body;
     $html .= qq{</div></div></body></html>\n};
     my $out = $file;
     $out =~ s/muse$/html/;
@@ -206,6 +208,7 @@ EOF
 sub make_latex {
     my $file = shift;
     my $doc = Text::Amuse->new(file => $file);
+    my $body = $doc->as_latex;
     my $latex = <<'EOF';
 \documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{scrbook}
 \usepackage{graphicx}
@@ -252,7 +255,10 @@ EOF
     foreach my $k (keys %headers) {
         $latex .= "\\textbf{$k}: $headers{$k}\n\n";
     }
-    $latex .= $doc->as_latex . "\n\\end{document}\n";
+    if ($doc->wants_toc) {
+        $latex .= "\\tableofcontents\n"
+    }
+    $latex .= $body . "\n\\end{document}\n";
     my $out = $file;
     $out =~ s/muse$/tex/;
     open (my $fh, ">:encoding(utf-8)", $out);
