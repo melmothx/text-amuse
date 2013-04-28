@@ -4,6 +4,7 @@ use 5.010001;
 use strict;
 use warnings;
 use Text::Amuse::Element;
+# use Data::Dumper;
 
 =head1 METHODS
 
@@ -397,9 +398,10 @@ sub _process_lists {
                 next;
             }
             # and while it's minor, pop the pile
-            while ($el->indentation < $listpile[$#listpile]->{indentation}) {
+            while (@listpile and $el->indentation < $listpile[$#listpile]->{indentation}) {
                 my $pending = pop(@listpile)->{block};
                 push @out, Text::Amuse::Element->new("</$pending>");
+                # print "Listpile: ", Dumper(\@listpile), "\nElement:", Dumper($el);
             }
             # all done
             push @out, $el;
