@@ -131,6 +131,24 @@ sub process {
     return join("", @pieces);
 }
 
+=head3 header
+
+Return the formatted header as an hash (not a ref) with key/value
+pairs.
+
+=cut
+
+sub header {
+    my $self = shift;
+    my %directives = $self->document->raw_header;
+    my %out;
+    while (my ($k, $v) = each %directives) {
+        $out{$k} = $self->manage_regular($v);
+    }
+    return %out;
+}
+
+
 =head2 INTERNAL METHODS
 
 =head3 add_footnote($num)
@@ -286,7 +304,7 @@ sub inline_footnotes {
                 }
             }
             else {
-                warn "Missing footnote [$fn_num] in $string";
+                # warn "Missing footnote [$fn_num] in $string";
                 push @output, $piece;
             }
         }

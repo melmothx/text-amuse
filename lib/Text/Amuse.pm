@@ -68,7 +68,7 @@ Output the HTML document (and cache it in the object)
 
 =cut
 
-sub as_html {
+sub _html_obj {
     my $self = shift;
     unless (defined $self->{_html_doc}) {
         $self->{_html_doc} =
@@ -77,7 +77,22 @@ sub as_html {
                                    format => 'html',
                                   );
     }
-    return $self->{_html_doc}->process;
+    return $self->{_html_doc};
+}
+
+
+sub as_html {
+    my $self = shift;
+    return $self->_html_obj->process;
+}
+
+=head3 header_as_html
+
+=cut
+
+sub header_as_html {
+    my $self = shift;
+    return $self->_html_obj->header;
 }
 
 =head3 as_latex
@@ -86,7 +101,7 @@ Output the (Xe)LaTeX document (and cache it in the object)
 
 =cut
 
-sub as_latex {
+sub _latex_obj {
     my $self = shift;
     unless (defined $self->{_ltx_doc}) {
         $self->{_ltx_doc} =
@@ -95,9 +110,24 @@ sub as_latex {
                                    format => 'ltx',
                                   );
     }
-    return $self->{_ltx_doc}->process;
+    return $self->{_ltx_doc};
 }
 
+sub as_latex {
+    my $self = shift;
+    return $self->_latex_obj->process;
+}
+
+=head3 header_as_latex
+
+The LaTeX formatted header.
+
+=cut
+
+sub header_as_latex {
+    my $self = shift;
+    return $self->_latex_obj->header;
+}
 
 
 =head1 AUTHOR

@@ -124,7 +124,7 @@ sub _split_body_and_directives {
 =head3 raw_header
 
 Accessor to the raw header of the muse file. The header is returned as
-hash, with key/value pairs
+hash, with key/value pairs. Please note: NOT an hashref.
 
 =cut
 
