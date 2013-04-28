@@ -95,6 +95,17 @@ sub header_as_html {
     return $self->_html_obj->header;
 }
 
+=head3 toc_as_html
+
+Return the HTML formatted ToC
+
+=cut
+
+sub toc_as_html {
+    my $self = shift;
+    return $self->_html_obj->html_toc;
+}
+
 =head3 as_latex
 
 Output the (Xe)LaTeX document (and cache it in the object)
@@ -117,6 +128,20 @@ sub as_latex {
     my $self = shift;
     return $self->_latex_obj->process;
 }
+
+=head3 wants_toc
+
+B<After> the latex has been produced, return true if a toc is needed
+because we found some headings inside.
+
+=cut
+
+sub wants_toc {
+    my $self = shift;
+    my @toc = $self->_latex_obj->table_of_contents;
+    return scalar(@toc);
+}
+
 
 =head3 header_as_latex
 

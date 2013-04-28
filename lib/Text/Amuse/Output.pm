@@ -92,6 +92,7 @@ sub process {
     my $self = shift;
     my @pieces;
     my $imagere = $self->image_re;
+    $self->reset_toc_stack;
     # loop over the parsed elements
     foreach my $el ($self->document->document) {
         if ($el->type eq 'startblock') {
@@ -530,10 +531,108 @@ sub manage_header {
     my $body = $self->manage_regular($el);
     # remove trailing spaces and \n
     chomp $body;
-    return $self->blkstring(start => $el->type) .
+    my $leading = $self->blkstring(start => $el->type);
+    # add them to the ToC for html output;
+    if ($el->type =~ m/h([1-4])/) {
+        my $level = $1;
+        my $tocline = $body;
+        my $index = $self->add_to_table_of_contents($level => $body);
+        $level++; # increment by one
+        die "wtf, no index for toc?" unless $index;
+
+        # inject the id into the html toc
+        if ($self->fmt eq 'html') {
+            $leading = "<h" . $level .
+              qq{ id="toc$index">};
+        }
+    }
+    return $leading .
       $body .
         $self->blkstring(stop => $el->type) . "\n";
 }
+
+=head3 add_to_table_of_contents
+
+When we catch an header, we save it in the Output object, so we can
+emit the ToC. Level 5 is excluded as per doc.
+
+It returns the numerical index (so you can inject the id).
+
+=cut
+
+sub add_to_table_of_contents {
+    my ($self, $level, $string) = @_;
+    return unless ($level && $string);
+    unless (defined $self->{_toc_entries}) {
+        $self->{_toc_entries} = [];
+    }
+    my $index = scalar(@{$self->{_toc_entries}});
+    push @{$self->{_toc_entries}}, { level => $level,
+                                     string => $string,
+                                     index => ++$index,
+                                   };
+    return $index;
+}
+
+=head3 reset_toc_stack
+
+Clear out the list. This is called at the beginning of the main loop,
+so we don't collect duplicates over multiple runs.
+
+=cut
+
+sub reset_toc_stack {
+    my $self = shift;
+    delete $self->{_toc_entries} if defined $self->{_toc_entries};
+}
+
+=head3 table_of_contents
+
+Emit the formatted toc (if any). Please note that this method works
+even for the LaTeX format, even if does not produce usable output.
+
+This because we can test if we need to emit a table of contents
+looking at this without searching the whole output.
+
+=cut
+
+sub table_of_contents {
+    my $self = shift;
+    my $internal_toc = $self->{_toc_entries};
+    my @toc;
+    return @toc unless $internal_toc; # no toc gets undef
+    # do a deep copy and return;
+    foreach my $entry (@$internal_toc) {
+        push @toc, { %$entry };
+    }
+    return @toc;
+}
+
+=head3 html_toc
+
+The HTML formatted table of contents.
+
+=cut
+
+sub html_toc {
+    my $self = shift;
+    return "" unless $self->fmt eq 'html';
+    my @toc = $self->table_of_contents;
+    return "" unless @toc;
+    # do the dirty job
+    my @out;
+    foreach my $item (@toc) {
+        my $line = qq{<p class="tableofcontentline toclevel} .
+          $item->{level} . qq{"><span class="tocprefix">} .
+          "&nbsp;&nbsp;" x  $item->{level} . "</span>" .
+            qq{<a href="#toc} . $item->{index} . qq{">} .
+              $item->{string} . "</a></p>";
+        push @out, $line;
+    }
+    return join ("\n", @out) . "\n";
+}
+
+
 
 =head3 manage_verse
 
