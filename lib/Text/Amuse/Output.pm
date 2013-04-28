@@ -5,47 +5,50 @@ use utf8;
 
 =head2 Basic LaTeX preamble
 
-\documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{scrbook}
-\usepackage{graphicx}
-\usepackage{alltt}
-\usepackage{verbatim}
-\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
-\usepackage{bookmark}
-\usepackage[stable]{footmisc}
-\usepackage{enumerate}
-\usepackage{longtable}
-\usepackage[normalem]{ulem}
+  \documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{scrbook}
+  \usepackage{graphicx}
+  \usepackage{alltt}
+  \usepackage{verbatim}
+  \usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
+  \usepackage{bookmark}
+  \usepackage[stable]{footmisc}
+  \usepackage{enumerate}
+  \usepackage{longtable}
+  \usepackage[normalem]{ulem}
+  
+  % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
+  \newcommand*{\forcelinebreak}{~\\\relax}
+  
+  \newcommand*{\hairline}{%
+    \bigskip%
+    \noindent \hrulefill%
+    \bigskip%
+  }
+  
+  % reverse indentation for biblio and play
+  
+  \newenvironment{amusebiblio}{
+    \leftskip=\parindent
+    \parindent=-\parindent
+    \bigskip
+  }{\bigskip}
+  
+  \newenvironment{amuseplay}{
+    \leftskip=\parindent
+    \parindent=-\parindent
+    \bigskip
+  }{\bigskip}
+  
+  \newcommand{\Slash}{\slash\hspace{0pt}}
+  
+=head2 METHODS
 
-% avoid breakage on multiple <br><br> and avoid the next [] to be eaten
-\newcommand*{\forcelinebreak}{~\\\relax}
+=head3 Text::Amuse::Output->new(document => $obj, format => "ltx")
 
-\newcommand*{\hairline}{%
-  \bigskip%
-  \noindent \hrulefill%
-  \bigskip%
-}
-
-% reverse indentation for biblio and play
-
-\newenvironment{amusebiblio}{
-  \leftskip=\parindent
-  \parindent=-\parindent
-  \bigskip
-}{\bigskip}
-
-\newenvironment{amuseplay}{
-  \leftskip=\parindent
-  \parindent=-\parindent
-  \bigskip
-}{\bigskip}
-
-\newcommand{\Slash}{\slash\hspace{0pt}}
+Constructor. Format can be C<ltx> or C<html>, while document must be a
+L<Text::Amuse::Document> object.
 
 =cut
-
-
-
-
 
 sub new {
     my $class = shift;
@@ -58,33 +61,25 @@ sub new {
     bless $self, $class;
 }
 
+=head3 document
+
+Accessor to the L<Text::Amuse::Document> object (read-only, but you
+may call its method on that.
+
+=cut
+
 sub document {
     return shift->{document};
 }
 
+=head3 fmt
+
+Accessor to the current format (read-only);
+
+=cut
+
 sub fmt {
     return shift->{fmt};
-}
-
-sub add_footnote {
-    my ($self, $num) = @_;
-    return unless $num;
-    unless ($self->document->get_footnote($num)) {
-        warn "no footnote $num found!";
-        return;
-    }
-    unless (defined $self->{_fn_list}) {
-        $self->{_fn_list} = [];
-    }
-    push @{$self->{_fn_list}}, $num;
-}
-
-sub flush_footnotes {
-    my $self = shift;
-    return unless (defined $self->{_fn_list});
-    # if we flush, we flush and forget, so we don't collect them again
-    # on the next call
-    return @{delete $self->{_fn_list}};
 }
 
 =head3 process
@@ -92,7 +87,6 @@ sub flush_footnotes {
 Return the string for the format defined in the constructor
 
 =cut
-
 
 sub process {
     my $self = shift;
@@ -137,6 +131,46 @@ sub process {
     return join("", @pieces);
 }
 
+=head2 INTERNAL METHODS
+
+=head3 add_footnote($num)
+
+Add the footnote to the internal list of found footnotes. Its
+existence is checked against the document object.
+
+=cut
+
+sub add_footnote {
+    my ($self, $num) = @_;
+    return unless $num;
+    unless ($self->document->get_footnote($num)) {
+        warn "no footnote $num found!";
+        return;
+    }
+    unless (defined $self->{_fn_list}) {
+        $self->{_fn_list} = [];
+    }
+    push @{$self->{_fn_list}}, $num;
+}
+
+=head3 flush_footnotes
+
+Return the list of footnotes found as a list of digits.
+
+=cut
+
+sub flush_footnotes {
+    my $self = shift;
+    return unless (defined $self->{_fn_list});
+    # if we flush, we flush and forget, so we don't collect them again
+    # on the next call
+    return @{delete $self->{_fn_list}};
+}
+
+=head3 manage_html_footnote
+
+=cut
+
 sub manage_html_footnote {
     my ($self, $num) = @_;
     return unless $num;
@@ -146,6 +180,9 @@ sub manage_html_footnote {
           qq{</p>\n};
 }
 
+=head3 blkstring 
+
+=cut
 
 sub blkstring  {
     my ($self, $start_stop, $block) = @_;
@@ -159,6 +196,11 @@ sub blkstring  {
     return $table->{$block}->{$start_stop}->{$self->fmt};
 }
 
+=head3 manage_regular($element_or_string)
+
+Main routine to transform a string to the given format
+
+=cut
 
 sub manage_regular {
     my ($self, $el) = @_;
@@ -192,9 +234,9 @@ sub manage_regular {
             # here we have different routines
             if ($self->fmt eq 'ltx') {
                 $l = $self->escape_tex($l);
-                $l = $self->ltx_replace_ldots($l);
+                $l = $self->_ltx_replace_ldots($l);
                 $l = $self->muse_inline_syntax_to_ltx($l);
-                $l = $self->ltx_replace_slash($l);
+                $l = $self->_ltx_replace_slash($l);
             }
             elsif ($self->fmt eq 'html') {
                 $l = $self->escape_html($l);
@@ -207,6 +249,13 @@ sub manage_regular {
     }
     return join("", @out);
 }
+
+=head3 inline_footnotes($string)
+
+Inline the footnotes in the given string, accordingly to the current
+format.
+
+=cut
 
 sub inline_footnotes {
     my ($self, $string) = @_;
@@ -248,6 +297,13 @@ sub inline_footnotes {
     return join("", @output);
 }
 
+=head3 safe($string)
+
+Be sure that the strings passed are properly escaped for the current
+format, to avoid command injection.
+
+=cut
+
 sub safe {
     my ($self, $string) = @_;
     if ($self->fmt eq 'ltx') {
@@ -257,6 +313,12 @@ sub safe {
         return $self->escape_all_html($string);
     }
 }
+
+=head3 escape_tex($string)
+
+Escape the string for LaTeX output
+
+=cut
 
 sub escape_tex {
     my ($self, $string) = @_;
@@ -275,7 +337,7 @@ sub escape_tex {
     return $string;
 }
 
-sub ltx_replace_ldots {
+sub _ltx_replace_ldots {
     my ($self, $string) = @_;
     my $ldots = "\\dots{}";
     $string =~ s/\.{3,4}/$ldots/g ;
@@ -283,12 +345,17 @@ sub ltx_replace_ldots {
     return $string;
 }
 
-sub ltx_replace_slash {
+sub _ltx_replace_slash {
     my ($self, $string) = @_;
     $string =~ s!/!\\Slash{}!g;
     return $string;
 }
 
+=head4 escape_all_html($string)
+
+Escape the string for HTML output
+
+=cut
 
 sub escape_all_html {
     my ($self, $string) = @_;
@@ -299,6 +366,10 @@ sub escape_all_html {
     $string =~ s/'/&#x27;/g;
     return $string;
 }
+
+=head3 muse_inline_syntax_to_ltx
+
+=cut
 
 sub muse_inline_syntax_to_ltx {
     my ($self, $string) = @_;
@@ -315,6 +386,10 @@ sub muse_inline_syntax_to_ltx {
     return $string;
 }
 
+=head3 escape_html
+
+=cut
+
 sub escape_html {
     my ($self, $string) = @_;
     $string = $self->remove_permitted_html($string);
@@ -322,6 +397,10 @@ sub escape_html {
     $string = $self->restore_permitted_html($string);
     return $string;
 }
+
+=head3 remove_permitted_html
+
+=cut
 
 sub remove_permitted_html {
     my ($self, $string) = @_;
@@ -341,6 +420,10 @@ sub remove_permitted_html {
     return $string;
 }
 
+=head3 restore_permitted_html
+
+=cut
+
 sub restore_permitted_html {
     my ($self, $string) = @_;
     foreach my $hash (keys %{ $self->reverse_tag_hash }) {
@@ -353,7 +436,9 @@ sub restore_permitted_html {
     return $string;
 }
 
+=head3 muse_inline_syntax_to_tags
 
+=cut
 
 sub muse_inline_syntax_to_tags {
     my ($self, $string) = @_;
@@ -388,6 +473,9 @@ sub muse_inline_syntax_to_tags {
     return substr($string, 1, $l);
 }
 
+=head3 manage_paragraph
+
+=cut
 
 sub manage_paragraph {
     my ($self, $el) = @_;
@@ -396,6 +484,10 @@ sub manage_paragraph {
     return $self->blkstring(start  => "p") .
       $body . $self->blkstring(stop => "p");
 }
+
+=head3 manage_header
+
+=cut
 
 sub manage_header {
     my ($self, $el) = @_;
@@ -406,6 +498,10 @@ sub manage_header {
       $body .
         $self->blkstring(stop => $el->type) . "\n";
 }
+
+=head3 manage_verse
+
+=cut
 
 sub manage_verse {
     my ($self, $el) = @_;
@@ -448,6 +544,10 @@ sub manage_verse {
       join($stanzasep, @out) . $self->blkstring(stop => $el->type);
 }
 
+=head3 manage_comment
+
+=cut
+
 sub manage_comment {
     my ($self, $el) = @_;
     my $body = $self->safe($el->removed);
@@ -455,6 +555,10 @@ sub manage_comment {
     return $self->blkstring(start => $el->type) .
       $body . $self->blkstring(stop => $el->type);
 }
+
+=head3 manage_table
+
+=cut
 
 sub manage_table {
     my ($self, $el) = @_;
@@ -469,6 +573,10 @@ sub manage_table {
         die "wtf?"
     }
 }
+
+=head3 manage_table_html
+
+=cut
 
 sub manage_table_html {
     my ($self, $table) = @_;
@@ -504,6 +612,10 @@ sub manage_table_html {
     push @out, "</table>\n";
     return join("\n", @out);
 }
+
+=head3 manage_table_ltx
+
+=cut
 
 sub manage_table_ltx {
     my ($self, $table) = @_;
@@ -552,8 +664,9 @@ sub manage_table_ltx {
     return $textable;
 }
 
+=head3 _split_table_in_hash
 
-
+=cut
 
 sub _split_table_in_hash {
     my ($self, $table) = @_;
@@ -585,6 +698,9 @@ sub _split_table_in_hash {
     return $output;
 }
 
+=head3 manage_example
+
+=cut
 
 sub manage_example {
     my ($self, $el) = @_;
@@ -593,7 +709,6 @@ sub manage_example {
       $body . $self->blkstring(stop => $el->type);
 }
 
-
 =head2 Links management
 
 =head3 linkify($link)
@@ -601,7 +716,6 @@ sub manage_example {
 Here we see if it's a single one or a link/desc pair. Then dispatch
 
 =cut
-
 
 sub linkify {
     my ($self, $link) = @_;
@@ -631,6 +745,10 @@ sub linkify {
         die "Wtf??? $link"
     }
 }
+
+=head3 format_links
+
+=cut
 
 sub format_links {
     my ($self, $link, $desc) = @_;
@@ -664,6 +782,10 @@ sub format_links {
     }
 }
 
+=head3 format_single_link
+
+=cut
+
 sub format_single_link {
     my ($self, $link) = @_;
     my $imagere = $self->image_re;
@@ -686,6 +808,10 @@ sub format_single_link {
     }
 }
 
+=head3 _url_safe_escape_latex
+
+=cut
+
 sub _url_safe_escape_latex {
   my ($self, $string) = @_;
   utf8::encode($string);
@@ -695,13 +821,15 @@ sub _url_safe_escape_latex {
   return $escaped;
 }
 
-
 =head1 HELPERS
 
 Methods providing some fixed values
 
 =cut
 
+=head3 blk_table
+
+=cut
 
 sub blk_table {
     my $self = shift;
@@ -880,7 +1008,6 @@ sub blk_table {
                                               },
                                      },
 
-
                                ol => {
                                       start => {
                                                 tex => "\n\\startitemize[N]\\relax\n",
@@ -906,7 +1033,6 @@ sub blk_table {
                                                 ltx => "\n\\end{enumerate}\n",
                                                },
                                       },
-
 
                                oli => {
                                        start => {
@@ -947,7 +1073,6 @@ sub blk_table {
                                                },
                                       },
 
-
                                ola => {
                                        start => {
                                                  tex => "\n\\startitemize[a]\\relax\n",
@@ -978,8 +1103,9 @@ sub blk_table {
     return $self->{_blk_table}
 }
 
+=head3 link_re
 
-
+=cut
 
 sub link_re {
     my $self = shift;
@@ -989,6 +1115,10 @@ sub link_re {
     return $self->{_link_re};
 }
 
+=head3 image_re
+
+=cut
+
 sub image_re {
     my $self = shift;
     unless (defined $self->{_image_re}) {
@@ -996,6 +1126,10 @@ sub image_re {
     }
     return $self->{_image_re};
 }
+
+=head3 url_re
+
+=cut
 
 sub url_re {
     my $self = shift;
@@ -1012,6 +1146,10 @@ sub url_re {
     return $self->{_url_re};
 }
 
+=head3 footnote_re
+
+=cut
+
 sub footnote_re {
     my $self = shift;
     unless (defined $self->{_footnote_re}) {
@@ -1019,6 +1157,10 @@ sub footnote_re {
     }
     return $self->{_footnote_re};
 }
+
+=head3 br_hash
+
+=cut
 
 sub br_hash {
     my $self = shift;
@@ -1028,6 +1170,10 @@ sub br_hash {
     }
     return $self->{_br_hash};
 }
+
+=head3 tag_hash
+
+=cut
 
 sub tag_hash {
     my $self = shift;
@@ -1047,6 +1193,10 @@ sub tag_hash {
     return $self->{_tag_hash};
 }
 
+=head3 reverse_tag_hash
+
+=cut
+
 sub reverse_tag_hash {
     my $self = shift;
     unless (defined $self->{_reverse_tag_hash}) {
@@ -1057,6 +1207,9 @@ sub reverse_tag_hash {
     return $self->{_reverse_tag_hash};
 }
 
+=head3 html_table_mapping
+
+=cut
 
 sub html_table_mapping {
     my $self = shift;
