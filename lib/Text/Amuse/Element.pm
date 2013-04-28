@@ -146,7 +146,6 @@ sub _block_re {
                  center   |
                  right    |
                  example  |
-                 verbatim |
                  quote    |
                  li | ul | ola | olA | oli | olI | oln # these are private
 

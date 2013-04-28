@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Text::Amuse::Element;
 
-plan tests => 264;
+plan tests => 248;
 
 sub test_line {
     my $string = shift;
@@ -105,7 +105,7 @@ test_line("     c. ciao", {
                       });
 
 foreach my $bl (qw/biblio play comment verse
-                   center right example verbatim quote/) {
+                   center right example quote/) {
     test_line("<$bl> \n", {
                           type => "startblock",
                           block => $bl,
@@ -121,7 +121,7 @@ foreach my $bl (qw/biblio play comment verse
 };
 
 foreach my $bl (qw/biblio play comment verse
-                   center right example verbatim quote/) {
+                   center right example quote/) {
     test_line(" <$bl>\n", {
                           type => "regular",
                           block => "regular",
