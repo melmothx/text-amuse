@@ -6,6 +6,8 @@ use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
 use t::Utils qw/read_file write_to_file/;
 
+plan tests => 18;
+
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
                    debug => 0);
@@ -47,8 +49,7 @@ test_testfile("verse");
 test_testfile("example-3");
 test_testfile("table");
 test_testfile("links");
-done_testing;
-
+test_testfile("special");
 
 sub test_testfile {
     my $base = shift;

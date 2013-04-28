@@ -91,6 +91,7 @@ Return the string for the format defined in the constructor
 sub process {
     my $self = shift;
     my @pieces;
+    my $imagere = $self->image_re;
     # loop over the parsed elements
     foreach my $el ($self->document->document) {
         if ($el->type eq 'startblock') {
@@ -102,7 +103,24 @@ sub process {
             push @pieces, $self->blkstring(stop => $el->block);
         }
         elsif ($el->type eq 'regular') {
-            push @pieces, $self->manage_paragraph($el);
+            # manage the special markup
+            if ($el->string =~ m/^\s*-----*\s*$/s) {
+                push @pieces, $self->manage_hr($el);
+            }
+            elsif ($el->string =~ m/(\* ?){5}\s*$/s) {
+                push @pieces, $self->manage_newpage($el);
+            }
+            # an image by itself, so avoid it wrapping with <p></p>,
+            # but only if just 1 is found. With multiple one, we get
+            # incorrect output anyway, so who cares?
+            elsif ($el->string =~ m/^\s*\[\[\s*$imagere\s*\]
+                                    (\[[^\]\[]+?\])?\]\s*$/sx and
+                   $el->string !~ m/\[\[.*\[\[/s) {
+                push @pieces, $self->manage_regular($el);
+            }
+            else {
+                push @pieces, $self->manage_paragraph($el);
+            }
         }
         elsif ($el->type =~ m/h[1-6]/) {
             push @pieces, $self->manage_header($el);
@@ -727,6 +745,42 @@ sub manage_example {
       $body . $self->blkstring(stop => $el->type);
 }
 
+=head3 manage_hr
+
+Put an horizontal rule
+
+=cut
+
+sub manage_hr {
+    my ($self, $el) = @_;
+    die "Wtf?" if $el->string =~ m/\w/s; # don't eat chars by mistake
+    if ($self->fmt eq 'html') {
+        return "\n<hr />\n";
+    }
+    elsif ($self->fmt eq 'ltx') {
+        return "\n\\hairline\n\n";
+    }
+}
+
+=head3 manage_newpage
+
+If it's LaTeX, insert a newpage
+
+=cut
+
+sub manage_newpage {
+    my ($self, $el) = @_;
+    die "Wtf?" if $el->string =~ m/\w/s; # don't eat chars by mistake
+    if ($self->fmt eq 'html') {
+        return $self->manage_paragraph($el);
+    }
+    elsif ($self->fmt eq 'ltx') {
+        return $self->manage_paragraph($el)
+          . "\n\\cleardoublepage\n\n";
+    }
+}
+
+
 =head2 Links management
 
 =head3 linkify($link)
@@ -775,7 +829,7 @@ sub format_links {
     # first the images
     if ($link =~ m/^$imagere$/) {
         if ($self->fmt eq 'html') {
-            return qq{<div class="image">\n} .
+            return qq{\n<div class="image">\n} .
               qq{<img src="$link" alt="$link" class="embedimg" />\n} .
                 qq{<div class="caption">$desc</div>\n</div>};
             }
@@ -810,7 +864,7 @@ sub format_single_link {
     # the re matches only clean names, no need to escape anything
     if ($link =~ m/^$imagere$/) {
         if ($self->fmt eq 'html') {
-            return qq{<img src="$link" alt="$link" class="embedimg" />};
+            return qq{\n<div class="image">\n<img src="$link" alt="$link" class="embedimg" />\n</div>};
         }
         elsif ($self->fmt eq 'ltx') {
             return qq/\n\\begin{figure}[ht]\n/ . qq/\\includegraphics/ .
@@ -958,7 +1012,7 @@ sub blk_table {
                                                   },
                                          stop => {
                                                   tex => "\n\\stopblockquote\n",
-                                                  html => "</blockquote>\n",
+                                                  html => "\n</blockquote>\n",
                                                   ltx => "\n\n\\end{quote}\n\n",
                                                  },
                                         },
@@ -966,24 +1020,24 @@ sub blk_table {
                                biblio => {
                                           start => {
                                                     tex => "\\startawikibiblio\n",
-                                                    html => "<div class=\"biblio\">\n",
+                                                    html => "\n<div class=\"biblio\">\n",
                                                     ltx => "\n\n\\begin{amusebiblio}\n\n",
                                                    },
                                           stop => {
                                                    tex => "\\stopawikibiblio\n",
-                                                   html => "</div>\n",
+                                                   html => "\n</div>\n",
                                                    ltx => "\n\n\\end{amusebiblio}\n\n",
                                                   },
                                          },
                                play => {
                                         start => {
                                                   tex => "\\startawikiplay\n",
-                                                  html => "<div class=\"play\">\n",
+                                                  html => "\n<div class=\"play\">\n",
                                                   ltx => "\n\n\\begin{amuseplay}\n\n",
                                                  },
                                         stop => {
                                                  tex => "\\stopawikiplay\n",
-                                                 html => "</div>\n",
+                                                 html => "\n</div>\n",
                                                  ltx => "\n\n\\end{amuseplay}\n\n",
                                                 },
                                        },
@@ -991,24 +1045,24 @@ sub blk_table {
                                center => {
                                           start => {
                                                     tex => "\\startawikicenter\n",
-                                                    html => "<div class=\"center\">",
+                                                    html => "\n<div class=\"center\">\n",
                                                     ltx => "\n\n\\begin{center}\n",
                                                    },
                                           stop => {
                                                    tex => "\\stopawikicenter\n",
-                                                   html => "</div>",
+                                                   html => "\n</div>\n",
                                                    ltx => "\n\\end{center}\n\n",
                                                   },
                                          },
                                right => {
                                          start => {
                                                    tex => "\\startawikiright\n",
-                                                   html => "<div class=\"right\">",
+                                                   html => "\n<div class=\"right\">\n",
                                                    ltx => "\n\n\\begin{flushright}\n",
                                                   },
                                          stop => {
                                                   tex => "\\stopawikiright\n",
-                                                  html => "</div>",
+                                                  html => "\n</div>\n",
                                                   ltx => "\n\\end{flushright}\n\n",
                                                  },
                                         },
