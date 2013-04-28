@@ -927,6 +927,7 @@ sub format_links {
     my $imagere = $self->image_re;
     # first the images
     if ($link =~ m/^$imagere$/) {
+        $self->document->attachments($link);
         if ($self->fmt eq 'html') {
             return qq{\n<div class="image">\n} .
               qq{<img src="$link" alt="$link" class="embedimg" />\n} .
@@ -962,6 +963,7 @@ sub format_single_link {
     my $imagere = $self->image_re;
     # the re matches only clean names, no need to escape anything
     if ($link =~ m/^$imagere$/) {
+        $self->document->attachments($link);
         if ($self->fmt eq 'html') {
             return qq{\n<div class="image">\n<img src="$link" alt="$link" class="embedimg" />\n</div>};
         }

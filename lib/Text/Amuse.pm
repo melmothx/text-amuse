@@ -106,6 +106,17 @@ sub toc_as_html {
     return $self->_html_obj->html_toc;
 }
 
+=head3 attachments
+
+Report the attachments (images) found.
+
+=cut
+
+sub attachments {
+    my $self = shift;
+    return $self->document->attachments;
+}
+
 =head3 as_latex
 
 Output the (Xe)LaTeX document (and cache it in the object)

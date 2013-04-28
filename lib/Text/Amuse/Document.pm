@@ -15,7 +15,7 @@ use Text::Amuse::Element;
 sub new {
     my $class = shift;
     my %args;
-    my $self;
+    my $self = {};
     if (@_ % 2 == 0) {
         %args = @_;
     }
@@ -54,6 +54,29 @@ sub filename {
     my $self = shift;
     return $self->{filename}
 }
+
+=head3 attachments
+
+Return the list of the filenames of the attached files, as linked.
+With an optional argument, store that file in the list.
+
+
+=cut
+
+sub attachments {
+    my ($self, $arg) = @_;
+    unless (defined $self->{_attached_files}) {
+        $self->{_attached_files} = {};
+    }
+    if (defined $arg) {
+        $self->{_attached_files}->{$arg} = 1;
+        return;
+    }
+    else {
+        return sort(keys %{$self->{_attached_files}});
+    }
+}
+
 
 =head3 get_lines
 
