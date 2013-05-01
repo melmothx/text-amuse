@@ -265,6 +265,9 @@ sub latex_template {
 \usepackage{enumerate}
 \usepackage{longtable}
 \usepackage[normalem]{ulem}
+% remove the numbering
+\setcounter{secnumdepth}{-2}
+
 
 % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
 \newcommand*{\forcelinebreak}{~\\\relax}
@@ -290,11 +293,28 @@ sub latex_template {
 }{\bigskip}
 
 \newcommand{\Slash}{\slash\hspace{0pt}}
+
+% global style
+\pagestyle{plain}
+\addtokomafont{disposition}{\rmfamily}
+% forbid widows/orphans
+\clubpenalty=10000
+\widowpenalty=10000
+\frenchspacing
+\sloppy
+
 \title{[% doc.header_as_latex.title %]}
 \date{[% doc.header_as_latex.date %]}
 \author{[% doc.header_as_latex.author %]}
 \begin{document}
 \maketitle
+
+[% IF doc.wants_toc %]
+
+\tableofcontents
+\cleardoublepage
+
+[% END %]
 
 [% doc.as_latex %]
 
@@ -303,9 +323,13 @@ sub latex_template {
 \strut
 \vfill
 
+\begin{center}
+
 [% doc.header_as_latex.source %]
 
 [% doc.header_as_latex.notes %]
+
+\end{center}
 
 \end{document}
 
