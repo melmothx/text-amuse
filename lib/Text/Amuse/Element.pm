@@ -5,9 +5,12 @@ use utf8;
 
 =head1 NAME
 
-Text::Muse::Element - Helper for Text::Muse
+Text::Amuse::Element - Helper for Text::Amuse
 
 =head1 METHODS/ACCESSORS
+
+Everything here is pretty much internal only, underdocumented and
+subject to change.
 
 =head3 new($string)
 

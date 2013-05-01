@@ -6,6 +6,16 @@ use warnings;
 use Text::Amuse::Element;
 # use Data::Dumper;
 
+=head1 NAME
+
+Text::Amuse::Document
+
+=head1 SYNOPSIS
+
+The module is used internally by L<Text::Amuse>, so everything here is
+pretty much internal only (and underdocumented). The useful stuff is
+accessible via the L<Text::Amuse> class.
+
 =head1 METHODS
 
 =head3 new(file => $filename)

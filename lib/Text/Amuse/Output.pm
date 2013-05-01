@@ -3,7 +3,16 @@ use strict;
 use warnings;
 use utf8;
 
-=head2 Basic LaTeX preamble
+=head1 NAME
+
+Text::Amuse::Output
+
+=head1 SYNOPSIS
+
+The module is used internally by L<Text::Amuse>, so everything here is
+pretty much internal only (and underdocumented).
+
+=head1 Basic LaTeX preamble
 
   \documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{scrbook}
   \usepackage{graphicx}
