@@ -1,11 +1,15 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use utf8;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Text::Amuse;
+use Template::Tiny;
 
 # quick and dirty to get the stuff compiled
+
+my $tt = Template::Tiny->new();
 
 foreach my $file (@ARGV) {
     unless ($file =~ m/\.muse$/ and -f $file) {
@@ -16,18 +20,13 @@ foreach my $file (@ARGV) {
     make_latex($file);
 }
 
-sub make_html {
-    my $file = shift;
-    my $doc = Text::Amuse->new(file => $file);
-    my %headers = $doc->header_as_html;
-    my $body = $doc->as_html;
-    my $toc = $doc->toc_as_html;
-    my $html = <<"EOF";
+sub html_template {
+    my $html = <<'EOF';
 <!doctype html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>$file</title>
+<title>[% doc.header_as_html.title %]</title>
     <style type="text/css">
  <!--/*--><![CDATA[/*><!--*/
 
@@ -188,29 +187,55 @@ div#tableofcontents{
     </style>
 </head>
 <body>
-<div id="page">
-<div class="header">
-EOF
+ <div id="page">
+  [% IF doc.header_as_html.author %]
+  <h2>[% doc.header_as_html.author %]</h2>
+  [% END %]
+  <h1>[% doc.header_as_html.title %]</h1>
 
-    foreach my $k (keys %headers) {
-        $html .= "<div><strong>$k</strong>: $headers{$k}</div>";
-    }
-    $html .= qq{</div><div>$toc</div>\n<div class="thework">};
-    $html .= $body;
-    $html .= qq{</div></div></body></html>\n};
-    my $out = $file;
-    $out =~ s/muse$/html/;
-    open (my $fh, ">:encoding(utf-8)", $out);
-    print $fh $html;
+  [% IF doc.header_as_html.source %]
+  [% doc.header_as_html.source %]
+  [% END %]
+
+  [% IF doc.header_as_html.notes %]
+  [% doc.header_as_html.notes %]
+  [% END %]
+
+  [% IF doc.toc_as_html %]
+  <div class="header">
+  [% doc.toc_as_html %]
+  </div>
+  [% END %]
+
+ <div id="thework">
+
+[% doc.as_html %]
+
+ </div>
+</div>
+</body>
+</html>
+
+EOF
+    return \$html;
+}
+
+sub make_html {
+    my $file = shift;
+    my $doc = Text::Amuse->new(file => $file);
+    my $out = "";
+    my $in = html_template();
+    $tt->process($in, { doc => $doc }, \$out);
+    my $outfile = $file;
+    $outfile =~ s/muse$/html/;
+    open (my $fh, ">:encoding(utf-8)", $outfile);
+    print $fh $out;
     close $fh;
 }
 
-sub make_latex {
-    my $file = shift;
-    my $doc = Text::Amuse->new(file => $file);
-    my $body = $doc->as_latex;
+sub latex_template {
     my $latex = <<'EOF';
-\documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{scrbook}
+\documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{[% IF doc.wants_toc %]scrbook[% ELSE %]scrartcl[% END %]}
 \usepackage{graphicx}
 \usepackage{alltt}
 \usepackage{verbatim}
@@ -245,23 +270,39 @@ sub make_latex {
 }{\bigskip}
 
 \newcommand{\Slash}{\slash\hspace{0pt}}
-\title{Test}
-\date{Test}
-\author{Test}
+\title{[% doc.header_as_latex.title %]}
+\date{[% doc.header_as_latex.date %]}
+\author{[% doc.header_as_latex.author %]}
 \begin{document}
+\maketitle
+
+[% doc.as_latex %]
+
+\cleardoublepage
+
+\strut
+\vfill
+
+[% doc.header_as_latex.source %]
+
+[% doc.header_as_latex.notes %]
+
+\end{document}
 
 EOF
-    my %headers = $doc->header_as_latex;
-    foreach my $k (keys %headers) {
-        $latex .= "\\textbf{$k}: $headers{$k}\n\n";
-    }
-    if ($doc->wants_toc) {
-        $latex .= "\\tableofcontents\n"
-    }
-    $latex .= $body . "\n\\end{document}\n";
-    my $out = $file;
-    $out =~ s/muse$/tex/;
-    open (my $fh, ">:encoding(utf-8)", $out);
-    print $fh $latex;
+    return \$latex;
+}
+
+sub make_latex {
+    my $file = shift;
+    my $doc = Text::Amuse->new(file => $file);
+    my $in = latex_template();
+    my $out = "";
+    $tt->process($in, { doc => $doc }, \$out);
+    my $outfile = $file;
+    $outfile =~ s/muse$/tex/;
+    open (my $fh, ">:encoding(utf-8)", $outfile);
+    print $fh $out;
     close $fh;
 }
+
