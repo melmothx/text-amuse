@@ -6,8 +6,14 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Text::Amuse;
 use Template::Tiny;
+use Getopt::Long;
 
 # quick and dirty to get the stuff compiled
+
+my $xtx = 0;
+GetOptions (
+            xtx => \$xtx,
+           );
 
 my $tt = Template::Tiny->new();
 
@@ -236,6 +242,20 @@ sub make_html {
 sub latex_template {
     my $latex = <<'EOF';
 \documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{[% IF doc.wants_toc %]scrbook[% ELSE %]scrartcl[% END %]}
+[% IF xtx %]
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainfont[Mapping=tex-text]{Charis SIL}
+\setsansfont[Mapping=tex-text,Scale=MatchLowercase]{DejaVu Sans}
+\setmonofont[Mapping=tex-text,Scale=MatchLowercase]{DejaVu Sans Mono}
+\setmainlanguage{[% doc.language %]}
+[% ELSE %]
+\usepackage[[% doc.language %]]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype} % you need an *updated* texlive 2012
+[% END %]
 \usepackage{graphicx}
 \usepackage{alltt}
 \usepackage{verbatim}
@@ -298,11 +318,33 @@ sub make_latex {
     my $doc = Text::Amuse->new(file => $file);
     my $in = latex_template();
     my $out = "";
-    $tt->process($in, { doc => $doc }, \$out);
+    $tt->process($in, { doc => $doc, xtx => $xtx }, \$out);
     my $outfile = $file;
     $outfile =~ s/muse$/tex/;
     open (my $fh, ">:encoding(utf-8)", $outfile);
     print $fh $out;
     close $fh;
+    my $exec = "pdflatex";
+    if ($xtx) {
+        $exec = "xelatex";
+    }
+    my $base = $file;
+    $base =~ s/muse$//;
+    cleanup($base);
+    for (1..3) {
+        system($exec, $outfile);
+    }
+    cleanup($base);
 }
 
+sub cleanup {
+    my $base = shift;
+    return unless $base;
+    for (qw/aux toc log tuc/) {
+        my $remove = $base . $_;
+        if (-f $remove) {
+            unlink $remove;
+            print "removing $remove\n";
+        }
+    }
+}
