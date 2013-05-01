@@ -9,7 +9,7 @@ use Text::Amuse::Output;
 
 =head1 NAME
 
-Text::Amuse - The great new Text::AMuse!
+Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
@@ -22,21 +22,42 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
-Quick summary of what the module does.
-
-Perhaps a little code snippet.
+Typical usage which should illustrate all the public methods
 
     use Text::Amuse;
-
-    my $foo = Text::Amuse->new();
-    ...
-
+    my $doc = Text::Amuse->new(file => "test.muse");
+    
+    # get the title, author, etc.
+    my %html_directives = $doc->header_as_html;
+    
+    # get the table of contents
+    my $html_toc = $doc->toc_as_html;
+    
+    # get the body
+    my $html_body = $doc->as_html;
+    
+    # same for LaTeX
+    my %latex_directives = $doc->header_as_latex;
+    my $latex_body = $doc->as_latex;
+    
+    # do we need a \tableofcontents ?
+    my $wants_toc = $doc->wants_toc; # (boolean)
+    
+    # files attached
+    my @images = $doc->attachments;
+    
+    # at this point you can inject the values in a template, which is left
+    # to the user. 
+    
 
 =head1 CONSTRUCTOR
 
 =head3 new (file => $file)
 
-Create a new Text::Amuse object
+Create a new Text::Amuse object. You should pass the named parameter
+C<file>, pointing to a muse file to process. Please note that you
+can't pass a string. Build a wrapper going through a temporary file if
+you need to pass strings.
 
 =cut
 
@@ -53,7 +74,7 @@ sub new {
 
 =head3 document
 
-Accessor to the L<Text::Amuse::Document> object
+Accessor to the L<Text::Amuse::Document> object. [Internal]
 
 =cut
 
@@ -92,6 +113,11 @@ sub as_html {
 
 =head3 header_as_html
 
+The directives of the document in HTML (title, authors, etc.),
+returned as an hash.
+
+B<Please note that the keys are not escaped nor manipulated>.
+
 =cut
 
 sub header_as_html {
@@ -104,7 +130,7 @@ sub header_as_html {
 
 =head3 toc_as_html
 
-Return the HTML formatted ToC
+Return the HTML formatted ToC, as a string.
 
 =cut
 
@@ -116,7 +142,7 @@ sub toc_as_html {
 
 =head3 attachments
 
-Report the attachments (images) found.
+Report the attachments (images) found, as a list.
 
 =cut
 
@@ -127,7 +153,8 @@ sub attachments {
 
 =head3 as_latex
 
-Output the (Xe)LaTeX document (and cache it in the object)
+Output the (Xe)LaTeX document (and cache it in the object), as a
+string.
 
 =cut
 
@@ -154,8 +181,7 @@ sub as_latex {
 
 =head3 wants_toc
 
-B<After> the latex has been produced, return true if a toc is needed
-because we found some headings inside.
+Return true if a toc is needed because we found some headings inside.
 
 =cut
 
@@ -169,7 +195,7 @@ sub wants_toc {
 
 =head3 header_as_latex
 
-The LaTeX formatted header.
+The LaTeX formatted header, as a string.
 
 =cut
 
