@@ -83,6 +83,8 @@ sub document {
 }
 
 
+=head2 HTML output
+
 =head3 as_html
 
 Output the HTML document (and cache it in the object)
@@ -143,16 +145,7 @@ sub toc_as_html {
     return $self->_html_obj->html_toc;
 }
 
-=head3 attachments
-
-Report the attachments (images) found, as a list.
-
-=cut
-
-sub attachments {
-    my $self = shift;
-    return $self->document->attachments;
-}
+=head2 LaTeX output
 
 =head3 as_latex
 
@@ -211,6 +204,76 @@ sub header_as_latex {
     return $self->{_cached_latex_header};
 }
 
+=head2 Helpers
+
+=head3 attachments
+
+Report the attachments (images) found, as a list. This can be invoked
+only after a call (direct or indirect) to C<as_html> or C<as_latex>,
+or any other operation which scans the body, otherwise you'll get an
+empty list.
+
+=cut
+
+sub attachments {
+    my $self = shift;
+    return $self->document->attachments;
+}
+
+=head3 language_code
+
+The language code of the document. This method will looks into the
+header of the document, searching for the keys C<lang> or C<language>,
+defaulting to C<en>.
+
+=head3 language
+
+Same as above, but returns the human readable version, notably used by
+Babel, Polyglossia, etc.
+
+=cut
+
+sub _language_mapping {
+    my $self = shift;
+    return {
+            en => 'english',
+            it => 'italian',
+            sr => 'serbian',
+            hr => 'croatian',
+            ru => 'russian',
+            es => 'spanish',
+            pt => 'portuguese',
+            de => 'german',
+            fr => 'french',
+            nl => 'dutch',
+           };
+}
+
+
+sub language_code {
+    my $self = shift;
+    unless (defined $self->{_doc_language_code}) {
+        my %header = $self->document->raw_header;
+        my $lang = $header{lang} || $header{language} || "en";
+        my $real = "en";
+        # check if language exists;
+        if ($self->_language_mapping->{$lang}) {
+            $real = $lang;
+        }
+        $self->{_doc_language_code} = $real;
+    }
+    return $self->{_doc_language_code};
+}
+
+sub language {
+    my $self = shift;
+    unless (defined $self->{_doc_language}) {
+        my $lc = $self->language_code;
+        # guaranteed not to return undef
+        $self->{_doc_language} = $self->_language_mapping->{$lc};
+    }
+    return $self->{_doc_language};
+}
 
 =head1 AUTHOR
 
@@ -259,6 +322,9 @@ L<http://search.cpan.org/dist/Text-Amuse/>
 
 
 =head1 LICENSE AND COPYRIGHT
+
+For the people caring about copyright and laws, this is the usual
+stuff:
 
 Copyright 2013 Marco Pessotto.
 
