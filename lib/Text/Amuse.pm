@@ -125,7 +125,10 @@ sub header_as_html {
     $self->as_html; # trigger the html generation. This operation is
                     # not expensive if we already call it, and won't
                     # be the next time.
-    return $self->_html_obj->header;
+    unless (defined $self->{_cached_html_header}) {
+        $self->{_cached_html_header} = $self->_html_obj->header;
+    }
+    return $self->{_cached_html_header};
 }
 
 =head3 toc_as_html
@@ -202,7 +205,10 @@ The LaTeX formatted header, as an hashref.
 sub header_as_latex {
     my $self = shift;
     $self->as_latex;
-    return $self->_latex_obj->header;
+    unless (defined $self->{_cached_latex_header}) {
+        $self->{_cached_latex_header} = $self->_latex_obj->header;
+    }
+    return $self->{_cached_latex_header};
 }
 
 
