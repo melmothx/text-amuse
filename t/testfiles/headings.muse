@@ -1,4 +1,4 @@
-#title headings
+#title *headings*
 
 * Part
 

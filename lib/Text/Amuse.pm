@@ -83,7 +83,11 @@ sub _html_obj {
 
 sub as_html {
     my $self = shift;
-    return $self->_html_obj->process;
+    unless (defined $self->{_html_output_strings}) {
+        $self->{_html_output_strings} = $self->_html_obj->process;
+    }
+    return unless defined wantarray;
+    return join("", @{ $self->{_html_output_strings} });
 }
 
 =head3 header_as_html
@@ -92,6 +96,9 @@ sub as_html {
 
 sub header_as_html {
     my $self = shift;
+    $self->as_html; # trigger the html generation. This operation is
+                    # not expensive if we already call it, and won't
+                    # be the next time.
     return $self->_html_obj->header;
 }
 
@@ -103,6 +110,7 @@ Return the HTML formatted ToC
 
 sub toc_as_html {
     my $self = shift;
+    $self->as_html; # be sure that it's processed
     return $self->_html_obj->html_toc;
 }
 
@@ -137,7 +145,11 @@ sub _latex_obj {
 
 sub as_latex {
     my $self = shift;
-    return $self->_latex_obj->process;
+    unless (defined $self->{_latex_output_strings}) {
+        $self->{_latex_output_strings} = $self->_latex_obj->process;
+    }
+    return unless defined wantarray;
+    return join("", @{ $self->{_latex_output_strings} });
 }
 
 =head3 wants_toc
@@ -149,6 +161,7 @@ because we found some headings inside.
 
 sub wants_toc {
     my $self = shift;
+    $self->as_latex;
     my @toc = $self->_latex_obj->table_of_contents;
     return scalar(@toc);
 }
@@ -162,6 +175,7 @@ The LaTeX formatted header.
 
 sub header_as_latex {
     my $self = shift;
+    $self->as_latex;
     return $self->_latex_obj->header;
 }
 

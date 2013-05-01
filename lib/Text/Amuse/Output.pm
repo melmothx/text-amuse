@@ -84,7 +84,15 @@ sub fmt {
 
 =head3 process
 
-Return the string for the format defined in the constructor
+This method returns a array ref with the processed chunks. To get
+a sensible output you will have to join the pieces yourself.
+
+We don't return a joined string to avoid copying large amounts of
+data.
+
+E.g.
+
+  print @{$obj->process};
 
 =cut
 
@@ -147,7 +155,7 @@ sub process {
             push @pieces, $self->manage_html_footnote($fn);
         }
     }
-    return join("", @pieces);
+    return \@pieces;
 }
 
 =head3 header
