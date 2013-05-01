@@ -14,8 +14,8 @@ ok($doc->toc_as_html =~ m/Part \(2\)/, "Html toc found");
 undef $doc;
 
 $doc = Text::Amuse->new(file => catfile(t => testfiles => 'headings.muse'));
-is_deeply({ $doc->header_as_html }, { title => '<em>headings</em>' }, "header ok");
-is_deeply({ $doc->header_as_latex }, { title => '\emph{headings}' }, "header ok");
+is_deeply($doc->header_as_html, { title => '<em>headings</em>' }, "header ok");
+is_deeply($doc->header_as_latex, { title => '\emph{headings}' }, "header ok");
 
 ok($doc->as_latex, "latex body ok");
 ok($doc->as_html, "html body ok");

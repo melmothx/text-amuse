@@ -114,7 +114,7 @@ sub as_html {
 =head3 header_as_html
 
 The directives of the document in HTML (title, authors, etc.),
-returned as an hash.
+returned as an hashref.
 
 B<Please note that the keys are not escaped nor manipulated>.
 
@@ -195,7 +195,7 @@ sub wants_toc {
 
 =head3 header_as_latex
 
-The LaTeX formatted header, as a string.
+The LaTeX formatted header, as an hashref.
 
 =cut
 

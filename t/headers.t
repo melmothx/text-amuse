@@ -19,7 +19,7 @@ ok($document->header_as_html);
 is($document->as_html, "\n<p>Hello</p>\n");
 is($document->as_latex, "\nHello\n\n");
 
-is_deeply({ $document->header_as_latex },
+is_deeply($document->header_as_latex,
           {
            title => '\\emph{Title}',
            author => '\\textbf{Prova}',
@@ -29,7 +29,7 @@ is_deeply({ $document->header_as_latex },
            bla => '\\emph{hem} \\textbf{ehm} \\textbf{\\emph{bla}}',
           }, "LaTeX header ok");
 
-is_deeply({ $document->header_as_html },
+is_deeply($document->header_as_html,
           {
            title => '<em>Title</em>',
            author =>  '<strong>Prova</strong>',

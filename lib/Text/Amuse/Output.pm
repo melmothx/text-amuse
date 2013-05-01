@@ -160,7 +160,7 @@ sub process {
 
 =head3 header
 
-Return the formatted header as an hash (not a ref) with key/value
+Return the formatted header as an hashref with key/value
 pairs.
 
 =cut
@@ -172,7 +172,7 @@ sub header {
     while (my ($k, $v) = each %directives) {
         $out{$k} = $self->manage_regular($v);
     }
-    return %out;
+    return \%out;
 }
 
 
