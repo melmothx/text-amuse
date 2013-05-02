@@ -528,11 +528,12 @@ sub _store_footnotes {
     my %footnotes;
     while (my $el = shift(@els)) {
         if ($el->type eq 'footnote') {
-            if ($el->removed =~ m/\[([0-9])\]/) {
+            if ($el->removed =~ m/\[([0-9]+)\]/) {
                 warn "Overwriting footnote number $1" if exists $footnotes{$1};
                 $footnotes{$1} = $el;
             }
-            else { die "Something is wrong here!\n" }
+            else { die "Something is wrong here! <" . $el->removed . ">"
+                     . $el->string . "!" }
         }
         else {
             push @out, $el;
