@@ -364,7 +364,7 @@ sub make_latex {
 sub cleanup {
     my $base = shift;
     return unless $base;
-    for (qw/aux toc log tuc/) {
+    for (qw/aux toc tuc/) {
         my $remove = $base . $_;
         if (-f $remove) {
             unlink $remove;
