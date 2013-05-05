@@ -22,8 +22,8 @@ my @expected = (
                 "This    is a test\n",
                );
 
-my @got = $muse->get_lines;
-is_deeply(\@got, \@expected, "input ok");
+my $got = $muse->get_lines;
+is_deeply($got, \@expected, "input ok");
 
 
 is_deeply [$muse->raw_body],

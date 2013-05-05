@@ -115,7 +115,7 @@ sub get_lines {
     }
     close $fh;
     # store the lines in the object
-    return @lines;
+    return \@lines;
 }
 
 
@@ -124,10 +124,10 @@ sub _split_body_and_directives {
     my (%directives, @body);
     my $in_meta = 1;
     my $lastdirective;
-    my @input = $self->get_lines;
+    my $input = $self->get_lines;
     # scan the line
-    while (@input) {
-        my $line = shift @input;
+    while (@$input) {
+        my $line = shift @$input;
         if ($in_meta) {
             # reset the directives on blank lines
             if ($line =~ m/^\s*$/s) {
