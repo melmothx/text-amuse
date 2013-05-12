@@ -6,7 +6,13 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 use Text::Amuse;
 use Template::Tiny;
+use EBook::EPUB;
+use Cwd;
 use Getopt::Long;
+use File::Basename;
+use Data::UUID;
+use File::Temp;
+use Data::Dumper;
 
 # quick and dirty to get the stuff compiled
 
@@ -24,6 +30,7 @@ foreach my $file (@ARGV) {
     }
     make_html($file);
     make_latex($file);
+    make_epub($file);
 }
 
 sub css_template {
@@ -232,6 +239,26 @@ EOF
     return \$html;
 }
 
+sub minimal_html_template {
+    my $html = <<'EOF';
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>[% title %]</title>
+    <link href="stylesheet.css" type="text/css" rel="stylesheet" />
+  </head>
+  <body>
+    <div>
+      [% text %]
+    </div>
+  </body>
+</html>
+EOF
+    return \$html;
+}
+
+
 sub make_html {
     my $file = shift;
     my $doc = Text::Amuse->new(file => $file);
@@ -380,4 +407,111 @@ sub cleanup {
             print "removing $remove\n";
         }
     }
+}
+
+sub make_epub {
+    my $file = shift;
+    my ($name, $path, $suffix) = fileparse($file, ".muse");
+    my $cwd = getcwd;
+    my $epubname = "${name}.epub";
+    if ($path) {
+        chdir $path or die "Couldn't chdir into $path $!";
+    }
+    my $epub = EBook::EPUB->new;
+    my $text = Text::Amuse->new(file => $file);
+
+    my @toc = $text->raw_html_toc;
+    my @pieces = $text->as_splat_html;
+    my $missing = scalar(@pieces) - scalar(@toc);
+    # this shouldn't happen
+
+    if ($missing > 1 or $missing < 0) {
+        print Dumper(\@pieces), Dumper(\@toc);
+        die "This shouldn't happen: missing pieces: $missing";
+    }
+    if ($missing == 1) {
+        unshift @toc, {
+                       index => 0,
+                       level => 0,
+                       string => "start body",
+                      };
+    }
+
+
+    my $tempdir = File::Temp->newdir();
+    $epub->add_stylesheet("stylesheet.css" => css_template());
+
+    my $titlepage;
+    my $header = $text->header_as_html;
+    if (my $t = $header->{title}) {
+        $epub->add_title($t);
+        $titlepage .= "<h1>$t</h1>\n";
+    }
+    if (my $author = $header->{author}) {
+        $epub->add_author($author);
+        $titlepage .= "<h2>$author</h2>\n";
+    }
+    if ($header->{date} =~ m/([0-9]{4})/) {
+        $epub->add_date($1);
+        $titlepage .= "<h3>$header->{date}</h3>"
+    }
+    $epub->add_language($text->language_code);
+    if (my $source = $header->{source}) {
+        $epub->add_source($source);
+        $titlepage .= "<p>$source</p>";
+    }
+    if (my $notes = $header->{notes}) {
+        $epub->add_description($notes);
+        $titlepage .= "<p>$notes</p>";
+    }
+    my $in = minimal_html_template;
+    my $out = "";
+    $tt->process($in, {
+                       title => $header->{title},
+                       text => $titlepage
+                      }, \$out);
+    my $tpid = $epub->add_xhtml("titlepage.xhtml", $out);
+    my $order = 0;
+    $epub->add_navpoint(label => "titlepage",
+                        id => $tpid,
+                        content => "titlepage.xhtml",
+                        play_order => ++$order);
+
+    foreach my $fi (@pieces) {
+        my $index = shift(@toc);
+        my $xhtml = "";
+        print Dumper($index);
+        my $filename = "piece" . $index->{index};
+        my $title = "*" x $index->{level} . " " . $index->{string};
+        $tt->process($in, { title => $title,
+                            text => $fi },
+                     \$xhtml);
+        my $id = $epub->add_xhtml($filename, $xhtml);
+        $epub->add_navpoint(label => $index->{string},
+                            content => $filename,
+                            id => $id,
+                            play_order => ++$order);
+    }
+    foreach my $att ($text->attachments) {
+        die "$att doesn't exist!" unless -f $att;
+        my $mime; 
+        if ($att =~ m/\.jpe?g$/) {
+            $mime = "image/jpeg";
+        }
+        elsif ($att =~ m/\.png$/) {
+            $mime = "image/png";
+        }
+        else {
+            die "Unrecognized attachment $att!";
+        }
+        $epub->copy_file($att, $att, $mime);
+    }
+    $epub->pack_zip($epubname);
+    chdir $cwd or die "Couldn't chdir into $cwd: $!";
+}
+
+sub _remove_html_tags {
+    my $string = shift;
+    $string =~ s/<.+?>//g;
+    return $string;
 }
