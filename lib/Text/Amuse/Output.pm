@@ -140,6 +140,9 @@ sub process {
                 push @pieces, $self->manage_paragraph($el);
             }
         }
+        elsif ($el->type eq 'standalone') {
+            push @pieces, $self->manage_regular($el);
+        }
         elsif ($el->type =~ m/h[1-6]/) {
             push @pieces, $self->manage_header($el);
         }
