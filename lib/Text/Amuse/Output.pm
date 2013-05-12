@@ -823,7 +823,7 @@ sub manage_table_ltx {
                 push @row, $self->manage_regular($cell);
             }
             my $texrow = join(q{ & }, @row);
-            push @{$out->{$t}}, $texrow . "  \\\\\n"
+            push @{$out->{$t}}, "\\relax " . $texrow . "  \\\\\n"
         }
     }
     # then we loop over what we have. First head, then body, and
