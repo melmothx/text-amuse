@@ -27,8 +27,8 @@ Typical usage which should illustrate all the public methods
     use Text::Amuse;
     my $doc = Text::Amuse->new(file => "test.muse");
     
-    # get the title, author, etc.
-    my %html_directives = $doc->header_as_html;
+    # get the title, author, etc. as an hashref
+    my $html_directives = $doc->header_as_html;
     
     # get the table of contents
     my $html_toc = $doc->toc_as_html;
@@ -37,7 +37,7 @@ Typical usage which should illustrate all the public methods
     my $html_body = $doc->as_html;
     
     # same for LaTeX
-    my %latex_directives = $doc->header_as_latex;
+    my $latex_directives = $doc->header_as_latex;
     my $latex_body = $doc->as_latex;
     
     # do we need a \tableofcontents ?
@@ -219,7 +219,8 @@ sub wants_toc {
 
 =head3 header_as_latex
 
-The LaTeX formatted header, as an hashref.
+The LaTeX formatted header, as an hashref. Keys are not interpolated
+in any way.
 
 =cut
 
