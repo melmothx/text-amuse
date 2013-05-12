@@ -132,7 +132,7 @@ sub _split_body_and_directives {
             # reset the directives on blank lines
             if ($line =~ m/^\s*$/s) {
                 $lastdirective = undef;
-            } elsif ($line =~ m/^\#(\w+)\s+(.+)$/s) {
+            } elsif ($line =~ m/^\#([A-Za-z0-9]+)\s+(.+)$/s) {
                 my $dir = $1;
                 $directives{$dir} = $2;
                 $lastdirective = $dir;
