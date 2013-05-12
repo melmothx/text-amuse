@@ -145,6 +145,20 @@ sub toc_as_html {
     return $self->_html_obj->html_toc;
 }
 
+=head3 raw_html_toc
+
+Return an internal representation of the ToC
+
+=cut 
+
+sub raw_html_toc {
+    my $self = shift;
+    $self->as_html;
+    return $self->_html_obj->table_of_contents;
+}
+
+
+
 =head2 LaTeX output
 
 =head3 as_latex

@@ -5,7 +5,7 @@ use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
 
-plan tests => 10;
+plan tests => 11;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'headings.muse'));
@@ -27,7 +27,52 @@ is($document->toc_as_html, $htmltoc, "ToC looks good");
 ok($document->as_latex);
 ok($document->wants_toc);
 
-print $document->toc_as_html, "\n";
+# print Dumper([$document->raw_html_toc]);
+
+my $exp = [
+           {
+            'level' => '1',
+            'index' => 1,
+            'string' => 'Part'
+           },
+           {
+            'level' => '2',
+            'index' => 2,
+            'string' => 'Chapter'
+           },
+           {
+            'level' => '3',
+            'index' => 3,
+            'string' => 'Section'
+           },
+           {
+            'level' => '4',
+            'index' => 4,
+            'string' => 'Subsection'
+           },
+           {
+            'level' => '1',
+            'index' => 5,
+            'string' => 'Part (2)'
+           },
+           {
+            'level' => '2',
+            'index' => 6,
+            'string' => 'Chapter (2)'
+           },
+           {
+            'level' => '3',
+            'index' => 7,
+            'string' => 'Section (2)'
+           },
+           {
+            'level' => '4',
+            'index' => 8,
+            'string' => 'Subsection (2)'
+           }
+          ];
+
+is_deeply([$document->raw_html_toc], $exp, "Raw toc ok");
 
 
 $document =
@@ -39,4 +84,5 @@ ok(!$document->toc_as_html);
 ok($document->as_latex);
 ok(!$document->wants_toc);
 is($document->toc_as_html, "");
+
 
