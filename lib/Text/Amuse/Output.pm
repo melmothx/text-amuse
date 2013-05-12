@@ -886,6 +886,15 @@ sub _split_table_in_hash {
             push @{$output->{body}}, \@cells;
         }
     }
+    # pad the cells with " " if their number doesn't match
+    foreach my $part (qw/body head foot/) {
+        foreach my $row (@{$output->{$part}}) {
+            while (@$row < $output->{counter}) {
+                # warn "Found uneven table: " . join (":", @$row), "\n";
+                push @$row, " ";
+            }
+        }
+    }
     return $output;
 }
 
