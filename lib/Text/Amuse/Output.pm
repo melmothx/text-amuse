@@ -872,8 +872,6 @@ sub _split_table_in_hash {
             $output->{caption} = $1;
             next
         }
-        # clean up the chunk
-        $row =~ s/^\s*\|+(.+?)\|+\s*$/$1/gm;
         if ($row =~ m/\|\|\|/) {
             my @fcells = split /\|+/, $row;
             push @{$output->{foot}}, \@fcells;
