@@ -187,7 +187,7 @@ sub process {
             push @pieces, $self->manage_example($el);
         }
         else {
-            die "Unrecognized element: " . $el->type);
+            die "Unrecognized element: " . $el->type;
         }
     }
     if ($self->fmt eq 'html') {
