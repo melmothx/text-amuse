@@ -160,7 +160,7 @@ sub process {
         elsif ($el->type =~ m/h[1-6]/) {
 
             # if we want a split html, we cut here and flush the footnotes
-            if ($splithtml && @pieces) {
+            if ($el->type =~ m/h[1-4]/ and $splithtml and @pieces) {
                 
                 foreach my $fn ($self->flush_footnotes) {
                     push @pieces, $self->manage_html_footnote($fn);

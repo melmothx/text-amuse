@@ -483,7 +483,7 @@ sub make_epub {
     foreach my $fi (@pieces) {
         my $index = shift(@toc);
         my $xhtml = "";
-        print Dumper($index);
+        # print Dumper($index);
         my $filename = "piece" . $index->{index};
         my $title = "*" x $index->{level} . " " . $index->{string};
         $tt->process($in, { title => $title,

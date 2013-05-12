@@ -48,7 +48,22 @@ my $expected =  [
 
 <p class="fnline"><a class="footnotebody" href="#fn_back4" id="fn4">[4]</a> Fourth
 </p>
+',
+
+          '<h5 id="toc4">subsection <a href="#fn5" class="footnote" id="fn_back5">[5]</a></h5>
+
+
+<p>subsection</p>
+<h6>subsub section <a href="#fn6" class="footnote" id="fn_back6">[6]</a></h6>
+
+
+<p class="fnline"><a class="footnotebody" href="#fn_back5" id="fn5">[5]</a> Fifth
+</p>
+
+<p class="fnline"><a class="footnotebody" href="#fn_back6" id="fn6">[6]</a> Sixth
+</p>
 '
+
                 ];
 
 
@@ -70,8 +85,15 @@ my $toc = [
             'level' => '3',
             'index' => 3,
             'string' => 'section <a href="#fn3" class="footnote" id="fn_back3">[3]</a>'
-           }
+           },
+           {
+            'level' => '4',
+            'index' => 4,
+            'string' => 'subsection <a href="#fn5" class="footnote" id="fn_back5">[5]</a>'
+           },
           ];
+
+# print Dumper([$output->table_of_contents]);
 
 is_deeply( [ $output->table_of_contents ], $toc, "ToC ok");
 
@@ -79,7 +101,10 @@ use Text::Amuse;
 
 my $splatdoc = Text::Amuse->new(file => $file);
 
+# print Dumper([$splatdoc->as_splat_html]);
+
 is_deeply( [ $splatdoc->as_splat_html ], $expected, "ok from Text::Amuse");
+
 
 is_deeply( [ $splatdoc->raw_html_toc ], $toc, "ToC ok");
 
