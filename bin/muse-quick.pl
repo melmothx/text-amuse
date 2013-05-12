@@ -452,9 +452,11 @@ sub make_epub {
         $epub->add_author($author);
         $titlepage .= "<h2>$author</h2>\n";
     }
-    if ($header->{date} =~ m/([0-9]{4})/) {
-        $epub->add_date($1);
-        $titlepage .= "<h3>$header->{date}</h3>"
+    if ($header->{date}) {
+        if ($header->{date} =~ m/([0-9]{4})/) {
+            $epub->add_date($1);
+            $titlepage .= "<h3>$header->{date}</h3>"
+        }
     }
     $epub->add_language($text->language_code);
     if (my $source = $header->{source}) {
