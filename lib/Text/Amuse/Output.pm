@@ -106,8 +106,11 @@ E.g.
 =cut
 
 sub process {
-    my $self = shift;
-    my @pieces;
+    my ($self, %opts) = @_;
+    my (@pieces, @splat, $splithtml);
+    if ($opts{split} and $self->fmt eq 'html') {
+        $splithtml = 1;
+    }
     my $imagere = $self->image_re;
     $self->reset_toc_stack;
     # loop over the parsed elements
@@ -144,6 +147,20 @@ sub process {
             push @pieces, $self->manage_regular($el);
         }
         elsif ($el->type =~ m/h[1-6]/) {
+
+            # if we want a split html, we cut here and flush the footnotes
+            if ($splithtml && @pieces) {
+                
+                foreach my $fn ($self->flush_footnotes) {
+                    push @pieces, $self->manage_html_footnote($fn);
+                }
+
+                push @splat, join("", @pieces);
+                @pieces = ();
+                # all done
+            }
+
+            # then continue as usual
             push @pieces, $self->manage_header($el);
         }
         elsif ($el->type eq 'verse') {
@@ -166,6 +183,13 @@ sub process {
         foreach my $fn ($self->flush_footnotes) {
             push @pieces, $self->manage_html_footnote($fn);
         }
+    }
+
+    if ($splithtml) {
+        # catch the last
+        push @splat, join("", @pieces);
+        # and return
+        return \@splat;
     }
     return \@pieces;
 }
