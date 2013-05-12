@@ -829,8 +829,9 @@ sub manage_table_ltx {
     # then we loop over what we have. First head, then body, and
     # finally foot
     
-    my $textable = "\\begin{table}[htp]\n\\centering\n\\begin{tabular}{" ;
-    $textable .= "|c" x $table->{counter};
+    my $textable =
+      "\\begin{table}[htp]\n\\centering\n\\begin{tabularx}{\\textwidth}{" ;
+    $textable .= "|X" x $table->{counter};
     $textable .= "|}\n";
     if (my @head = @{$out->{head}}) {
         $textable .= "\\hline\n" . join("", @head);
@@ -841,9 +842,10 @@ sub manage_table_ltx {
     if (my @foot = @{$out->{foot}}) {
         $textable .= "\\hline\n" . join("", @foot);
     }
-    $textable .= "\\hline\n\\end{tabular}\n";
+    $textable .= "\\hline\n\\end{tabularx}\n";
     if (defined $table->{caption} and $table->{caption} ne "") {
-        $textable .= "\n" . $self->manage_regular($table->{caption}) . "\n\n";
+        $textable .= "\n\\medskip\n" .
+          $self->manage_regular($table->{caption}) . "\n\n";
     }
     $textable .= "\\end{table}\n";
     # print $textable;

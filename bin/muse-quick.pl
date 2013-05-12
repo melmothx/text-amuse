@@ -300,7 +300,7 @@ sub latex_template {
 \usepackage{bookmark}
 \usepackage[stable]{footmisc}
 \usepackage{enumerate}
-\usepackage{longtable}
+\usepackage{tabularx}
 \usepackage[normalem]{ulem}
 % remove the numbering
 \setcounter{secnumdepth}{-2}
