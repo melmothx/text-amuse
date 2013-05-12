@@ -6,7 +6,7 @@ use Text::Amuse::Output;
 use File::Spec::Functions;
 use Test::More;
 
-plan tests => 1;
+plan tests => 2;
 
 my $file = catfile(t => testfiles => "splat.muse");
 my $doc = Text::Amuse::Document->new(file => $file);
@@ -52,5 +52,24 @@ my $expected =  [
                 ];
 
 
-is_deeply($expected, $splat, "Splat html OK");
+is_deeply($splat, $expected, "Splat html OK");
 
+my $toc = [
+           {
+            'level' => '1',
+            'index' => 1,
+            'string' => 'Here'
+           },
+           {
+            'level' => '2',
+            'index' => 2,
+            'string' => 'chapter'
+           },
+           {
+            'level' => '3',
+            'index' => 3,
+            'string' => 'section <a href="#fn3" class="footnote" id="fn_back3">[3]</a>'
+           }
+          ];
+
+is_deeply( [ $output->table_of_contents ], $toc, "ToC ok");
