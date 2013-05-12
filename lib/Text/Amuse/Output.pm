@@ -810,7 +810,6 @@ sub manage_table_html {
 sub manage_table_ltx {
     my ($self, $table) = @_;
 
-    my $total = 0;
     my $out = {
                body => [],
                head => [],
@@ -819,10 +818,6 @@ sub manage_table_ltx {
     foreach my $t (qw/body head foot/) {
         foreach my $rt (@{$table->{$t}}) {
             my @row;
-            # update the counter
-            if (@$rt > $total) {
-                $total = scalar @$rt;
-            }
             foreach my $cell (@$rt) {
                 # escape all!
                 push @row, $self->manage_regular($cell);
@@ -832,10 +827,11 @@ sub manage_table_ltx {
         }
     }
     # then we loop over what we have. First head, then body, and
-    # finally foot print "found $total fields\n";
+    # finally foot
     
     my $textable = "\\begin{table}[htp]\n\\centering\n\\begin{tabular}{" ;
-      $textable .= "|c" x $total; $textable .= "|}\n";
+    $textable .= "|c" x $table->{counter};
+    $textable .= "|}\n";
     if (my @head = @{$out->{head}}) {
         $textable .= "\\hline\n" . join("", @head);
     }
@@ -846,8 +842,8 @@ sub manage_table_ltx {
         $textable .= "\\hline\n" . join("", @foot);
     }
     $textable .= "\\hline\n\\end{tabular}\n";
-    if (my $caption = $table->{caption}) {
-        $textable .= "\n" . $self->manage_regular($caption) . "\n\n";
+    if (defined $table->{caption} and $table->{caption} ne "") {
+        $textable .= "\n" . $self->manage_regular($table->{caption}) . "\n\n";
     }
     $textable .= "\\end{table}\n";
     # print $textable;
