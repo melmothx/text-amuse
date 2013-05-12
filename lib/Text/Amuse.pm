@@ -145,11 +145,25 @@ sub toc_as_html {
     return $self->_html_obj->html_toc;
 }
 
+=head3 as_splat_html
+
+Return a list of strings, each of them is a html page resulting from
+the splitting of the as_html output. Linked footnotes as inserted at
+the end of each page.
+
+=cut
+
+sub as_splat_html {
+    my $self = shift;
+    return @{ $self->_html_obj->process(split => 1) };
+}
+
+
 =head3 raw_html_toc
 
 Return an internal representation of the ToC
 
-=cut 
+=cut
 
 sub raw_html_toc {
     my $self = shift;

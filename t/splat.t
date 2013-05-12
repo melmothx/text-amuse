@@ -6,7 +6,7 @@ use Text::Amuse::Output;
 use File::Spec::Functions;
 use Test::More;
 
-plan tests => 2;
+plan tests => 9;
 
 my $file = catfile(t => testfiles => "splat.muse");
 my $doc = Text::Amuse::Document->new(file => $file);
@@ -54,6 +54,7 @@ my $expected =  [
 
 is_deeply($splat, $expected, "Splat html OK");
 
+
 my $toc = [
            {
             'level' => '1',
@@ -73,3 +74,18 @@ my $toc = [
           ];
 
 is_deeply( [ $output->table_of_contents ], $toc, "ToC ok");
+
+use Text::Amuse;
+
+my $splatdoc = Text::Amuse->new(file => $file);
+
+is_deeply( [ $splatdoc->as_splat_html ], $expected, "ok from Text::Amuse");
+
+is_deeply( [ $splatdoc->raw_html_toc ], $toc, "ToC ok");
+
+ok($splatdoc->as_html);
+ok($splatdoc->as_latex);
+ok($splatdoc->wants_toc);
+is_deeply( [ $splatdoc->raw_html_toc ], $toc, "ToC ok");
+is_deeply( [ $splatdoc->as_splat_html ], $expected,
+           "ok again from Text::Amuse");
