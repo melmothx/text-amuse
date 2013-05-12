@@ -26,15 +26,8 @@ foreach my $file (@ARGV) {
     make_latex($file);
 }
 
-sub html_template {
-    my $html = <<'EOF';
-<!doctype html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>[% doc.header_as_html.title %]</title>
-    <style type="text/css">
- <!--/*--><![CDATA[/*><!--*/
+sub css_template {
+    my $css = <<'EOF';
 
 html,body, pre.verse {
 	margin:0;
@@ -187,8 +180,21 @@ div#tableofcontents{
 	font-weight: normal;
 	font-size: 8pt;
 }
+EOF
+    return $css;
+}
 
 
+sub html_template {
+    my $html = <<'EOF';
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>[% doc.header_as_html.title %]</title>
+    <style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+[% css %]
   /*]]>*/-->
     </style>
 </head>
@@ -231,7 +237,10 @@ sub make_html {
     my $doc = Text::Amuse->new(file => $file);
     my $out = "";
     my $in = html_template();
-    $tt->process($in, { doc => $doc }, \$out);
+    $tt->process($in, {
+                       doc => $doc,
+                       css => css_template(),
+                      }, \$out);
     my $outfile = $file;
     $outfile =~ s/muse$/html/;
     open (my $fh, ">:encoding(utf-8)", $outfile);
