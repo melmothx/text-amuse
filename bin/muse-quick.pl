@@ -295,7 +295,8 @@ sub latex_template {
 \usepackage{graphicx}
 \usepackage{alltt}
 \usepackage{verbatim}
-\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
+% http://tex.stackexchange.com/questions/3033/forcing-linebreaks-in-url
+\PassOptionsToPackage{hyphens}{url}\usepackage[hyperfootnotes=false,hidelinks,breaklinks=true]{hyperref}
 \usepackage{bookmark}
 \usepackage[stable]{footmisc}
 \usepackage{enumerate}
