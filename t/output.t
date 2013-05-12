@@ -53,6 +53,7 @@ test_testfile("special");
 test_testfile("breaklist");
 test_testfile("verse-2");
 test_testfile("headings");
+test_testfile("table-2");
 
 sub test_testfile {
     my $base = shift;

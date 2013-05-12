@@ -847,7 +847,7 @@ sub manage_table_ltx {
     }
     $textable .= "\\hline\n\\end{tabular}\n";
     if (my $caption = $table->{caption}) {
-        $textable .= "\n" . $caption . "\n\n";
+        $textable .= "\n" . $self->manage_regular($caption) . "\n\n";
     }
     $textable .= "\\end{table}\n";
     # print $textable;
