@@ -862,24 +862,27 @@ sub _split_table_in_hash {
     my ($self, $table) = @_;
     return {} unless $table;
     my $output = {
-                  "caption" => "",
-                  "body" => [],
-                  "head" => [],
-                  "foot" => [],
+                  caption => "",
+                  body => [],
+                  head => [],
+                  foot => [],
+                  counter => 0,
                  };
     foreach my $row (split "\n", $table) {
         if ($row =~ m/^\s*\|\+\s*(.+?)\s*\+\|\s*$/) {
             $output->{caption} = $1;
             next
         }
+        my $dest;
+        my @cells = split /\|+/, $row;
+        if ($output->{counter} < scalar(@cells)) {
+            $output->{counter} = scalar(@cells);
+        }
         if ($row =~ m/\|\|\|/) {
-            my @fcells = split /\|+/, $row;
-            push @{$output->{foot}}, \@fcells;
+            push @{$output->{foot}}, \@cells;
         } elsif ($row =~ m/\|\|/) {
-            my @hcells = split /\|+/, $row;
-            push @{$output->{head}}, \@hcells;
+            push @{$output->{head}}, \@cells;
         } else {
-            my @cells = split /\|+/, $row;
             push @{$output->{body}}, \@cells;
         }
     }
