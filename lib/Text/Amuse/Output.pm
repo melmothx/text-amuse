@@ -99,6 +99,17 @@ a sensible output you will have to join the pieces yourself.
 We don't return a joined string to avoid copying large amounts of
 data.
 
+  my $splat_pages = $obj->process(split => 1);
+  foreach my $html (@$splat_pages) {
+      # ...templating here...
+  }
+
+If the format is C<html>, the option C<split> may be passed. Instead
+of a arrayref of chuncks, an arrayref with html pages will be
+returned. Each page usually starts with an heading, and it's without
+<head> <body>. Footnotes are flushed and inserted at the end of each
+pages.
+
 E.g.
 
   print @{$obj->process};
