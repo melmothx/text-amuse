@@ -289,8 +289,8 @@ sub latex_template {
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{lmodern}
-\usepackage{microtype} % you need an *updated* texlive 2012
 [% END %]
+\usepackage{microtype} % you need an *updated* texlive 2012, but harmless
 \usepackage{graphicx}
 \usepackage{alltt}
 \usepackage{verbatim}
