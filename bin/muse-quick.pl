@@ -248,7 +248,7 @@ sub minimal_html_template {
     <link href="stylesheet.css" type="text/css" rel="stylesheet" />
   </head>
   <body>
-    <div>
+    <div id="page">
       [% text %]
     </div>
   </body>
