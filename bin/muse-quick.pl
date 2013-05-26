@@ -36,12 +36,12 @@ foreach my $file (@ARGV) {
 sub css_template {
     my $css = <<'EOF';
 
-html,body, pre.verse {
+html,body {
 	margin:0;
 	padding:0;
 	border: none;
  	background: transparent;
-	font-family: Verdana, "DejaVu Sans", Helvetica, Arial, sans-serif;
+	font-family: serif;
 	font-size: 10pt;
 } 
 div#page {
@@ -95,10 +95,9 @@ span.hiddenindex, span.commentmarker, .comment, span.tocprefix, #hitme {
     background: rgb(255,255,158);
 }
 
-pre.verse {          
+.verse {          
     margin: 24px 48px;
     overflow: auto;
-    border: none;
 } 
 
 table, th, td {
