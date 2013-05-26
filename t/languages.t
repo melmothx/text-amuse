@@ -33,7 +33,7 @@ sub test_lang {
     is($doc->language, $expected_lang, "$lang is $expected_lang");
     is_deeply($doc->header_as_html, {title => "test lang $lang",
                                      lang => $lang}, "header OK");
-    is($doc->as_html, "\n<p>Hello</p>\n", "body ok");
+    is($doc->as_html, "\n<p>\nHello\n</p>\n", "body ok");
 
     # ok($doc->as_html);
     my $other = File::Temp->new(TEMPLATE => "musetestXXXXXX",

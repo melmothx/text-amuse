@@ -1073,11 +1073,11 @@ sub blk_table {
         $self->{_blk_table} = {
                                   p =>  { start => {
                                                     ltx => "\n",
-                                                    html => "\n<p>",
+                                                    html => "\n<p>\n",
                                                    },
                                           stop => {
                                                    ltx => "\n\n",
-                                                   html => "</p>\n",
+                                                   html => "\n</p>\n",
                                                   },
                                         },
                                   h1 => {

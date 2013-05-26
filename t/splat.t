@@ -19,7 +19,9 @@ my $expected =  [
                  '<h2 id="toc1">Here</h2>
 
 
-<p>Here there is the body <a href="#fn1" class="footnote" id="fn_back1">[1]</a></p>
+<p>
+Here there is the body <a href="#fn1" class="footnote" id="fn_back1">[1]</a>
+</p>
 
 <p class="fnline"><a class="footnotebody" href="#fn_back1" id="fn1">[1]</a> First
 </p>
@@ -29,7 +31,9 @@ my $expected =  [
                  '<h3 id="toc2">chapter</h3>
 
 
-<p>Here we go <a href="#fn2" class="footnote" id="fn_back2">[2]</a></p>
+<p>
+Here we go <a href="#fn2" class="footnote" id="fn_back2">[2]</a>
+</p>
 
 <p class="fnline"><a class="footnotebody" href="#fn_back2" id="fn2">[2]</a> Second
 </p>
@@ -39,9 +43,13 @@ my $expected =  [
                  '<h4 id="toc3">section <a href="#fn3" class="footnote" id="fn_back3">[3]</a></h4>
 
 
-<p>section <a href="#fn4" class="footnote" id="fn_back4">[4]</a></p>
+<p>
+section <a href="#fn4" class="footnote" id="fn_back4">[4]</a>
+</p>
 
-<p>End of the game</p>
+<p>
+End of the game
+</p>
 
 <p class="fnline"><a class="footnotebody" href="#fn_back3" id="fn3">[3]</a> Third
 </p>
@@ -53,7 +61,9 @@ my $expected =  [
           '<h5 id="toc4">subsection <a href="#fn5" class="footnote" id="fn_back5">[5]</a></h5>
 
 
-<p>subsection</p>
+<p>
+subsection
+</p>
 <h6>subsub section <a href="#fn6" class="footnote" id="fn_back6">[6]</a></h6>
 
 

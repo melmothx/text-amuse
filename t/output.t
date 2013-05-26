@@ -20,12 +20,16 @@ $document =
 
 my $exphtml = << 'HTML';
 
-<p><em>em</em> <br /> <strong>strong</strong> <br /> <strong><em>emStrong</em></strong> <code>code</code> <em>em</em>
+<p>
+<em>em</em> <br /> <strong>strong</strong> <br /> <strong><em>emStrong</em></strong> <code>code</code> <em>em</em>
 <strong>strong</strong> <em><strong>EmStrong</em></strong>
 <em>em</em> <strong>strong</strong> <strong><em>emStrong</em></strong> <code>code</code> <em>em</em>
-<strong>strong</strong> <em><strong>EmStrong</em></strong></p>
+<strong>strong</strong> <em><strong>EmStrong</em></strong>
+</p>
 
-<p>&lt;script&gt;alert(&quot;hacked!&quot;)&lt;/script&gt;&lt;em&gt;&lt;strong&gt;</p>
+<p>
+&lt;script&gt;alert(&quot;hacked!&quot;)&lt;/script&gt;&lt;em&gt;&lt;strong&gt;
+</p>
 HTML
 
 my $exptex = << 'TEX';

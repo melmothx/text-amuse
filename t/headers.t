@@ -16,7 +16,7 @@ ok($document->as_latex);
 ok($document->header_as_latex);
 ok($document->header_as_html);
 
-is($document->as_html, "\n<p>Hello</p>\n");
+is($document->as_html, "\n<p>\nHello\n</p>\n");
 is($document->as_latex, "\nHello\n\n");
 
 is_deeply($document->header_as_latex,
