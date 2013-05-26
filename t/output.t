@@ -1,12 +1,18 @@
 use strict;
 use warnings;
+use utf8;
 use Test::More;
 use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
 use t::Utils qw/read_file write_to_file/;
 
-plan tests => 30;
+ # my $builder = Test::More->builder;
+ # binmode $builder->output,         ":utf8";
+ # binmode $builder->failure_output, ":utf8";
+ # binmode $builder->todo_output,    ":utf8";
+
+plan tests => 32;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -60,6 +66,8 @@ test_testfile("headings");
 test_testfile("table-2");
 test_testfile("uneven-table");
 test_testfile("table-square-brackets");
+test_testfile("nbsp");
+
 
 sub test_testfile {
     my $base = shift;
@@ -71,4 +79,5 @@ sub test_testfile {
     my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
     is ($document->as_latex, $latex, "LaTex for $base OK");
     is ($document->as_html, $html, "HTML for $base OK");
+    # print Dumper($document->document);
 }

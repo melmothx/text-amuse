@@ -160,7 +160,7 @@ sub _parse_string {
     my $l = $self->rawline;
     my $blockre = $self->_block_re;
     # null line is default, do nothing
-    if ($l =~ m/^\s*$/s) {
+    if ($l =~ m/^[\n\t ]*$/s) {
         # do nothing, already default
         $self->removed($l);
     }
