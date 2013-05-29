@@ -392,7 +392,7 @@ sub make_latex {
     $base =~ s/muse$//;
     cleanup($base);
     for (1..3) {
-        system($exec, $outfile);
+        system($exec, '-interaction=nonstopmode', $outfile);
     }
     cleanup($base);
 }
