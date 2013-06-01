@@ -356,6 +356,7 @@ sub latex_template {
 
 \cleardoublepage
 
+\thispagestyle{empty}
 \strut
 \vfill
 
