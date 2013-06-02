@@ -141,7 +141,7 @@ sub process {
             if ($el->string =~ m/^\s*-----*\s*$/s) {
                 push @pieces, $self->manage_hr($el);
             }
-            elsif ($el->string =~ m/(\* ?){5}\s*$/s) {
+            elsif ($el->string =~ m/^\s*(\* ?){5}\s*$/s) {
                 push @pieces, $self->manage_newpage($el);
             }
             # an image by itself, so avoid it wrapping with <p></p>,
@@ -934,7 +934,7 @@ If it's LaTeX, insert a newpage
 
 sub manage_newpage {
     my ($self, $el) = @_;
-    die "Wtf?" if $el->string =~ m/\w/s; # don't eat chars by mistake
+    die "Wtf? " . $el->string if $el->string =~ m/\w/s; # don't eat chars by mistake
     if ($self->fmt eq 'html') {
         return $self->manage_paragraph($el);
     }

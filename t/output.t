@@ -12,7 +12,7 @@ use t::Utils qw/read_file write_to_file/;
  # binmode $builder->failure_output, ":utf8";
  # binmode $builder->todo_output,    ":utf8";
 
-plan tests => 46;
+plan tests => 48;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -74,6 +74,7 @@ test_testfile("broken2");
 test_testfile("broken3");
 test_testfile("list-and-fn");
 test_testfile("complete");
+test_testfile("right");
 
 sub test_testfile {
     my $base = shift;
