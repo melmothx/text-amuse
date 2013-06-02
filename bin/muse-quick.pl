@@ -450,6 +450,9 @@ sub make_epub {
         $epub->add_title(_remove_html_tags($t));
         $titlepage .= "<h1>$t</h1>\n";
     }
+    else {
+        $epub->add_title(_remove_html_tags($t) || "No title");
+    }
     if (my $author = $header->{author}) {
         $epub->add_author(_remove_html_tags($author));
         $titlepage .= "<h2>$author</h2>\n";
