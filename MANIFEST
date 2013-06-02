@@ -118,4 +118,3 @@ t/testfiles/verse.muse
 t/text-amuse.t
 t/tocs.t
 t/unroll.t
-t/Utils.pm
