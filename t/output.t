@@ -14,7 +14,7 @@ use t::Utils qw/read_file write_to_file/;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 50;
+plan tests => 52;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -78,7 +78,7 @@ test_testfile("list-and-fn");
 test_testfile("complete");
 test_testfile("right");
 test_testfile("square-brackets");
-
+test_testfile("verbatim");
 
 sub test_testfile {
     my $base = shift;
