@@ -5,7 +5,6 @@ use Test::More;
 use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
-use t::Utils qw/read_file write_to_file/;
 
  # my $builder = Test::More->builder;
  # binmode $builder->output,         ":utf8";
@@ -100,4 +99,20 @@ sub test_testfile {
                [ split /\n/, $html],
                "HTML for $base OK");
     # print Dumper($document->document);
+}
+
+sub write_to_file {
+    my ($file, @stuff) = @_;
+    open (my $fh, ">:encoding(utf-8)", $file) or die "Couldn't open $file $!";
+    print $fh @stuff;
+    close $fh;
+}
+
+sub read_file {
+    my $file = shift;
+    local $/ = undef;
+    open (my $fh, "<:encoding(utf-8)", $file) or die "Couldn't open $file $!";
+    my $string = <$fh>;
+    close $fh;
+    return $string;
 }
