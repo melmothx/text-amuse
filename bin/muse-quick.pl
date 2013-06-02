@@ -517,6 +517,7 @@ sub make_epub {
 
 sub _remove_html_tags {
     my $string = shift;
+    return "" unless defined $string;
     $string =~ s/<.+?>//g;
     return $string;
 }
