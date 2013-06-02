@@ -832,7 +832,7 @@ sub manage_table_ltx {
     # finally foot
     
     my $textable =
-      "\\begin{table}[htp]\n\\centering\n\\begin{tabularx}{\\textwidth}{" ;
+      "\\noindent\n \\begin{minipage}[t]{\\textwidth}\n\\centering\n\\begin{tabularx}{\\textwidth}{" ;
     $textable .= "|X" x $table->{counter};
     $textable .= "|}\n";
     if (my @head = @{$out->{head}}) {
@@ -847,9 +847,9 @@ sub manage_table_ltx {
     $textable .= "\\hline\n\\end{tabularx}\n";
     if (defined $table->{caption} and $table->{caption} ne "") {
         $textable .= "\n\\medskip\n" .
-          $self->manage_regular($table->{caption}) . "\n\n";
+          $self->manage_regular($table->{caption}) . "\n\n\\medskip\n\n";
     }
-    $textable .= "\\end{table}\n";
+    $textable .= "\\end{minipage}\n";
     # print $textable;
     return $textable;
 }
