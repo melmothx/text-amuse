@@ -12,6 +12,8 @@ use t::Utils qw/read_file write_to_file/;
  # binmode $builder->failure_output, ":utf8";
  # binmode $builder->todo_output,    ":utf8";
 
+my $leave_out_in_tmp = 0;
+
 plan tests => 48;
 
 my $document =
@@ -80,8 +82,12 @@ sub test_testfile {
     my $base = shift;
     $document = Text::Amuse->new(file => catfile(t => testfiles => "$base.muse"),
                                  debug => 0);
-    write_to_file(catfile(tmpdir() => "$base.out.html"), $document->as_html);
-    write_to_file(catfile(tmpdir() => "$base.out.ltx"), $document->as_latex);
+    if ($leave_out_in_tmp) {
+        write_to_file(catfile(tmpdir() => "$base.out.html"),
+                      $document->as_html);
+        write_to_file(catfile(tmpdir() => "$base.out.ltx"),
+                      $document->as_latex);
+    }
     my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
     my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
     is ($document->as_latex, $latex, "LaTex for $base OK");
