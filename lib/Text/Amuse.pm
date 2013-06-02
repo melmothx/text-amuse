@@ -3,7 +3,7 @@ package Text::Amuse;
 use 5.010001;
 use strict;
 use warnings;
-use Data::Dumper;
+# use Data::Dumper;
 use Text::Amuse::Document;
 use Text::Amuse::Output;
 
@@ -17,7 +17,7 @@ Version 0.01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
