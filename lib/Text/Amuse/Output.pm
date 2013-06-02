@@ -40,12 +40,14 @@ pretty much internal only (and underdocumented).
     \leftskip=\parindent
     \parindent=-\parindent
     \bigskip
+    \indent
   }{\bigskip}
   
   \newenvironment{amuseplay}{
     \leftskip=\parindent
     \parindent=-\parindent
     \bigskip
+    \indent
   }{\bigskip}
   
   \newcommand{\Slash}{\slash\hspace{0pt}}
