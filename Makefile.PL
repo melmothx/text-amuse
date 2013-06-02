@@ -16,7 +16,6 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => 0,
-        'Test::Memory::Cycle' => 0,
     },
     PREREQ_PM => {
         #'ABC'              => 1.6,
@@ -25,4 +24,9 @@ WriteMakefile(
     # EXE_FILES => [ 'bin/muse-quick.pl' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Text-Amuse-*' },
+    META_MERGE => {
+                   resources => {
+                                 repository => 'https://gitorious.org/text-amuse'
+                                },
+                  }
 );

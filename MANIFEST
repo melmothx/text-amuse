@@ -82,7 +82,6 @@ t/testfiles/open-letter.muse
 t/testfiles/other.png
 t/testfiles/packing.muse
 t/testfiles/prova.muse
-t/testfiles/real-case-table.muse
 t/testfiles/recursiv.muse
 t/testfiles/right.exp.html
 t/testfiles/right.exp.ltx
