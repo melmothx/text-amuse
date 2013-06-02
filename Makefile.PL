@@ -21,7 +21,7 @@ WriteMakefile(
         #'ABC'              => 1.6,
         #'Foo::Bar::Module' => 5.0401,
     },
-    # EXE_FILES => [ 'bin/muse-quick.pl' ],
+    EXE_FILES => [ 'bin/muse-quick.pl' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Text-Amuse-*' },
     META_MERGE => {

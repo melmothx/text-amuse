@@ -304,6 +304,36 @@ sub language {
     return $self->{_doc_language};
 }
 
+=head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP
+
+=head3 Inline markup
+
+Underlining has been dropped.
+
+Emphasis and strong can also be written with tags, like <em>emphasis</em>,
+<strong>strong</strong> and <code>code</code>.
+
+Added tag <sup> and <sub> for superscript and subscript.
+
+=head3 Block markup
+
+Description lists have been dropped. (Lists work as usual).
+
+The only tables supported are the native one (with ||| as separator).
+
+=head3 Others
+
+Anchors are unsupported (mainly because of the confusing syntax and
+the PDF output).
+
+Embedded lisp code and syntax highlight is not supported.
+
+Exoteric stuff like citing from other resources is not supported.
+
+The scope of this module is not to replicate all the features of the
+original implementation, but to use the markup for a wiki (as opposed
+as a personal and private wiki).
+
 =head1 AUTHOR
 
 Marco Pessotto, C<< <melmothx at gmail.com> >>
@@ -320,7 +350,12 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Text::Amuse
 
-Repository available at Gitorious: https://gitorious.org/text-amuse
+Repository available at Gitorious: L<https://gitorious.org/text-amuse>
+
+=head1 SEE ALSO
+
+The original documentation for the Emacs Muse markup can be found at:
+L<http://mwolson.org/static/doc/muse/Markup-Rules.html>
 
 =head1 LICENSE
 

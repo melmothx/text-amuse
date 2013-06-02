@@ -9,7 +9,6 @@ use strict;
 use warnings;
 use utf8;
 use FindBin;
-use lib "$FindBin::Bin/../lib";
 use Text::Amuse;
 use Template::Tiny;
 use EBook::EPUB;
@@ -23,9 +22,28 @@ use Data::Dumper;
 # quick and dirty to get the stuff compiled
 
 my $xtx = 0;
+my $help;
 GetOptions (
             xtx => \$xtx,
+            help => \$help,
+            version => \$help,
            );
+
+if ($help) {
+    print << "HELP";
+Usage: muse-quick.pl [-xtx] file.muse
+
+Version $Text::Amuse::VERSION.
+
+This program uses Text::Amuse to produce usable output in HTML, EPUB,
+LaTeX and PDF format.
+
+The only option, beside --help, is --xtx, which uses XeLaTeX instead
+of pdfLaTeX to generate the PDF output.
+
+HELP
+    exit;
+}
 
 my $tt = Template::Tiny->new();
 
