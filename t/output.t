@@ -92,7 +92,11 @@ sub test_testfile {
     }
     my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
     my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
-    is ($document->as_latex, $latex, "LaTex for $base OK");
-    is ($document->as_html, $html, "HTML for $base OK");
+    is_deeply ([ split /\n/, $document->as_latex ],
+               [ split /\n/, $latex ],
+               "LaTex for $base OK");
+    is_deeply ([ split /\n/, $document->as_html ],
+               [ split /\n/, $html],
+               "HTML for $base OK");
     # print Dumper($document->document);
 }
