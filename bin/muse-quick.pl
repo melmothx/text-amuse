@@ -1,4 +1,10 @@
 #!/usr/bin/env perl
+
+# This program is free software and is published under the same terms
+# as Perl itself.
+
+# written by Marco Pessotto <melmothx@gmail.com>
+
 use strict;
 use warnings;
 use utf8;

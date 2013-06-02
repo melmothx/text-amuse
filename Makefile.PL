@@ -28,5 +28,5 @@ WriteMakefile(
                    resources => {
                                  repository => 'https://gitorious.org/text-amuse'
                                 },
-                  }
+                  },
 );
