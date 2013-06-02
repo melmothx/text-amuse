@@ -130,7 +130,7 @@ sub header_as_html {
     unless (defined $self->{_cached_html_header}) {
         $self->{_cached_html_header} = $self->_html_obj->header;
     }
-    return $self->{_cached_html_header};
+    return { %{ $self->{_cached_html_header} } };
 }
 
 =head3 toc_as_html
@@ -230,7 +230,7 @@ sub header_as_latex {
     unless (defined $self->{_cached_latex_header}) {
         $self->{_cached_latex_header} = $self->_latex_obj->header;
     }
-    return $self->{_cached_latex_header};
+    return { %{ $self->{_cached_latex_header} } };
 }
 
 =head2 Helpers
