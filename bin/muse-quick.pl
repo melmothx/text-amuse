@@ -447,11 +447,11 @@ sub make_epub {
     my $titlepage;
     my $header = $text->header_as_html;
     if (my $t = $header->{title}) {
-        $epub->add_title($t);
+        $epub->add_title(_remove_html_tags($t));
         $titlepage .= "<h1>$t</h1>\n";
     }
     if (my $author = $header->{author}) {
-        $epub->add_author($author);
+        $epub->add_author(_remove_html_tags($author));
         $titlepage .= "<h2>$author</h2>\n";
     }
     if ($header->{date}) {
@@ -472,7 +472,7 @@ sub make_epub {
     my $in = minimal_html_template;
     my $out = "";
     $tt->process($in, {
-                       title => $header->{title},
+                       title => _remove_html_tags($header->{title}),
                        text => $titlepage
                       }, \$out);
     my $tpid = $epub->add_xhtml("titlepage.xhtml", $out);
@@ -488,7 +488,7 @@ sub make_epub {
         # print Dumper($index);
         my $filename = "piece" . $index->{index};
         my $title = "*" x $index->{level} . " " . $index->{string};
-        $tt->process($in, { title => $title,
+        $tt->process($in, { title => _remove_html_tags($title),
                             text => $fi },
                      \$xhtml);
         my $id = $epub->add_xhtml($filename, $xhtml);
