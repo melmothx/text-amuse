@@ -8,7 +8,6 @@
 use strict;
 use warnings;
 use utf8;
-use FindBin;
 use Text::Amuse;
 use Template::Tiny;
 use EBook::EPUB;
@@ -340,21 +339,21 @@ sub latex_template {
 
 % reverse indentation for biblio and play
 
-\newenvironment{amusebiblio}{
+\newenvironment*{amusebiblio}{
   \leftskip=\parindent
   \parindent=-\parindent
   \bigskip
   \indent
 }{\bigskip}
 
-\newenvironment{amuseplay}{
+\newenvironment*{amuseplay}{
   \leftskip=\parindent
   \parindent=-\parindent
   \bigskip
   \indent
 }{\bigskip}
 
-\newcommand{\Slash}{\slash\hspace{0pt}}
+\newcommand*{\Slash}{\slash\hspace{0pt}}
 
 % global style
 \pagestyle{plain}
