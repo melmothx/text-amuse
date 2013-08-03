@@ -16,16 +16,23 @@ use Getopt::Long;
 use File::Basename;
 use Data::UUID;
 use File::Temp;
+use File::Spec::Functions qw/catfile/;
+use File::Path qw/make_path/;
 use Data::Dumper;
 
 # quick and dirty to get the stuff compiled
 
 my $xtx = 0;
 my $help;
+my $template_dir;
+my $gen_templates;
+
 GetOptions (
             xtx => \$xtx,
             help => \$help,
             version => \$help,
+            'tt-dir=s' => \$template_dir,
+            templates => \$gen_templates
            );
 
 if ($help) {
@@ -37,11 +44,48 @@ Version $Text::Amuse::VERSION.
 This program uses Text::Amuse to produce usable output in HTML, EPUB,
 LaTeX and PDF format.
 
-The only option, beside --help, is --xtx, which uses XeLaTeX instead
-of pdfLaTeX to generate the PDF output.
+The other options, beside --help, are:
+
+  --xtx, which uses XeLaTeX instead of pdfLaTeX to generate the PDF
+         output.
+
+  --tt-dir directory where the templates should be looked up, with
+           the following hardcoded names: html.tt latex.tt css.tt
+
+  --templates populate the tt-dir directory with the embedded templates.
 
 HELP
     exit;
+}
+
+if ($gen_templates) {
+    unless ($template_dir) {
+        die "I need the tt-dir option for templates to work!\n";
+    }
+    my %templates = (
+                     css => _embedded_css_template(),
+                     latex => _embedded_latex_template(),
+                     html => _embedded_html_template(),
+                    );
+    unless (-d $template_dir) {
+        warn "Couldn't find $template_dir, creating it\n";
+        make_path($template_dir);
+    }
+    foreach my $tmpl (keys %templates) {
+        my $target = catfile($template_dir, $tmpl . ".tt");
+        if (-f $target) {
+            warn "$target exists, skipping...\n";
+            next;
+        }
+        else {
+            warn "Creating $target...\n";
+        }
+        open (my $fh, ">:encoding(utf-8)", $target)
+          or die "Couldn't open $target: $!";
+        my $body = $templates{$tmpl};
+        print $fh $$body;
+        close $fh;
+    }
 }
 
 my $tt = Template::Tiny->new();
@@ -57,6 +101,60 @@ foreach my $file (@ARGV) {
 }
 
 sub css_template {
+    # this function returns a string, so dereference the result of the
+    # embedded.
+    if (my $tt = lookup_template("css.tt")) {
+        return $$tt;
+    }
+    else {
+        return ${_embedded_css_template()};
+    }
+}
+
+sub html_template {
+    if (my $tt = lookup_template("html.tt")) {
+        return $tt;
+    }
+    else {
+        return _embedded_html_template();
+    }
+}
+
+sub latex_template {
+    if (my $tt = lookup_template("latex.tt")) {
+        return $tt;
+    }
+    else {
+        return _embedded_latex_template();
+    }
+}
+
+sub lookup_template {
+    my $file = shift;
+    if ($template_dir) {
+        if (-d $template_dir) {
+            my $template_file = catfile($template_dir, $file);
+            if (-f $template_file) {
+                my $slurped;
+                open (my $fh, "<:encoding(utf-8)", $template_file)
+                  or die "Couldn't open $template_file $!";
+                {
+                    local $/;
+                    $slurped = <$fh>;
+                }
+                close $fh;
+                # return a reference
+                return \$slurped;
+            }
+        }
+        # if we're still here, something went wrong
+        warn "Couldn't find a template for $file in $template_dir!\n";
+        warn "Using the embedded one!\n";
+    }
+    return;
+}
+
+sub _embedded_css_template {
     my $css = <<'EOF';
 
 html,body {
@@ -210,11 +308,11 @@ div#tableofcontents{
 	font-size: 8pt;
 }
 EOF
-    return $css;
+    return \$css;
 }
 
 
-sub html_template {
+sub _embedded_html_template {
     my $html = <<'EOF';
 <!doctype html>
 <html>
@@ -297,7 +395,7 @@ sub make_html {
     close $fh;
 }
 
-sub latex_template {
+sub _embedded_latex_template {
     my $latex = <<'EOF';
 \documentclass[DIV=9,fontsize=10pt,oneside,paper=a5]{[% IF doc.wants_toc %]scrbook[% ELSE %]scrartcl[% END %]}
 [% IF xtx %]
