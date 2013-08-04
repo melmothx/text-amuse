@@ -205,7 +205,7 @@ EOF
 sub as_html {
     my $self = shift;
     my $wrap = $self->wrap;
-    my $width = $self->width_html;
+    my $width = "";
     my $desc;
     my $class = "image";
     my $out;
@@ -220,8 +220,11 @@ sub as_html {
 <div class="caption">$realdesc</div>
 EOF
     }
+    if ($self->width != 1) {
+        $width = q{ style="width:} .  $self->width_html . q{;"};
+    }
 
-    $out = qq{\n<div class="$class">\n} .
+    $out = qq{\n<div class="$class"$width>\n} .
       qq{<img src="$src" alt="$src" class="embedimg" />\n};
     if (defined $desc) {
         $out .= $desc;
