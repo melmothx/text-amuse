@@ -265,16 +265,19 @@ Babel, Polyglossia, etc.
 sub _language_mapping {
     my $self = shift;
     return {
+            cs => 'czech',
+            de => 'german',
             en => 'english',
+            es => 'spanish',
+            fi => 'finnish',
+            fr => 'french',
+            hr => 'croatian',
             it => 'italian',
             sr => 'serbian',
-            hr => 'croatian',
             ru => 'russian',
-            es => 'spanish',
-            pt => 'portuguese',
-            de => 'german',
-            fr => 'french',
             nl => 'dutch',
+            pt => 'portuguese',
+            tr => 'turkish',
            };
 }
 
