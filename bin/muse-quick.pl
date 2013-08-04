@@ -422,6 +422,7 @@ sub _embedded_latex_template {
 \usepackage{enumerate}
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
+\usepackage{wrapfig}
 % remove the numbering
 \setcounter{secnumdepth}{-2}
 

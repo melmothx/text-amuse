@@ -8,7 +8,7 @@ plan tests => 11;
 my $image;
 $image = Text::Amuse::Output::Image->new(
                                          width => 0.25,
-                                         wrap => 1,
+                                         wrap => "r",
                                          filename => "test.png",
                                         );
 

@@ -25,6 +25,7 @@ pretty much internal only (and underdocumented).
   \usepackage{enumerate}
   \usepackage{longtable}
   \usepackage[normalem]{ulem}
+  \usepackage{wrapfig}
   
   % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
   \newcommand*{\forcelinebreak}{~\\\relax}
@@ -957,6 +958,7 @@ Here we see if it's a single one or a link/desc pair. Then dispatch
 sub linkify {
     my ($self, $link) = @_;
     die "no link passed" unless defined $link;
+    # warn "Linkifying $link";
     if ($link =~ m/^\[\[
                      \s*
                      (.+?) # link
@@ -995,20 +997,8 @@ sub format_links {
     if (my $image = $self->find_image($link)) {
         my $src = $image->filename;
         $self->document->attachments($src);
-        if ($self->fmt eq 'html') {
-            return qq{\n<div class="image">\n} .
-              qq{<img src="$src" alt="$src" class="embedimg" />\n} .
-                qq{<div class="caption">$desc</div>\n</div>};
-            }
-        elsif ($self->fmt eq 'ltx') {
-            my $width = $image->width_latex;
-            return qq/\n\\begin{figure}[ht]\n/ .
-              qq/\\centering\n/ .
-                qq/\\includegraphics/ .
-                  qq/[width=$width]{$src}\n/ .
-                    qq/\\bigskip\n $desc/ .
-                      qq/\n\\end{figure}\n/;
-        }
+        $image->desc($desc);
+        return $image->output;
     }
     # links
     if ($self->fmt eq 'html') {
@@ -1031,15 +1021,7 @@ sub format_single_link {
     # the re matches only clean names, no need to escape anything
     if (my $image = $self->find_image($link)) {
         $self->document->attachments($image->filename);
-        my $src = $image->filename;
-        if ($self->fmt eq 'html') {
-            return qq{\n<div class="image">\n<img src="$src" alt="$src" class="embedimg" />\n</div>};
-        }
-        elsif ($self->fmt eq 'ltx') {
-            my $width = $image->width_latex;
-            return qq/\n\\begin{figure}[ht]\n/ . qq/\\includegraphics/ .
-              qq/[width=$width]{$src}/ . qq/\n\\end{figure}\n/;
-        }
+        return $image->output;
     }
     if ($self->fmt eq 'html') {
         $link = $self->_url_safe_escape($link);
@@ -1366,7 +1348,13 @@ Regular expression to match image links.
 sub image_re {
     my $self = shift;
     unless (defined $self->{_image_re}) {
-        $self->{_image_re} = qr{([0-9A-Za-z][0-9A-Za-z/-]+\.(png|jpe?g))};
+        $self->{_image_re} = qr{([0-9A-Za-z][0-9A-Za-z/-]+ # basename
+                                    \. # dot
+                                    (png|jpe?g)) # extension $2
+                                (\: # attribute # $3
+                                    w=([\.0-9]+) # width $4
+                                    ([rl])? # float $5
+                                )?}x;
     }
     return $self->{_image_re};
 }
@@ -1381,8 +1369,16 @@ is, return a Text::Amuse::Output::Image object.
 sub find_image {
     my ($self, $link) = @_;
     my $imagere = $self->image_re;
+    # warn "$link , $imagere\n";
     if ($link =~ m/^$imagere$/s) {
-        return Text::Amuse::Output::Image->new(filename => $link);
+        my $filename = $1;
+        my $width = $4;
+        my $float = $5;
+        # warn "passing $1 $4 $5";
+        return Text::Amuse::Output::Image->new(filename => $filename,
+                                               width => $width,
+                                               wrap => $float,
+                                               fmt => $self->fmt);
     }
     else {
         return;

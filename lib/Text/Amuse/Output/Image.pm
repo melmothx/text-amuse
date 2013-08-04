@@ -30,6 +30,13 @@ These arguments are saved in the objects and can be accessed with:
 
 =item wrap
 
+=item fmt
+
+=item desc
+
+Please note that we concatenate the caption as is. It's up to the
+caller to pass an escaped string.
+
 =back
 
 =cut
@@ -37,9 +44,9 @@ These arguments are saved in the objects and can be accessed with:
 sub new {
     my $class = shift;
     my $self = {
-                    width => 1,
-                    wrap => 0,
-                   };
+                width => 1,
+                wrap => 0,
+               };
     my %opts = @_;
 
     if (my $f = $opts{filename}) {
@@ -53,8 +60,13 @@ sub new {
         die "Missing filename argument!";
     }
 
-    if ($opts{wrap}) {
-        $self->{wrap} = 1; 
+    if (my $wrap = $opts{wrap}) {
+        if ($wrap eq 'l' or $wrap eq 'r') {
+            $self->{wrap} = $wrap;
+        }
+        else {
+            die "Wrong wrapping option";
+        }
     }
 
     if (my $w = $opts{width}) {
@@ -63,6 +75,12 @@ sub new {
         }
         else {
             die "Wrong width $w passed!";
+        }
+    }
+
+    foreach my $k (qw/desc fmt/) {
+        if (exists $opts{$k} and defined $opts{$k}) {
+            $self->{$k} = $opts{$k};
         }
     }
 
@@ -81,6 +99,18 @@ sub filename {
     return shift->{filename};
 }
 
+sub fmt {
+    return shift->{fmt};
+}
+
+sub desc {
+    my ($self, @args) = @_;
+    if (@args) {
+        $self->{desc} = shift(@args);
+    }
+    return shift->{desc};
+}
+
 =head2 Formatters
 
 =over 4
@@ -92,6 +122,8 @@ Width in percent
 =item width_latex
 
 Width as  '0.25\textwidth'
+
+=back
 
 =cut
 
@@ -110,6 +142,104 @@ sub width_latex {
     }
     else {
         return $self->width . "\\textwidth"; # a float
+    }
+}
+
+=head1 METHODS
+
+=over 4
+
+=item as_latex
+
+The LaTeX code for the image.
+
+=item as_html
+
+The HTML code for the image
+
+=item output
+
+Given that we know the format, just return the right one, using
+C<as_html> or C<as_latex>.
+
+=back
+
+
+=cut
+
+
+
+sub as_latex {
+    my $self = shift;
+    my $wrap = $self->wrap;
+    my $width = $self->width_latex;
+    my $desc = "";
+    if (my $realdesc = $self->desc) {
+        $desc = "\n\\bigskip\n $realdesc\n";
+    }
+    my $src = $self->filename;
+    my $out;
+    if ($wrap) {
+        $out =<<"EOF";
+
+\\begin{wrapfigure}{$wrap}{$width}
+\\centering
+\\includegraphics[width=$width]{$src}$desc
+\\end{wrapfigure}
+EOF
+    }
+    else {
+        $out =<<"EOF";
+
+\\begin{figure}[htp!]
+\\centering
+\\includegraphics[width=$width]{$src}$desc
+\\end{figure}
+EOF
+
+
+    }
+    return $out;
+}
+
+sub as_html {
+    my $self = shift;
+    my $wrap = $self->wrap;
+    my $width = $self->width_html;
+    my $desc;
+    my $class = "image";
+    my $out;
+    if ($wrap) {
+        $class = "float_image_$wrap";
+    }
+
+    my $src = $self->filename;
+
+    if (my $realdesc = $self->desc) {
+        $desc = <<"EOF";
+<div class="caption">$realdesc</div>
+EOF
+    }
+
+    $out = qq{\n<div class="$class">\n} .
+      qq{<img src="$src" alt="$src" class="embedimg" />\n};
+    if (defined $desc) {
+        $out .= $desc;
+    }
+    $out .= qq{</div>};
+    return $out;
+}
+
+sub output {
+    my $self = shift;
+    if ($self->fmt eq 'ltx') {
+        return $self->as_latex;
+    }
+    elsif ($self->fmt eq 'html') {
+        return $self->as_html;
+    }
+    else {
+        die "Bad format ". $self->fmt;
     }
 }
 
