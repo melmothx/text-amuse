@@ -83,7 +83,7 @@ sub filename {
 
 =head2 Formatters
 
-=over4
+=over 4
 
 =item width_html
 
