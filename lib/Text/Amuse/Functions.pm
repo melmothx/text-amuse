@@ -14,15 +14,20 @@ our @EXPORT_OK = qw/muse_format_line
                    /;
 
 
-# 
-# sub muse_to_html {
-#     return;
-# }
-# 
-# sub muse_to_latex {
-#     return;
-# }
-# 
+=head1 NAME
+
+Text::Amuse::Functions
+
+=head1 SYNOPSIS
+
+This module provides some functions to format strings wrapping the OO
+interface to function calls.
+
+  use Text::Amuse::Functions qw/muse_format_line/
+  my $html = muse_format_line(html => "hello 'world'");
+  my $ltx =  muse_format_line(ltx => "hello #world");
+
+=head1 FUNCTIONS
 
 =head3 muse_format_line ($format, $string)
 
@@ -43,3 +48,6 @@ sub muse_format_line {
                                        format => $format);
     return join("", @{ $out->process });
 }
+
+1;
+
