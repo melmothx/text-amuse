@@ -5,6 +5,7 @@ lib/Text/Amuse/Document.pm
 lib/Text/Amuse/Element.pm
 lib/Text/Amuse/Functions.pm
 lib/Text/Amuse/Output.pm
+lib/Text/Amuse/Output/Image.pm
 lib/Text/Amuse/String.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -18,6 +19,7 @@ t/elements.t
 t/footnotes.t
 t/functions.t
 t/headers.t
+t/images.t
 t/languages.t
 t/lists.t
 t/manifest.t
