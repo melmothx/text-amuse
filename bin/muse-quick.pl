@@ -19,6 +19,7 @@ use File::Temp;
 use File::Spec::Functions qw/catfile/;
 use File::Path qw/make_path/;
 use Data::Dumper;
+use Pod::Usage;
 
 # quick and dirty to get the stuff compiled
 
@@ -36,27 +37,47 @@ GetOptions (
            );
 
 if ($help) {
-    print << "HELP";
-Usage: muse-quick.pl [-xtx] file.muse
+    pod2usage("Using Text::Amuse version " . $Text::Amuse::VERSION . "\n");
+    exit;
+}
 
-Version $Text::Amuse::VERSION.
+=head1 NAME
+
+muse-quick.pl -- format your muse document using Text::Amuse
+
+=head1 SYNOPSIS
+
+  muse-quick.pl [-xtx] file.muse
 
 This program uses Text::Amuse to produce usable output in HTML, EPUB,
 LaTeX and PDF format.
 
 The other options, beside --help, are:
 
-  --xtx, which uses XeLaTeX instead of pdfLaTeX to generate the PDF
-         output.
+=over 4
 
-  --tt-dir directory where the templates should be looked up, with
-           the following hardcoded names: html.tt latex.tt css.tt
+=item --xtx
 
-  --templates populate the tt-dir directory with the embedded templates.
+which uses XeLaTeX instead of pdfLaTeX to generate the PDF output.
 
-HELP
-    exit;
-}
+=item --tt-dir
+
+directory where the templates should be looked up, with the following
+hardcoded names: html.tt latex.tt css.tt
+
+=item --templates
+
+populate the tt-dir directory with the embedded templates.
+
+=back
+
+=head1 DEPENDENCIES
+
+This script has additional dependencies (beside L<Text::Amuse> itself
+and the core modules): L<Template::Tiny>, L<EBook::EPUB>,
+L<Data::UUID>).
+
+=cut
 
 if ($gen_templates) {
     unless ($template_dir) {
