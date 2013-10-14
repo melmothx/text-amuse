@@ -5,3 +5,15 @@
 	Initial release on CPAN.
 
 
+2013-10-14      Marco Pessotto <melmothx@gmail.com>
+
+	Release 0.02
+
+	Improved images handling (with hidden experimental features, see
+	tests in images.t if you're curious).
+
+	Improved muse-quick.pl script + doc.
+
+	Improved docs.
+
+
