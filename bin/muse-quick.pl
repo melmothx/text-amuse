@@ -8,13 +8,14 @@
 use strict;
 use warnings;
 use utf8;
+# use FindBin qw/$Bin/;
+# use lib "$Bin/../lib";
 use Text::Amuse;
 use Template::Tiny;
-use EBook::EPUB;
+use Module::Load;
 use Cwd;
 use Getopt::Long;
 use File::Basename;
-use Data::UUID;
 use File::Temp;
 use File::Spec::Functions qw/catfile/;
 use File::Path qw/make_path/;
@@ -74,8 +75,7 @@ populate the tt-dir directory with the embedded templates.
 =head1 DEPENDENCIES
 
 This script has additional dependencies (beside L<Text::Amuse> itself
-and the core modules): L<Template::Tiny>, L<EBook::EPUB>,
-L<Data::UUID>).
+and the core modules): L<Template::Tiny> and L<EBook::EPUB> (optional).
 
 =cut
 
@@ -414,6 +414,7 @@ sub make_html {
     open (my $fh, ">:encoding(utf-8)", $outfile);
     print $fh $out;
     close $fh;
+    print "$outfile generated\n";
 }
 
 sub _embedded_latex_template {
@@ -444,9 +445,9 @@ sub _embedded_latex_template {
 \usepackage{tabularx}
 \usepackage[normalem]{ulem}
 \usepackage{wrapfig}
+\usepackage{indentfirst}
 % remove the numbering
 \setcounter{secnumdepth}{-2}
-
 
 % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
 \newcommand*{\forcelinebreak}{~\\\relax}
@@ -530,6 +531,7 @@ sub make_latex {
     open (my $fh, ">:encoding(utf-8)", $outfile);
     print $fh $out;
     close $fh;
+    print "$outfile  generated\n";
     my $exec = "pdflatex";
     if ($xtx) {
         $exec = "xelatex";
@@ -538,8 +540,36 @@ sub make_latex {
     $base =~ s/muse$//;
     cleanup($base);
     for (1..3) {
-        system($exec, '-interaction=nonstopmode', $outfile);
+        my $pid = open(KID, "-|");
+        defined $pid or die "Can't fork: $!";
+
+        # parent swallows the output
+        if ($pid) {
+            my $shitout;
+            while (<KID>) {
+                my $line = $_;
+                if ($line =~ m/^[!#]/) {
+                    $shitout++;
+                }
+                if ($shitout) {
+                    print $line;
+                }
+            }
+            close KID or warn "Compilation failed\n";
+            my $exit_code = $? >> 8;
+            unless ($exit_code == 0) {
+                warn "$exec compilation failed with exit code $exit_code, " .
+                  "skipping PDF generation\n";
+                return;
+            }
+        }
+        else {
+            open(STDERR, ">&STDOUT");
+            exec($exec, '-interaction=nonstopmode', $outfile)
+              || die "Can't exec $exec $!";
+        }
     }
+    print "${base}pdf  generated\n";
     cleanup($base);
 }
 
@@ -550,13 +580,19 @@ sub cleanup {
         my $remove = $base . $_;
         if (-f $remove) {
             unlink $remove;
-            print "removing $remove\n";
         }
     }
 }
 
 sub make_epub {
     my $file = shift;
+    eval {
+        load EBook::EPUB;
+    };
+    if ($@) {
+        warn "Couldn't load EBook::EPUB, skipping EPUB generation\n";
+        return;
+    }
     my ($name, $path, $suffix) = fileparse($file, ".muse");
     my $cwd = getcwd;
     my $epubname = "${name}.epub";
@@ -658,6 +694,7 @@ sub make_epub {
         $epub->copy_file($att, $att, $mime);
     }
     $epub->pack_zip($epubname);
+    print "$epubname generated\n";
     chdir $cwd or die "Couldn't chdir into $cwd: $!";
 }
 

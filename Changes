@@ -1,8 +1,8 @@
-2013-06-02      Marco Pessotto <melmothx@gmail.com>
+2013-11-27      Marco Pessotto <melmothx@gmail.com>
 
-	Release 0.01
+	Release 0.03
 
-	Initial release on CPAN.
+	Improved muse-quick.pl output and behaviour. Made EBook::EPUB optional.
 
 
 2013-10-14      Marco Pessotto <melmothx@gmail.com>
@@ -15,5 +15,14 @@
 	Improved muse-quick.pl script + doc.
 
 	Improved docs.
+
+
+
+
+2013-06-02      Marco Pessotto <melmothx@gmail.com>
+
+	Release 0.01
+
+	Initial release on CPAN.
 
 
