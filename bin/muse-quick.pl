@@ -21,6 +21,7 @@ use File::Spec::Functions qw/catfile/;
 use File::Path qw/make_path/;
 use Data::Dumper;
 use Pod::Usage;
+use Cwd;
 
 # quick and dirty to get the stuff compiled
 
@@ -109,16 +110,27 @@ if ($gen_templates) {
     }
 }
 
-my $tt = Template::Tiny->new();
+my $tt;
+
+my $current_dir = getcwd();
 
 foreach my $file (@ARGV) {
+    # reset the dir
+    chdir $current_dir or die "Cannot chdir into $current_dir";
+    # reset tt
+    $tt = Template::Tiny->new();
     unless ($file =~ m/\.muse$/ and -f $file) {
         warn "Skipping $file";
         next;
     }
-    make_html($file);
-    make_latex($file);
-    make_epub($file);
+    my ($name, $path, $suffix) = fileparse($file);
+    if ($path) {
+        chdir $path or die "Cannot chdir into $path\n";
+        print "Working on $name in $path\n";
+    }
+    make_html($name);
+    make_latex($name);
+    make_epub($name);
 }
 
 sub css_template {
