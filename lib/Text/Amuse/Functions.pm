@@ -30,7 +30,7 @@ interface to function calls.
 
 =head1 FUNCTIONS
 
-=head3 muse_format_line ($format, $string)
+=head2 muse_format_line ($format, $string)
 
 Output the given chunk in the desired format (C<html> or C<ltx>).
 
