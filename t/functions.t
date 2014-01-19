@@ -2,9 +2,13 @@ use strict;
 use warnings;
 use utf8;
 use Test::More;
-use Text::Amuse::Functions qw/muse_format_line/;
+use Data::Dumper;
+use Text::Amuse::Functions qw/muse_format_line
+                              muse_fast_scan_header/;
+use File::Temp;
 
-plan tests => 8;
+
+plan tests => 15;
 
 is(muse_format_line(html => q{<em>ciao</em>bella<script">}),
    "<em>ciao</em>bella&lt;script&quot;&gt;");
@@ -25,3 +29,111 @@ is(muse_format_line(html => "[1] [[http://pippo.org][mylink]]"),
 is(muse_format_line(ltx => "[1] [[http://pippo.org][mylink]]"),
   q([1] \href{http://pippo.org}{mylink}));
 
+
+my $body  =<<'BODY';
+#author Pippo ć đ Đ à
+#title Ciao ć đ Đ à is a long title
+#random Random
+
+Here the body starts
+
+
+BODY
+
+my $expected = {
+             random => 'Random',
+             title => "Ciao \x{107} \x{111} \x{110} \x{e0} is a long title",
+             author => "Pippo \x{107} \x{111} \x{110} \x{e0}",
+            };
+
+test_directive($body, $expected);
+
+
+$body =<<'BODY';
+#author Pippo ć đ Đ à
+
+#title Ciao ć đ Đ à
+is a long title
+#random Random
+
+here the body start ć đ Đ à
+BODY
+
+diag "Testing line breaks";
+test_directive($body, $expected);
+
+$body =<<'BODY';
+#author     Pippo          
+ć
+đ
+Đ
+à
+
+#title    Ciao ć đ Đ à           
+          is a long title             
+
+#random        Random                 
+
+here the body start ć đ Đ à
+BODY
+
+diag "Testing stripping";
+test_directive($body, $expected);
+
+eval {
+    test_directive($body, $expected, 1);
+};
+ok($@, "Wrong format handled dies");
+ok($@ =~ m/^Wrong format 1 at/, "Error code ok");
+
+diag "Testing formats";
+
+$body =<<'BODY';
+#author     Pippo          
+ć
+*đ*
+Đ
+à
+
+#title    Ciao ć đ Đ à           
+          is a *long* title             
+
+#random        ***Random***                 
+
+here the body starts....
+BODY
+
+$expected = {
+             random => '<strong><em>Random</em></strong>',
+             title => "Ciao \x{107} \x{111} \x{110} \x{e0} is a <em>long</em> title",
+             author => "Pippo \x{107} <em>\x{111}</em> \x{110} \x{e0}",
+};
+
+test_directive($body, $expected, "html");
+
+$expected = {
+             random => '\\textbf{\\emph{Random}}',
+             title => "Ciao \x{107} \x{111} \x{110} \x{e0} is a \\emph{long} title",
+             author => "Pippo \x{107} \\emph{\x{111}} \x{110} \x{e0}",
+};
+
+
+test_directive($body, $expected, "ltx");
+
+
+sub write_file {
+    my ($file, @strings) = @_;
+    open (my $fh, ">:encoding(UTF-8)", $file) or die "$file: $!";
+    print $fh @strings;
+    close $fh;
+}
+
+sub test_directive {
+    my ($string, $directives, $format) = @_;
+    my $tmp = File::Temp->new();
+    my $fname = $tmp->filename;
+    write_file($fname, $string);
+    my $dirs = muse_fast_scan_header($fname, $format);
+    is_deeply($dirs, $directives, "Correctly parsed")
+      or print Dumper($dirs, $expected);
+}

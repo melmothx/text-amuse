@@ -1,3 +1,11 @@
+2014-01-19      Marco Pessotto <melmothx@gmail.com>
+
+	Release 0.05
+
+	New function Text::Amuse::Utils::muse_fast_scan_header
+
+
+
 2013-12-02      Marco Pessotto <melmothx@gmail.com>
 
 	Release 0.04
