@@ -132,6 +132,7 @@ sub test_directive {
     my ($string, $directives, $format) = @_;
     my $tmp = File::Temp->new();
     my $fname = $tmp->filename;
+    diag "Using $fname\n";
     write_file($fname, $string);
     my $dirs = muse_fast_scan_header($fname, $format);
     is_deeply($dirs, $directives, "Correctly parsed")
