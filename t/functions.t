@@ -8,7 +8,7 @@ use Text::Amuse::Functions qw/muse_format_line
 use File::Temp;
 
 
-plan tests => 15;
+plan tests => 17;
 
 is(muse_format_line(html => q{<em>ciao</em>bella<script">}),
    "<em>ciao</em>bella&lt;script&quot;&gt;");
@@ -117,6 +117,52 @@ $expected = {
              author => "Pippo \x{107} \\emph{\x{111}} \x{110} \x{e0}",
 };
 
+
+test_directive($body, $expected, "ltx");
+
+$body =<<'BODY';
+#author     "Pippo" & 'Pluto'          
+ć
+*đ*
+<Đ>
+à
+
+#title    Ciao ć đ Đ à           
+          is a *long* title             
+
+#random        ***Random***                 
+
+here the body starts....
+BODY
+
+$expected = {
+             random => '<strong><em>Random</em></strong>',
+             title => "Ciao \x{107} \x{111} \x{110} \x{e0} is a <em>long</em> title",
+             author => "&quot;Pippo&quot; &amp; &#x27;Pluto&#x27; \x{107} <em>\x{111}</em> &lt;\x{110}&gt; \x{e0}"
+            };
+
+test_directive($body, $expected, "html");
+
+$body =<<'BODY';
+#author     {Pippo} & \Pluto| # ^ _          
+ć
+*đ*
+<Đ>
+à
+
+#title    Ciao ć đ Đ à           
+          is a *long* title             
+
+#random        ***Random***                 
+
+here the body starts....
+BODY
+
+$expected = {
+             random => '\\textbf{\\emph{Random}}',
+             title => "Ciao \x{107} \x{111} \x{110} \x{e0} is a \\emph{long} title",
+             author => "\\{Pippo\\} \\& \\textbackslash{}Pluto\\textbar{} \\# \\^{} \\_ \x{107} \\emph{\x{111}} <\x{110}> \x{e0}"
+            };
 
 test_directive($body, $expected, "ltx");
 
