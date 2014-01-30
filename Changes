@@ -3,7 +3,7 @@
 	Release 0.06
 
 	New functions in Text::Amuse::Functions: muse_to_tex and muse_to_html
-
+    Bugfix: Don't use \bigskip when inside a paragraph
 
 
 2014-01-19      Marco Pessotto <melmothx@gmail.com>
