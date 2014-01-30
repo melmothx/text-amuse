@@ -2,7 +2,7 @@ use 5.010001;
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 4;
+use Test::More tests => 6;
 use Text::Amuse::Functions qw/muse_to_html muse_to_tex/;
 
 my $builder = Test::More->builder;
