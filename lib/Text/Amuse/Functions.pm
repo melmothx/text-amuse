@@ -2,6 +2,7 @@ package Text::Amuse::Functions;
 use strict;
 use warnings;
 use utf8;
+use File::Temp;
 use Text::Amuse;
 use Text::Amuse::String;
 use Text::Amuse::Output;
@@ -12,6 +13,8 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw/muse_format_line
                     muse_fast_scan_header
+                    muse_to_html
+                    muse_to_tex
                    /;
 
 
@@ -111,6 +114,53 @@ sub muse_fast_scan_header {
         }
     }
     return \%directives;
+}
+
+=head2 muse_to_html($body);
+
+Format the $body text (assumed to be decoded) as HTML and return it.
+Header is discarded.
+
+$body can also be a reference to a scalar to speed up the argument
+passing.
+
+=head2 muse_to_tex($body);
+
+Format the $body text (assumed to be decoded) as LaTeX and return it.
+Header is discarded
+
+$body can also be a reference to a scalar to speed up the argument
+passing.
+
+=cut
+
+sub muse_to_html {
+    return _format_on_the_fly(html => shift);
+}
+
+sub muse_to_tex {
+    return _format_on_the_fly(ltx => shift);
+}
+
+sub _format_on_the_fly {
+    my ($format, $text) = @_;
+    my $fh = File::Temp->new(SUFFIX => '.muse');
+    binmode $fh, ':encoding(utf-8)';
+    if (ref $text) {
+        print $fh $$text, "\n";
+    }
+    else {
+        print $fh $text, "\n";
+    }
+    # flush the file and close it
+    close $fh;
+    my $doc = Text::Amuse->new(file => $fh->filename);
+    if ($format eq 'ltx') {
+        return $doc->as_latex;
+    }
+    elsif ($format eq 'html') {
+        return $doc->as_html;
+    }
 }
 
 
