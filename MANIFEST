@@ -16,6 +16,7 @@ t/br.t
 t/breakages.t
 t/broken.t
 t/caching.t
+t/changes.t
 t/elements.t
 t/footnotes.t
 t/functions.t
