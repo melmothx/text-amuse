@@ -161,6 +161,9 @@ sub _format_on_the_fly {
     elsif ($format eq 'html') {
         return $doc->as_html;
     }
+    else {
+        die "Wrong usage, format can be only ltx or html!";
+    }
 }
 
 
