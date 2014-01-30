@@ -836,6 +836,7 @@ sub manage_table_ltx {
     my $textable =<<'EOF';
 \noindent
  \begin{minipage}[t]{\textwidth}
+\smallskip
 \centering
 EOF
     $textable .= "\\begin{tabularx}{\\textwidth}{" ;
@@ -855,7 +856,8 @@ EOF
         $textable .= "\n\\medskip\n" .
           $self->manage_regular($table->{caption}) . "\n\n\\medskip\n\n";
     }
-    $textable .= "\\end{minipage}\n";
+    $textable .= "\\bigskip\n";
+    $textable .= "\\end{minipage}\n\n";
     # print $textable;
     return $textable;
 }
