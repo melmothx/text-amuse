@@ -833,8 +833,12 @@ sub manage_table_ltx {
     # then we loop over what we have. First head, then body, and
     # finally foot
     
-    my $textable =
-      "\\noindent\n \\begin{minipage}[t]{\\textwidth}\n\\centering\n\\begin{tabularx}{\\textwidth}{" ;
+    my $textable =<<'EOF';
+\noindent
+ \begin{minipage}[t]{\textwidth}
+\centering
+EOF
+    $textable .= "\\begin{tabularx}{\\textwidth}{" ;
     $textable .= "|X" x $table->{counter};
     $textable .= "|}\n";
     if (my @head = @{$out->{head}}) {
