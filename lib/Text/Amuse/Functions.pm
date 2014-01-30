@@ -83,10 +83,15 @@ sub muse_fast_scan_header {
                 $lastdirective = undef;
             }
 
-            elsif ($line =~ m/^\#([A-Za-z0-9]+)\s+(.+)$/s) {
+            elsif ($line =~ m/^\#([A-Za-z0-9]+)(\s+(.+))?$/s) {
                 my $dir = $1;
-                warn "Overwriting directive $dir!" if $directives{$dir};
-                $directives{$dir} = $2;
+                warn "Overwriting directive $dir!" if exists $directives{$dir};
+                if ($2) {
+                    $directives{$dir} = $3;
+                }
+                else {
+                    $directives{$dir} = '';
+                }
                 $lastdirective = $dir;
             }
 

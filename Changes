@@ -5,6 +5,8 @@ Revision history for perl module Text::Amuse
  - New functions in Text::Amuse::Functions: muse_to_tex and muse_to_html
  - Bugfix: Don't use \bigskip when inside a paragraph
  - Bugfix: Fixed Changes file
+ - Bugfix: Permit empty directives without packing them in the previous
+   line
 
 0.05 2014-01-19
 
