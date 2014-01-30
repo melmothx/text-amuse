@@ -175,7 +175,9 @@ sub as_latex {
     my $width = $self->width_latex;
     my $desc = "";
     if (my $realdesc = $self->desc) {
-        $desc = "\n\\bigskip\n $realdesc\n";
+        # the \noindent here is harmless if you still want the label,
+        # commenting out the \renewcommand*
+        $desc = "\n\\caption{\\noindent $realdesc}";
     }
     my $src = $self->filename;
     my $out;

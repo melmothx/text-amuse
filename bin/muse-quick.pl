@@ -461,6 +461,11 @@ sub _embedded_latex_template {
 % remove the numbering
 \setcounter{secnumdepth}{-2}
 
+% remove labels from the captions
+\renewcommand*{\captionformat}{}
+\renewcommand*{\figureformat}{}
+
+
 % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
 \newcommand*{\forcelinebreak}{~\\\relax}
 
