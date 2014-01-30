@@ -1,51 +1,32 @@
-2014-XX-XX      Marco Pessotto <melmothx@gmail.com>
+Revision history for perl module Text::Amuse
 
-	Release 0.06
+0.06 2014-01-30
 
-	New functions in Text::Amuse::Functions: muse_to_tex and muse_to_html
-    Bugfix: Don't use \bigskip when inside a paragraph
+ - New functions in Text::Amuse::Functions: muse_to_tex and muse_to_html
+ - Bugfix: Don't use \bigskip when inside a paragraph
 
+0.05 2014-01-19
 
-2014-01-19      Marco Pessotto <melmothx@gmail.com>
+ - New function Text::Amuse::Utils::muse_fast_scan_header
 
-	Release 0.05
+0.04 2013-12-02
 
-	New function Text::Amuse::Utils::muse_fast_scan_header
+ - Release 0.04
+ - Improved muse-quick.pl: change directory while compiling
 
+0.03 2013-11-27
 
+ - Improved muse-quick.pl output and behaviour. Made EBook::EPUB optional.
 
-2013-12-02      Marco Pessotto <melmothx@gmail.com>
+0.02 2013-10-14
 
-	Release 0.04
+ - Improved images handling (with hidden experimental features, see
+ - tests in images.t if you're curious).
+ - Improved muse-quick.pl script + doc.
+ - Improved docs.
 
-	Improved muse-quick.pl: change directory while compiling
+0.01 2013-06-02
 
-
-2013-11-27      Marco Pessotto <melmothx@gmail.com>
-
-	Release 0.03
-
-	Improved muse-quick.pl output and behaviour. Made EBook::EPUB optional.
-
-
-2013-10-14      Marco Pessotto <melmothx@gmail.com>
-
-	Release 0.02
-
-	Improved images handling (with hidden experimental features, see
-	tests in images.t if you're curious).
-
-	Improved muse-quick.pl script + doc.
-
-	Improved docs.
-
-
-
-
-2013-06-02      Marco Pessotto <melmothx@gmail.com>
-
-	Release 0.01
-
-	Initial release on CPAN.
-
+ - Release 0.01
+ - Initial release on CPAN.
 
