@@ -47,6 +47,9 @@ t/testfiles/broken2.muse
 t/testfiles/broken3.exp.html
 t/testfiles/broken3.exp.ltx
 t/testfiles/broken3.muse
+t/testfiles/captions.exp.html
+t/testfiles/captions.exp.ltx
+t/testfiles/captions.muse
 t/testfiles/comments.exp.html
 t/testfiles/comments.exp.ltx
 t/testfiles/comments.muse

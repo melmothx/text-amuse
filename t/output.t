@@ -13,7 +13,7 @@ use Data::Dumper;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 54;
+plan tests => 56;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -79,6 +79,7 @@ test_testfile("right");
 test_testfile("square-brackets");
 test_testfile("verbatim");
 test_testfile("images");
+test_testfile("captions");
 
 sub test_testfile {
     my $base = shift;
