@@ -4,6 +4,8 @@ Revision history for perl module Text::Amuse
 
  - Fixed LaTeX output for captions and tables
  - Better error handling on PDF generation (muse-quick.pl)
+ - TODO Document the image syntax and add a full page key
+   (see http://www.tex.ac.uk/cgi-bin/texfaq2html?label=tmupfl)
 
 0.06 2014-01-30
 
