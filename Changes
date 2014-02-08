@@ -3,6 +3,7 @@ Revision history for perl module Text::Amuse
 0.07 Future
 
  - Fixed LaTeX output for captions and tables
+ - Better error handling on PDF generation (muse-quick.pl)
 
 0.06 2014-01-30
 

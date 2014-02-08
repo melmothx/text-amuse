@@ -115,6 +115,7 @@ my $tt;
 my $current_dir = getcwd();
 
 foreach my $file (@ARGV) {
+    print "Working on $file\n";
     # reset the dir
     chdir $current_dir or die "Cannot chdir into $current_dir";
     # reset tt
@@ -458,7 +459,8 @@ sub make_html {
                       }, \$out);
     my $outfile = $file;
     $outfile =~ s/muse$/html/;
-    open (my $fh, ">:encoding(utf-8)", $outfile);
+    open (my $fh, ">:encoding(utf-8)", $outfile)
+      or die "Couldn't open $outfile: $!";
     print $fh $out;
     close $fh;
     print "$outfile generated\n";
@@ -580,7 +582,8 @@ sub make_latex {
     $tt->process($in, { doc => $doc, xtx => $xtx }, \$out);
     my $outfile = $file;
     $outfile =~ s/muse$/tex/;
-    open (my $fh, ">:encoding(utf-8)", $outfile);
+    open (my $fh, ">:encoding(utf-8)", $outfile)
+      or die "Couldn't open $outfile: $!";
     print $fh $out;
     close $fh;
     print "$outfile  generated\n";
@@ -591,6 +594,7 @@ sub make_latex {
     my $base = $file;
     $base =~ s/muse$//;
     cleanup($base);
+    # TODO unclear if 3 time is enough, maybe check the toc length?
     for (1..3) {
         my $pid = open(KID, "-|");
         defined $pid or die "Can't fork: $!";
@@ -609,10 +613,17 @@ sub make_latex {
             }
             close KID or warn "Compilation failed\n";
             my $exit_code = $? >> 8;
-            unless ($exit_code == 0) {
-                warn "$exec compilation failed with exit code $exit_code, " .
-                  "skipping PDF generation\n";
-                return;
+            if ($exit_code != 0) {
+                warn "$exec compilation failed with exit code $exit_code\n";
+                if (-f $base . 'log') {
+                    # if we have a .log file, this means something was
+                    # produced.
+                    die "Bailing out!";
+                }
+                else {
+                    warn "Skipping PDF generation\n";
+                    return;
+                }
             }
         }
         else {
