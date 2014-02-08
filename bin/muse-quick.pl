@@ -129,6 +129,7 @@ foreach my $file (@ARGV) {
         print "Working on $name in $path\n";
     }
     make_html($name);
+    make_bare_html($name);
     make_latex($name);
     make_epub($name);
 }
@@ -344,6 +345,22 @@ EOF
     return \$css;
 }
 
+sub _bare_html_template {
+    my $html = <<'EOF';
+
+[%- IF doc.toc_as_html -%]
+<div class="table-of-contents">
+[% doc.toc_as_html %]
+</div>
+[%- END -%]
+
+<div id="thework">
+[% doc.as_html %]
+</div>
+EOF
+    return \$html;
+}
+
 
 sub _embedded_html_template {
     my $html = <<'EOF';
@@ -409,6 +426,24 @@ sub minimal_html_template {
 </html>
 EOF
     return \$html;
+}
+
+
+sub make_bare_html {
+    my $file = shift;
+    my $doc = Text::Amuse->new(file => $file);
+    my $out = "";
+    my $in = _bare_html_template();
+    $tt->process($in, {
+                       doc => $doc,
+                      }, \$out);
+    my $outfile = $file;
+    $outfile =~ s/muse$/bare.html/;
+    open (my $fh, ">:encoding(utf-8)", $outfile)
+      or die "Couldn't open $outfile: $!";
+    print $fh $out;
+    close $fh;
+    print "$outfile generated\n";
 }
 
 
