@@ -1,5 +1,7 @@
 bin/muse-quick.pl
 Changes
+examples/logo.png
+examples/manual.muse
 lib/Text/Amuse.pm
 lib/Text/Amuse/Document.pm
 lib/Text/Amuse/Element.pm
