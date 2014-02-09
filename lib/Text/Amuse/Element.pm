@@ -213,6 +213,10 @@ sub _parse_string {
         $self->removed(">");
         $self->type("verse");
     }
+
+    # TODO catch table only with a trailing space. This needs a
+    # migration script, a Changes entry and a manual change. Too early
+    # for this.
     elsif ($l =~ m/\|/) {
         $self->type("table");
         $self->string($l);
