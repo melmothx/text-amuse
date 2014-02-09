@@ -1,4 +1,4 @@
-#title The AMuseWiki Manual
+#title The Text::Amuse markup manual
 #lang en
 #subtitle The writer's guide
 #date 2012
@@ -911,12 +911,132 @@ directory of the file, and the result is:
 Now, let's add a caption.
 
 <example>
-[[logo.png][This is our logo]]
+[[logo.png][This is *our* logo]]
 </example>
 
-[[logo.png][This is our banner]]
+[[logo.png][This is *our* logo]]
 
-Remote urls are not permitted. Also, the patch checking is rather strict, so please use just alphanumeric filenames for your images.
+Remote urls are not permitted. Also, the path checking is rather
+strict, so please use just alphanumeric filenames for your images.
+
+*** Floating images and adjusting width
+
+By default, image width in the HTML output is kept to the original
+one, whatever it is, but limited via CSS, while in the PDF expands to
+fill the page width. This creates problems.
+
+Starting with version 0.07, it's possible to set the width of the
+image, **in percent**, just appending it to the file name after a
+whitespace.
+
+It's also possible to make it a right or left float, adding the
+character =l= or =r=, or to mark it as a "fullpage" with =f=.
+
+This one will have a width to 80% of the page width:
+
+<example>
+[[logo.png 80]]
+</example>
+
+This one will have a width to 80% of the page width and will be a left
+float.
+
+<example>
+[[logo.png 80 l]]
+</example>
+
+This one will have a width to 80% of the page width and will be a right
+float.
+
+<example>
+[[logo.png 80 r]]
+</example>
+
+The Following will be marked as a fullpage.
+
+<example>
+[[logo.png f]]
+</example>
+
+Floating without a width doesn't make sense, as in the PDF will be no
+room for wrapping text around it.
+
+**** Examples
+
+The next figures use these codes:
+
+<example>
+[[logo.png 10r][right float]]
+[[logo.png 10l][left float]]
+[[logo.png 50f][full page]]
+</example>
+
+Suggestions that I write my memoirs came to me when I had barely begun
+to live, and continued all through the years. But I never paid heed to
+the proposal. I was living my life intensely — what need to write
+about it? Another reason for my reluctance was the conviction I
+entertained that one should write about one’s life only when one had
+ceased to stand in the very torrent of it. “When one has reached a
+good philosophic age,” I used to tell my friends, “capable of viewing
+the tragedies and comedies of life impersonally and detachedly —
+particularly one’s own life — one is likely to create an autobiography
+worth while.” Still feeling adolescently young in spite of advancing
+years, I did not consider myself competent to undertake such a task.
+Moreover, I always lacked the necessary leisure for concentrated
+writing.
+
+[[logo.png 10r][right float]]
+
+My enforced European inactivity left me enough time to read a great
+deal, including biographies and autobiographies. I discovered, much to
+my discomfiture, that old age, far from ripening wisdom and
+
+mellowness, is too often fraught with senility, narrowness, and petty
+rancour. I would not risk such a calamity, and I began to think
+seriously about writing my life.
+
+[[logo.png 10l][left float]]
+
+The great difficulty that faced me was lack of historical data for my
+work. Almost everything in the way of books, correspondence, and
+similar material that I had accumulated during the thirty-five years
+
+of my life in the United States had been confiscated by the Department
+of Justice raiders and never returned. I lacked even my personal set
+of the Mother Earth magazine, which I had published for twelve years.
+
+It was a problem I could see no solution for. Sceptic that I am, I had
+overlooked the magic power of friendship, which had so often in my
+life made mountains move. My staunch friends Leonard D. Abbott, Agnes
+Inglis, W. S. Van Valkenburgh, and others soon put my doubts to shame.
+
+Agnes, the founder of the Labadie Library in Detroit, containing the
+richest collection of radical and revolutionary material in America,
+came to my aid with her usual readiness. Leonard did his share, and
+Van spent all his free time in research work for me.
+
+The great difficulty that faced me was lack of historical data for my
+work. Almost everything in the way of books, correspondence, and
+similar material that I had accumulated during the thirty-five years
+
+of my life in the United States had been confiscated by the Department
+of Justice raiders and never returned. I lacked even my personal set
+of the Mother Earth magazine, which I had published for twelve years.
+
+It was a problem I could see no solution for. Sceptic that I am, I had
+overlooked the magic power of friendship, which had so often in my
+life made mountains move. My staunch friends Leonard D. Abbott, Agnes
+Inglis, W. S. Van Valkenburgh, and others soon put my doubts to shame.
+
+Agnes, the founder of the Labadie Library in Detroit, containing the
+richest collection of radical and revolutionary material in America,
+came to my aid with her usual readiness. Leonard did his share, and
+Van spent all his free time in research work for me.
+
+
+[[logo.png 50f][full page]]
+
+
 
 ** Inserting a horizontal line or anchor
 

@@ -7,6 +7,8 @@ Revision history for perl module Text::Amuse
  - Changed experimental syntax for image floating and fix
    for long series of images.
    http://www.tex.ac.uk/cgi-bin/texfaq2html?label=tmupfl
+ - Added updated manual
+ - Added image syntax to the manual
 
 0.06 2014-01-30
 
