@@ -181,12 +181,12 @@ The HTML code for the image. Classes used:
   
   div.float_image_l {
       float: left;
-      margin-left: auto;
-      margin-right: auto;
   }
   
   div.float_image_f {
       clear: both;
+      margin-left: auto;
+      margin-right: auto;
   }
 
 
