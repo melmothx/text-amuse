@@ -15,10 +15,11 @@ pretty much internal only (and underdocumented).
 
 =head1 METHODS/ACCESSORS
 
-=head2 new(filename => "hello.png", width => 0.5, wrap => 1)
+=head2 new(filename => "hello.png", width => 50, wrap => 'l')
 
-Constructor. Accepts three options: filename, width, as a float, and
-wrap, as a boolean. C<filename> is mandatory.
+Constructor. Accepts three options: C<filename>, C<width>, as a
+integer in percent, and C<wrap>, as a string denoting the position.
+C<filename> is mandatory.
 
 These arguments are saved in the objects and can be accessed with:
 
@@ -29,6 +30,11 @@ These arguments are saved in the objects and can be accessed with:
 =item width
 
 =item wrap
+
+If 'l', the the float will wrap on the left, if 'r' will wrap on the
+right, if 'f' it's not floating, but it's intended as fullpage (will
+insert a clearpage after the image). This is handy if there is some
+long serie of images without text.
 
 =item fmt
 
@@ -61,7 +67,7 @@ sub new {
     }
 
     if (my $wrap = $opts{wrap}) {
-        if ($wrap eq 'l' or $wrap eq 'r') {
+        if ($wrap eq 'l' or $wrap eq 'r' or $wrap eq 'f') {
             $self->{wrap} = $wrap;
         }
         else {
@@ -71,7 +77,7 @@ sub new {
 
     if (my $w = $opts{width}) {
         if (looks_like_number($w)) {
-            $self->{width} = sprintf('%.2f', $w);
+            $self->{width} = sprintf('%.2f', $w / 100);
         }
         else {
             die "Wrong width $w passed!";
@@ -151,11 +157,38 @@ sub width_latex {
 
 =item as_latex
 
-The LaTeX code for the image.
+The LaTeX code for the image. Right and left floats uses the
+wrapfigure packages. To full page floats a \clearpage is appended.
 
 =item as_html
 
-The HTML code for the image
+The HTML code for the image. Classes used:
+
+  img.embedimg {
+      margin: 1em;
+  }
+  
+  div.image, div.float_image_f {
+      margin: 1em;
+      text-align: center;
+      padding: 3px;
+      background-color: white;
+  }
+  
+  div.float_image_r {
+      float: right;
+  }
+  
+  div.float_image_l {
+      float: left;
+      margin-left: auto;
+      margin-right: auto;
+  }
+  
+  div.float_image_f {
+      clear: both;
+  }
+
 
 =item output
 
@@ -181,7 +214,7 @@ sub as_latex {
     }
     my $src = $self->filename;
     my $out;
-    if ($wrap) {
+    if ($wrap eq 'r' or $wrap eq 'l') {
         $out =<<"EOF";
 
 \\begin{wrapfigure}{$wrap}{$width}
@@ -201,6 +234,12 @@ EOF
 
 
     }
+
+    # if full, add a clearpage after the image
+    if ($wrap eq 'f') {
+        $out .= "\\clearpage\n";
+    }
+
     return $out;
 }
 
@@ -231,7 +270,7 @@ EOF
     if (defined $desc) {
         $out .= $desc;
     }
-    $out .= qq{</div>};
+    $out .= "</div>\n";
     return $out;
 }
 

@@ -61,6 +61,7 @@ t/testfiles/example-3.exp.html
 t/testfiles/example-3.exp.ltx
 t/testfiles/example-3.muse
 t/testfiles/example.muse
+t/testfiles/float.png
 t/testfiles/footnotes.exp.html
 t/testfiles/footnotes.exp.ltx
 t/testfiles/footnotes.muse
@@ -68,6 +69,9 @@ t/testfiles/headers.muse
 t/testfiles/headings.exp.html
 t/testfiles/headings.exp.ltx
 t/testfiles/headings.muse
+t/testfiles/image2.exp.html
+t/testfiles/image2.exp.ltx
+t/testfiles/image2.muse
 t/testfiles/images.exp.html
 t/testfiles/images.exp.ltx
 t/testfiles/images.muse

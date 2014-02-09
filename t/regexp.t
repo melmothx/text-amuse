@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
+use Test::More tests => 124;
 use Text::Amuse::Output;
 use File::Spec::Functions;
 use Data::Dumper;
@@ -27,4 +27,25 @@ foreach my $url ("http://example.org",
     }
 }
 
-done_testing;
+foreach my $image (
+                   'float.jpg 30',
+                   'float.png 30 r',
+                   'float.png 30 f',
+                   'float.png  f',
+                   'float.png  r',
+                   'float.png    80f',
+                   'float.png 23 l',
+                   'float.png',
+                   'float.png r',
+                   'float.png ',
+                  ) {
+    ok($obj->find_image($image), "<$image> is seen as an image");
+}
+
+foreach my $image (
+                   ' float.png',
+                   'flap.pdf',
+                  ) {
+    ok(!$obj->find_image($image), "<$image> is not seen as an image");
+}
+

@@ -283,14 +283,28 @@ caption {
 }
 
 img.embedimg {
-    margin: 1em;
     max-width:90%;
 }
-div.image {
+div.image, div.float_image_f {
     margin: 1em;
     text-align: center;
     padding: 3px;
     background-color: white;
+}
+
+div.float_image_r {
+    float: right;
+}
+
+div.float_image_l {
+    float: left;
+}
+
+div.float_image_f {
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+
 }
 
 .biblio p, .play p {

@@ -998,7 +998,6 @@ sub linkify {
 sub format_links {
     my ($self, $link, $desc) = @_;
     $desc = $self->manage_regular($desc);
-    my $imagere = $self->image_re;
     # first the images
     if (my $image = $self->find_image($link)) {
         my $src = $image->filename;
@@ -1357,9 +1356,9 @@ sub image_re {
         $self->{_image_re} = qr{([0-9A-Za-z][0-9A-Za-z/-]+ # basename
                                     \. # dot
                                     (png|jpe?g)) # extension $2
-                                (\: # attribute # $3
-                                    w=([\.0-9]+) # width $4
-                                    ([rl])? # float $5
+                                ([ ]+
+                                    ([0-9]+)? # width in percent
+                                    ([ ]*([rlf]))?
                                 )?}x;
     }
     return $self->{_image_re};
@@ -1375,18 +1374,17 @@ is, return a Text::Amuse::Output::Image object.
 sub find_image {
     my ($self, $link) = @_;
     my $imagere = $self->image_re;
-    # warn "$link , $imagere\n";
     if ($link =~ m/^$imagere$/s) {
         my $filename = $1;
         my $width = $4;
-        my $float = $5;
-        # warn "passing $1 $4 $5";
+        my $float = $6;
         return Text::Amuse::Output::Image->new(filename => $filename,
                                                width => $width,
                                                wrap => $float,
                                                fmt => $self->fmt);
     }
     else {
+        # warn "Not recognized\n";
         return;
     }
 }

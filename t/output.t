@@ -13,7 +13,7 @@ use Data::Dumper;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 56;
+plan tests => 58;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -54,32 +54,36 @@ is($document->as_html, $exphtml);
 is($document->as_latex, $exptex);
 
 
-test_testfile("comments");
-test_testfile("footnotes");
-test_testfile("verse");
-test_testfile("example-3");
-test_testfile("table");
-test_testfile("links");
-test_testfile("special");
-test_testfile("breaklist");
-test_testfile("verse-2");
-test_testfile("headings");
-test_testfile("table-2");
-test_testfile("uneven-table");
-test_testfile("table-square-brackets");
-test_testfile("nbsp");
-test_testfile("links-2");
-test_testfile("10_theses");
-test_testfile("broken");
-test_testfile("broken2");
-test_testfile("broken3");
-test_testfile("list-and-fn");
-test_testfile("complete");
-test_testfile("right");
-test_testfile("square-brackets");
-test_testfile("verbatim");
-test_testfile("images");
-test_testfile("captions");
+foreach my $testfile (qw/comments
+                         footnotes
+                         verse
+                         example-3
+                         table
+                         links
+                         special
+                         breaklist
+                         verse-2
+                         headings
+                         table-2
+                         uneven-table
+                         table-square-brackets
+                         nbsp
+                         links-2
+                         10_theses
+                         broken
+                         broken2
+                         broken3
+                         list-and-fn
+                         complete
+                         right
+                         square-brackets
+                         verbatim
+                         images
+                         captions
+                         image2
+                        /) {
+    test_testfile($testfile);
+}
 
 sub test_testfile {
     my $base = shift;
