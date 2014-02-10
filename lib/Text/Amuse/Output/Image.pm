@@ -210,7 +210,7 @@ sub as_latex {
     if (my $realdesc = $self->desc) {
         # the \noindent here is harmless if you still want the label,
         # commenting out the \renewcommand*
-        $desc = "\n\\caption{\\noindent $realdesc}";
+        $desc = "\n\\caption[]{\\noindent $realdesc}";
     }
     my $src = $self->filename;
     my $out;
