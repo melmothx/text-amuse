@@ -515,10 +515,16 @@ sub _embedded_latex_template {
 % remove labels from the captions
 \renewcommand*{\captionformat}{}
 \renewcommand*{\figureformat}{}
+\renewcommand*{\tableformat}{}
+\KOMAoption{captions}{belowfigure,nooneline}
+\addtokomafont{caption}{\centering}
+
+
+
 
 
 % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
-\newcommand*{\forcelinebreak}{~\\\relax}
+\newcommand*{\forcelinebreak}{\strut\\{}}
 
 \newcommand*{\hairline}{%
   \bigskip%

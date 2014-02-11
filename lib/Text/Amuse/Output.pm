@@ -29,7 +29,9 @@ pretty much internal only (and underdocumented).
   
   % avoid breakage on multiple <br><br> and avoid the next [] to be eaten
   \newcommand*{\forcelinebreak}{~\\\relax}
-  
+  % this also works
+  % \newcommand*{\forcelinebreak}{\strut\\{}}
+
   \newcommand*{\hairline}{%
     \bigskip%
     \noindent \hrulefill%
@@ -833,12 +835,8 @@ sub manage_table_ltx {
     # then we loop over what we have. First head, then body, and
     # finally foot
     
-    my $textable =<<'EOF';
-\noindent
- \begin{minipage}[t]{\textwidth}
-\smallskip
-\centering
-EOF
+    my $textable = "\\begin{table}[htbp!]\n";
+    $textable .= " \\begin{minipage}[t]{\\textwidth}\n";
     $textable .= "\\begin{tabularx}{\\textwidth}{" ;
     $textable .= "|X" x $table->{counter};
     $textable .= "|}\n";
@@ -853,11 +851,11 @@ EOF
     }
     $textable .= "\\hline\n\\end{tabularx}\n";
     if (defined $table->{caption} and $table->{caption} ne "") {
-        $textable .= "\n\\medskip\n" .
-          $self->manage_regular($table->{caption}) . "\n\n\\medskip\n\n";
+        $textable .= "\n\\caption[]{" .
+          $self->manage_regular($table->{caption}) . "}\n";
     }
-    $textable .= "\\bigskip\n";
-    $textable .= "\\end{minipage}\n\n";
+    $textable .= "\\end{minipage}\n";
+    $textable .= "\\end{table}\n\n";
     # print $textable;
     return $textable;
 }

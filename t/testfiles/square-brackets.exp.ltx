@@ -132,10 +132,8 @@ Test\textsubscript{[test14=sub]} Test\textsuperscript{[test15=sup]} Test16\sout{
 
 - [test24=nolist]
 
-\noindent
+\begin{table}[htbp!]
  \begin{minipage}[t]{\textwidth}
-\smallskip
-\centering
 \begin{tabularx}{\textwidth}{|X|X|}
 \hline
 \relax [test27=tableheader]  &  [test28=tableheader]  \\
@@ -146,13 +144,9 @@ Test\textsubscript{[test14=sub]} Test\textsuperscript{[test15=sup]} Test16\sout{
 \hline
 \end{tabularx}
 
-\medskip
-[test31=caption]
-
-\medskip
-
-\bigskip
+\caption[]{[test31=caption]}
 \end{minipage}
+\end{table}
 
 
 [test32=back to text]
