@@ -120,6 +120,7 @@ t/testfiles/uneven-table.exp.html
 t/testfiles/uneven-table.exp.ltx
 t/testfiles/uneven-table.muse
 t/testfiles/unroll.muse
+t/testfiles/update.pl
 t/testfiles/verbatim.exp.html
 t/testfiles/verbatim.exp.ltx
 t/testfiles/verbatim.muse
