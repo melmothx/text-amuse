@@ -226,7 +226,7 @@ EOF
     else {
         $out =<<"EOF";
 
-\\begin{figure}[htp!]
+\\begin{figure}[htbp!]
 \\centering
 \\includegraphics[width=$width]{$src}$desc
 \\end{figure}

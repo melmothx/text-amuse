@@ -52,7 +52,7 @@ is($image->width_latex, "\\textwidth", "LaTeX width ok");
 
 $ltx =<<'EOF';
 
-\begin{figure}[htp!]
+\begin{figure}[htbp!]
 \centering
 \includegraphics[width=\textwidth]{test.png}
 \end{figure}
@@ -122,7 +122,7 @@ is($image->width_latex, "0.50\\textwidth", "LaTeX width ok");
 
 $ltx =<<'EOF';
 
-\begin{figure}[htp!]
+\begin{figure}[htbp!]
 \centering
 \includegraphics[width=0.50\textwidth]{test.png}
 \end{figure}
