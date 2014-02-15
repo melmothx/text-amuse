@@ -8,7 +8,7 @@ use Text::Amuse::Functions qw/muse_format_line
 use File::Temp;
 
 
-plan tests => 17;
+plan tests => 19;
 
 is(muse_format_line(html => q{<em>ciao</em>bella<script">}),
    "<em>ciao</em>bella&lt;script&quot;&gt;");
@@ -165,6 +165,10 @@ $expected = {
             };
 
 test_directive($body, $expected, "ltx");
+
+test_directive("ciao\n\n" x 100, {});
+test_directive("ciao\n" x 100, {});
+
 
 
 sub write_file {
