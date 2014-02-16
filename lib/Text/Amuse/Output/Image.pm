@@ -2,7 +2,6 @@ package Text::Amuse::Output::Image;
 use strict;
 use warnings;
 use utf8;
-use Scalar::Util qw/looks_like_number/;
 
 =head1 NAME
 
@@ -76,7 +75,7 @@ sub new {
     }
 
     if (my $w = $opts{width}) {
-        if (looks_like_number($w)) {
+        if ($w =~ m/^[0-9]+$/s) {
             $self->{width} = sprintf('%.2f', $w / 100);
         }
         else {

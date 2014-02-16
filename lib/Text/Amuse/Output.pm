@@ -834,8 +834,17 @@ sub manage_table_ltx {
     }
     # then we loop over what we have. First head, then body, and
     # finally foot
-    
-    my $textable = "\\begin{table}[htbp!]\n";
+    my $has_caption;
+    if (defined $table->{caption} and $table->{caption} ne '') {
+        $has_caption = 1;
+    }
+    my $textable = '';
+    if ($has_caption) {
+        $textable .= "\\begin{table}[htbp!]\n";
+    }
+    else {
+        $textable .= "\\bigskip\n\\noindent\n";
+    }
     $textable .= " \\begin{minipage}[t]{\\textwidth}\n";
     $textable .= "\\begin{tabularx}{\\textwidth}{" ;
     $textable .= "|X" x $table->{counter};
@@ -850,12 +859,18 @@ sub manage_table_ltx {
         $textable .= "\\hline\n" . join("", @foot);
     }
     $textable .= "\\hline\n\\end{tabularx}\n";
-    if (defined $table->{caption} and $table->{caption} ne "") {
+    if ($has_caption) {
         $textable .= "\n\\caption[]{" .
           $self->manage_regular($table->{caption}) . "}\n";
     }
     $textable .= "\\end{minipage}\n";
-    $textable .= "\\end{table}\n\n";
+    if ($has_caption) {
+        $textable .= "\\end{table}\n";
+    }
+    else {
+        $textable .= "\\bigskip\n";
+    }
+    $textable .= "\n";
     # print $textable;
     return $textable;
 }

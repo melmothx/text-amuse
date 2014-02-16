@@ -15,9 +15,13 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     BUILD_REQUIRES => {
-        'Test::More' => 0,
+        'Test::More'   => 0,
+        'Data::Dumper' => 0,
+        'File::Spec'   => 0,
     },
     PREREQ_PM => {
+        'File::Temp' => 0,
+
         #'ABC'              => 1.6,
         #'Foo::Bar::Module' => 5.0401,
     },

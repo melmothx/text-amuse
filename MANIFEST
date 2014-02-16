@@ -110,6 +110,9 @@ t/testfiles/square-brackets.muse
 t/testfiles/table-2.exp.html
 t/testfiles/table-2.exp.ltx
 t/testfiles/table-2.muse
+t/testfiles/table-captions.exp.html
+t/testfiles/table-captions.exp.ltx
+t/testfiles/table-captions.muse
 t/testfiles/table-square-brackets.exp.html
 t/testfiles/table-square-brackets.exp.ltx
 t/testfiles/table-square-brackets.muse

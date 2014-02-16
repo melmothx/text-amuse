@@ -869,6 +869,19 @@ typeset the pipe symbol without triggering a list. In =<example>= you
 can type it freely. Inside the cells you can do pretty much what you
 want (beside headers and lists): mark them up freely.
 
+*** Floating tables
+
+When composing tables, please keep in mind the following:
+
+ - tables are never splat over pages. If they don't fit a page, they
+   will run off the page. So keep them short or split them yourself.
+
+ - tables *without* a caption are inserted at the point they are in the
+   source. Table *with* a caption are converted into a float, so they
+   are in no way guaranteed they will appear in the same exact point
+   of the source. Anyway, the result is way better, and you have a
+   caption, so you can refer to them in the text.
+
 ** Hyperlinks with or without description (and images)
 
 

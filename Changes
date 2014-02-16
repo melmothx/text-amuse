@@ -1,11 +1,8 @@
 Revision history for perl module Text::Amuse
 
 0.08 FUTURE
- - Tables have captions (\caption[]{text}) and are floats now
+ - If tables have a caption (\caption[]{text}) are floats now
  - Fixed line breaks in captions
- - TODO Don't compile #DELETED texts, and instead remove all the
-   generated files.
- - Move the code for compilation in a module.
 
 0.07 2014-02-09
 
