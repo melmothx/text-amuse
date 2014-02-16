@@ -1074,9 +1074,7 @@ Methods providing some fixed values
 =cut
 
 sub blk_table {
-    my $self = shift;
-    unless (defined $self->{_blk_table}) {
-        $self->{_blk_table} = {
+    my $table = {
                                   p =>  { start => {
                                                     ltx => "\n",
                                                     html => "\n<p>\n",
@@ -1340,9 +1338,8 @@ sub blk_table {
                                                ltx => "\n\n",
                                               },
                                      },
-                              };
-    }
-    return $self->{_blk_table}
+                };
+    return $table;
 }
 
 =head3 link_re
@@ -1350,11 +1347,7 @@ sub blk_table {
 =cut
 
 sub link_re {
-    my $self = shift;
-    unless (defined $self->{_link_re}) {
-        $self->{_link_re} = qr{\[\[[^\[].*?\]\]};
-    }
-    return $self->{_link_re};
+    return qr{\[\[[^\[].*?\]\]};
 }
 
 =head3 image_re
@@ -1364,17 +1357,13 @@ Regular expression to match image links.
 =cut
 
 sub image_re {
-    my $self = shift;
-    unless (defined $self->{_image_re}) {
-        $self->{_image_re} = qr{([0-9A-Za-z][0-9A-Za-z/-]+ # basename
+    return qr{([0-9A-Za-z][0-9A-Za-z/-]+ # basename
                                     \. # dot
                                     (png|jpe?g)) # extension $2
                                 ([ ]+
                                     ([0-9]+)? # width in percent
                                     ([ ]*([rlf]))?
                                 )?}x;
-    }
-    return $self->{_image_re};
 }
 
 =head3 find_image($link)
@@ -1408,9 +1397,7 @@ sub find_image {
 =cut
 
 sub url_re {
-    my $self = shift;
-    unless (defined $self->{_url_re}) {
-        $self->{_url_re} = qr!((www\.|https?:\/\/)
+    return qr!((www\.|https?:\/\/)
                               \w[\w\-\.]+\.\w+ # domain
                               (:\d+)? # the port
                               # everything else, but start with a
@@ -1418,8 +1405,6 @@ sub url_re {
                               # tolerate spaces
                               (/(\S*\w)?)?)
                              !x;
-    }
-    return $self->{_url_re};
 }
 
 =head3 footnote_re
@@ -1427,11 +1412,7 @@ sub url_re {
 =cut
 
 sub footnote_re {
-    my $self = shift;
-    unless (defined $self->{_footnote_re}) {
-        $self->{_footnote_re} = qr{\[[0-9]+\]};
-    }
-    return $self->{_footnote_re};
+    return qr{\[[0-9]+\]};
 }
 
 =head3 br_hash
@@ -1466,7 +1447,7 @@ sub tag_hash {
            'code' => 'e6fb06210fafc02fd7479ddbed2d042cc3a5155e' . $random,
           };
     }
-    return $self->{_tag_hash};
+    return { %{$self->{_tag_hash} } };
 }
 
 =head3 reverse_tag_hash
@@ -1480,7 +1461,7 @@ sub reverse_tag_hash {
         my %reverse = reverse %hash;
         $self->{_reverse_tag_hash} = \%reverse;
     }
-    return $self->{_reverse_tag_hash};
+    return { %{$self->{_reverse_tag_hash}} };
 }
 
 =head3 html_table_mapping
@@ -1488,7 +1469,6 @@ sub reverse_tag_hash {
 =cut
 
 sub html_table_mapping {
-    my $self = shift;
     return {
             head => {
                      b => " <thead>",
