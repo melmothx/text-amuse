@@ -133,6 +133,9 @@ t/testfiles/verse-2.muse
 t/testfiles/verse.exp.html
 t/testfiles/verse.exp.ltx
 t/testfiles/verse.muse
+t/testfiles/zeros.exp.html
+t/testfiles/zeros.exp.ltx
+t/testfiles/zeros.muse
 t/text-amuse.t
 t/tocs.t
 t/unroll.t
