@@ -206,7 +206,8 @@ sub as_latex {
     my $wrap = $self->wrap;
     my $width = $self->width_latex;
     my $desc = "";
-    if (my $realdesc = $self->desc) {
+    my $realdesc = $self->desc;
+    if (defined($realdesc) && length($realdesc)) {
         # the \noindent here is harmless if you still want the label,
         # commenting out the \renewcommand*
         $desc = "\n\\caption[]{\\noindent $realdesc}";
@@ -254,8 +255,8 @@ sub as_html {
     }
 
     my $src = $self->filename;
-
-    if (my $realdesc = $self->desc) {
+    my $realdesc = $self->desc;
+    if (defined($realdesc) && length($realdesc)) {
         $desc = <<"EOF";
 <div class="caption">$realdesc</div>
 EOF

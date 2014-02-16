@@ -13,7 +13,7 @@ use Data::Dumper;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 60;
+plan tests => 62;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -82,6 +82,7 @@ foreach my $testfile (qw/comments
                          captions
                          image2
                          table-captions
+                         zeros
                         /) {
     test_testfile($testfile);
 }
