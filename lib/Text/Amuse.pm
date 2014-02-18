@@ -278,6 +278,7 @@ sub _language_mapping {
             nl => 'dutch',
             pt => 'portuguese',
             tr => 'turkish',
+            mk => 'macedonian',
            };
 }
 
