@@ -1,6 +1,6 @@
 Revision history for perl module Text::Amuse
 
-0.10 FUTURE
+0.10 2014-02-18
  - Bugfix: Fixed missing macedonian language in the list
 
 0.09 2014-02-16
