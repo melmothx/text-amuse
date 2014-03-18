@@ -76,10 +76,18 @@ sub new {
 
 Accessor to the L<Text::Amuse::Document> object. [Internal]
 
+=head3 file
+
+Accessor to the file passed in the constructor (read-only)
+
 =cut
 
 sub document {
     return shift->{_document_obj};
+}
+
+sub file {
+    return shift->{file};
 }
 
 
