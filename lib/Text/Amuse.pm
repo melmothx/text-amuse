@@ -13,11 +13,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 
 =head1 SYNOPSIS
@@ -314,6 +314,30 @@ sub language {
         $self->{_doc_language} = $self->_language_mapping->{$lc};
     }
     return $self->{_doc_language};
+}
+
+=head3 other_language_codes
+
+Always return undef, because in the current implementation you can't
+switch language in the middle of a text. But could be implemented in
+the future. It should return an arrayref or undef.
+
+=cut
+
+sub other_language_codes {
+    return;
+}
+
+=head3 other_languages
+
+Always return undef. When and if implemented, it should return an
+arrayref or undef.
+
+=cut
+
+
+sub other_languages {
+    return;
 }
 
 =head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP

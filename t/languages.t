@@ -16,7 +16,7 @@ binmode $builder->todo_output,    ":utf8";
 
 
 
-plan tests => 152;
+plan tests => 190;
 
 sub test_lang {
     my ($lang, $expected_code, $expected_lang) = @_;
@@ -49,6 +49,8 @@ sub test_lang {
     is_deeply($doc->header_as_html, {title => "test language  $lang",
                                      language => $lang}, "header OK");
     is($doc->as_latex, "\nHello\n\n", "body ok");
+    ok(!$doc->other_language_codes);
+    ok(!$doc->other_languages);
 }
 
 my %langs = (

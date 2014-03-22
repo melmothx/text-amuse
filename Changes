@@ -1,9 +1,10 @@
 Revision history for perl module Text::Amuse
 
-0.11 FUTURE
+0.11 2014-03-22
 
  - Added missing "file" accessor in main module. Not really needed,
    but nice to have.
+ - Added placeholders for other_language_codes and other_languages.
 
 0.10 2014-02-18
 
