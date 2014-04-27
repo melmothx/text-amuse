@@ -157,12 +157,16 @@ If you want to add a blank, line, put the =br= tag on a line by itself:
 
 <example>
 Here we add a blank line
+
 <br>
+
 Here we go.
 </example>
 
 Here we add a blank line
+
 <br>
+
 Here we go.
 
 
