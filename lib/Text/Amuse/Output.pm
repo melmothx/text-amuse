@@ -683,11 +683,17 @@ sub html_toc {
     # do the dirty job
     my @out;
     foreach my $item (@toc) {
+        # given that we wrap this into <a>, we have to strip eventual ones
+
+        my $string = $item->{string};
+        $string =~ s!<a [^>]+?>!!g;
+        $string =~ s!</a>!!g;
+
         my $line = qq{<p class="tableofcontentline toclevel} .
           $item->{level} . qq{"><span class="tocprefix">} .
           "&nbsp;&nbsp;" x  $item->{level} . "</span>" .
             qq{<a href="#toc} . $item->{index} . qq{">} .
-              $item->{string} . "</a></p>";
+              $string . "</a></p>";
         push @out, $line;
     }
     return join ("\n", @out) . "\n";

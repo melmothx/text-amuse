@@ -68,6 +68,9 @@ t/testfiles/footnotes.exp.html
 t/testfiles/footnotes.exp.ltx
 t/testfiles/footnotes.muse
 t/testfiles/headers.muse
+t/testfiles/headings-with-fn.exp.html
+t/testfiles/headings-with-fn.exp.ltx
+t/testfiles/headings-with-fn.muse
 t/testfiles/headings.exp.html
 t/testfiles/headings.exp.ltx
 t/testfiles/headings.muse
@@ -137,5 +140,6 @@ t/testfiles/zeros.exp.html
 t/testfiles/zeros.exp.ltx
 t/testfiles/zeros.muse
 t/text-amuse.t
+t/tocs-with-fn.t
 t/tocs.t
 t/unroll.t

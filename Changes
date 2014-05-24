@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.12 2014-05-24
+
+ - Removed anchors when generating a HTML toc
+
 0.11 2014-03-22
 
  - Added missing "file" accessor in main module. Not really needed,
