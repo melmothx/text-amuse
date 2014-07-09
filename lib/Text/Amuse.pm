@@ -284,7 +284,7 @@ sub _language_mapping {
             sr => 'serbian',
             ru => 'russian',
             nl => 'dutch',
-            pt => 'portuguese',
+            pt => 'portuges',
             tr => 'turkish',
             mk => 'macedonian',
            };
