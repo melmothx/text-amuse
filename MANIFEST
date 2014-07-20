@@ -28,6 +28,7 @@ t/languages.t
 t/lists.t
 t/manifest.t
 t/memory-cycles.t
+t/memory-size.t
 t/on-the-fly.t
 t/output.t
 t/pod-coverage.t
