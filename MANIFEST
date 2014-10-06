@@ -1,7 +1,5 @@
 bin/muse-quick.pl
 Changes
-examples/logo.png
-examples/manual.muse
 lib/Text/Amuse.pm
 lib/Text/Amuse/Document.pm
 lib/Text/Amuse/Element.pm
@@ -91,6 +89,10 @@ t/testfiles/list-and-fn.exp.html
 t/testfiles/list-and-fn.exp.ltx
 t/testfiles/list-and-fn.muse
 t/testfiles/lists.muse
+t/testfiles/m-l-manual-logo.png
+t/testfiles/manual.exp.html
+t/testfiles/manual.exp.ltx
+t/testfiles/manual.muse
 t/testfiles/myimage.png
 t/testfiles/nbsp.exp.html
 t/testfiles/nbsp.exp.ltx

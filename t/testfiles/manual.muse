@@ -1,7 +1,10 @@
 #title The Text::Amuse markup manual
 #lang en
-#subtitle The writer's guide
+#topics doc, howto
+#authors Marco Pessotto, Michael Olson, John Wiegley
+#subtitle The writer’s guide
 #date 2012
+
 
 Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010 Free Software
 Foundation, Inc.
@@ -25,7 +28,7 @@ simple as possible so that you can focus on document creation, rather
 than formatting.
 
 This document describes Muse, which was written by John
-Wiegley, then maintained by Michael Olson and edited for this
+Wiegley, then maintained by Michael Olson and heavily edited and partially rewritten for this
 implementation by Marco Pessotto.
 
 ** Paragraphs
@@ -45,7 +48,7 @@ are to be published as centered paragraphs.
            Like this
 
 
-But if the line begins with more than 20 spaces, you'll have a right
+But if the line begins with more than 20 spaces, you’ll have a right
 aligned paragraph. This is handy for signatures.
 
                                      Like this right-aligned one.
@@ -73,18 +76,22 @@ This is a quotation:
 **** Source
 
 <example>
-A line that begins with six or more columns of whitespace
-(but less than 20) indicates a centered paragraph.
 
-Alternatively, you can use the =<center>= tag to surround regions that
-are to be published as centered paragraphs.
+A line that begins with six or more columns of
+whitespace (but less than 20) indicates a centered
+paragraph.
+
+Alternatively, you can use the =<center>= tag to
+surround regions that are to be published as centered
+paragraphs.
 
            Like this
 
-But if the line begins with more than 20 spaces, you'll have a right
-aligned paragraph. This is handy for signatures.
+But if the line begins with more than 20 spaces, you’ll
+have a right aligned paragraph. This is handy for
+signatures.
 
-                                     Like this right-aligned one.
+                              Like this right-aligned one.
 
 The same result is done with the =right= tag.
 
@@ -100,10 +107,12 @@ And this is right
 
 This is a quotation:
 
-  But if a line begins with whitespace (at least 2 spaces), though
-  less than six columns, it indicates a quoted paragraph.
-  Alternatively, you can use the =<quote>= tag to surround regions that
-  are to be published as quoted paragraphs.
+  But if a line begins with whitespace (at least 2
+  spaces), though less than six columns, it indicates a
+  quoted paragraph. Alternatively, you can use the
+  =<quote>= tag to surround regions that are to be
+  published as quoted paragraphs.
+
 </example>
 
 
@@ -126,14 +135,21 @@ Example:
 
 <example>
  <example>
- The =<example>= tag is used for examples, where whitespace
- should be preserved, the text rendered in monospace, and any
- characters special to the output style escaped.
+ The =<example>= tag is used for examples, where
+ whitespace should be preserved, the text rendered in
+ monospace, and any characters special to the output
+ style escaped.
  </example>
 </example>
 
-There is no =<literal>= tag as in the original Muse markup, because it's
+There is no =<literal>= tag as in the original Muse markup, because it’s
 not a private tool and will be exposed to the internet.
+
+**Please note** that the output will keep the lines
+untouched. This means that it's very likely that you
+will get overflowing lines. To avoid this, a safe value
+for a line length could be 60 characters. Use longer
+lines at your perils.
 
 *** Line breaks
 
@@ -174,7 +190,7 @@ Here we go.
 
 If you put exactly five “*” separated by whitespace on a line by
 itself, indented by 6 or more spaces (like a centered paragraph),
-you'll get a page break in the PDF.
+you’ll get a page break in the PDF.
 
 This code will break the page.
 
@@ -184,35 +200,35 @@ This code will break the page.
 
        * * * * * 
 
-Anyway, using three of them is just a decorator and it's not threated specially.
+Anyway, using three of them is just a decorator and it’s not threated specially.
 
        * * * 
 
-It's just a centered paragraph with 3 “*”.
+It’s just a centered paragraph with 3 “*”.
 
 ** Levels of headings
 
   
-A heading becomes a chapter or section in printed output - depending on
+A heading becomes a chapter or section in printed output — depending on
 the style.  To indicate a heading, start a new paragraph with one or
 more asterices, followed by a space and the heading title.  Then begin
 another paragraph to enter the text for that section.
 
 All levels of headings will be published. There is support for 5 levels.
 
-The first level is a "part", and should be used only for larger texts. In this document is used for the License and for the main title.
+The first level is a “part”, and should be used only for larger texts. In this document is used for the License and for the main title.
 
-The second level is a "chapter". It starts a new page on the PDF output.
+The second level is a “chapter”. It starts a new page on the PDF output.
 
 The third level is undoubtely the most used. It usually separate a
-section of an article. For example the "Literal paragraph" above.
+section of an article. For example the “Literal paragraph” above.
 
 The forth level goes down further.
 
 **** Forth level, a “subsection”
 
-The fifth level is very, very low. It's handy to create description
-lists, too. It's not dumped on the Table of Contents.
+The fifth level is very, very low. It’s handy to create description
+lists, too. It’s not dumped on the Table of Contents.
 
 ***** item 1
 
@@ -240,7 +256,7 @@ Another description
 
 
 
-Directives are lines beginning with the `#' character that come before
+Directives are lines beginning with the ‘#’ character that come before
 any paragraphs or sections in the document.
 
 Directives are of the form =#directive content of directive=.
@@ -248,7 +264,7 @@ Directives are of the form =#directive content of directive=.
 You can use any combination of uppercase and lowercase letters for
 directives, even if the directive is not in the list below. The
 directives are completely arbitrary. You can put there whatever you
-want. It's the template job to pick them up. In the templates shipped
+want. It’s the template job to pick them up. In the templates shipped
 with this bunlde there is support for the following directives:
 
    The following is a list of directives that Muse uses.
@@ -268,8 +284,8 @@ with this bunlde there is support for the following directives:
  - =#LISTtitle=
 
    This directive is used (defaulting to =#title=) to alphabetically
-   sort the titles. It's handy if you want, for example, sort "A
-   title" under "T" and not under "A". 
+   sort the titles. It’s handy if you want, for example, sort “A
+   title” under “T” and not under “A”. 
 
    In this case you may write =#LISTtitle Title=
 
@@ -279,14 +295,14 @@ with this bunlde there is support for the following directives:
 
  - =#SORTauthors= 
 
-   If not provided, this default to =#author=. It's a list
+   If not provided, this default to =#author=. It’s a list
    separated by semicolons or commas with the various authors. While
    =#author= affects the display only, this one is used to index the
    document.
 
  - =#SORTtopics=
 
-   As for authors, it's a list (comma- or
+   As for authors, it’s a list (comma- or
    semicolon-separated) list of topics for the current text. Used to
    index the document.
 
@@ -332,7 +348,7 @@ Each of these forms may span
 multiple lines, but not multiple paragraphs.
 
 You can also use the =<code>= tag to indicate verbatim and monospace
-text. This is handy for regions that have an "=" in them.
+text. This is handy for regions that have an “=” in them.
 
 If the “*” confuse you or the preview is screwed up, you can use
 inline tag =<em>= and =<strong>=, which are guarantee to work in any case.
@@ -354,7 +370,7 @@ And produces the same thing.
      <code>verbatim and monospace</code>
 
 Please note that there is no support for the underline. Underlining is
-an handwritten substitute for the italics. You simply don't need it.
+an handwritten substitute for the italics. You simply don’t need it.
 
 Also, small caps are missing, mainly because on the HTML they look
 awful and a very few fonts have decent small caps.
@@ -365,8 +381,8 @@ there is also a =<del>= tag for overstriking.
 
 <example>
 This is the <sup>superscript</sup> and this is a
-<sub>subscript</sub>, and this is <del>something deleted and
-overstriked</del>
+<sub>subscript</sub>, and this is <del>something
+deleted and overstriked</del>
 </example>
 
 This is the <sup>superscript</sup> and this is a
@@ -387,11 +403,14 @@ Here the text continues.
 [1] This footnote
     spans more lines in the source
 
- [2] But this is not, because of the initial whitespace.
+ [2] But this is not, because of the initial
+     whitespace.
 
-[3] Footnotes which don't have a referrer will disappear on the PDF
-    output and preserverd in the HTML. But will lead to incorrect
-    code, as it will point to a non-existent anchor
+[3] Footnotes which don’t have a referrer will
+    disappear on the PDF output and preserverd in the
+    HTML. But will lead to incorrect code, as it will
+    point to a non-existent anchor
+
 </example>
 
 This is the result:
@@ -407,13 +426,13 @@ Here the text continues.
 
  [2] But this is not, because of the initial whitespace.
 
-[3] Footnotes which don't have a referrer will disappear on the PDF
+[3] Footnotes which don’t have a referrer will disappear on the PDF
     output and preserved in the HTML. But will lead to incorrect
     code, as it will point to a non-existent anchor
 
 ----
 
-You can break the footnotes lines (even if it's not reccomended), but keep the indentation consistent, as shown above
+You can break the footnotes lines (even if it’s not reccomended), but keep the indentation consistent, as shown above
 
 *** Indicating poetic stanzas
 
@@ -561,13 +580,13 @@ A list with lower letters
 
 While the original Emacs Muse had the description lists, this
 implementation has not. You should use the fifth level of headings for
-those. The outcome is mostly the same (yes, you can't nest them in
+those. The outcome is mostly the same (yes, you can’t nest them in
 lists, but crazy nesting is beyond the scope of this markup).
 
 *** Nested lists
 
 It is possible to nest lists of the same or different kinds.  The
-"level" of the list is determined by the amount of initial whitespace.
+“level” of the list is determined by the amount of initial whitespace.
 
 <example>
 Normal text.
@@ -611,11 +630,11 @@ If you want to break up a line within any list type, just put one blank
 line between the end of the previous line and the beginning of the next
 line, using the same amount of initial indentation.
 
-Keep in mind that if you put random indentation you'll get random and
-probably unexpected results (but it should not crash -- if it does,
+Keep in mind that if you put random indentation you’ll get random and
+probably unexpected results (but it should not crash — if it does,
 please contact me).
 
-Also, you can be lazy with numbered list. The parser actually doesn't
+Also, you can be lazy with numbered list. The parser actually doesn’t
 care if you number them properly, or just do something like that.
 
 <example>
@@ -646,12 +665,12 @@ If you need to switch type while the list is running, put a =br= tag
 between them, or some invisible material like a non-breaking space.
 
 <example>
-This won't get you what you expect:
+This won’t get you what you expect:
 
  1. first
  a. first item
 
-So you'll have to do:
+So you’ll have to do:
 
  1. first
 
@@ -664,12 +683,12 @@ Which yields:
 
 ----
 
-This won't get you what you expect:
+This won’t get you what you expect:
 
  1. first
  a. first item
 
-So you'll have to do:
+So you’ll have to do:
 
  1. first
 
@@ -684,84 +703,85 @@ So you'll have to do:
 <example>
 Normal text.
 
- - Level 1, bullet item one, this is the first paragraph. I can break
-   the line, keeping the same amount of indentation
+ - Level 1, bullet item one, this is the first
+   paragraph. I can break the line, keeping the same
+   amount of indentation
 
-   Here I have the same amount of indentation, and it continues the
-   item above.
+   Here I have the same amount of indentation, and it
+   continues the item above.
 
-   1. Level 2, enum item one. i can break the line, keeping the same
-      amount of indentation
+   1. Level 2, enum item one. i can break the line,
+      keeping the same amount of indentation
 
-      Here I have the same amount of indentation, and it continues the
-      item above.
+      Here I have the same amount of indentation, and
+      it continues the item above.
 
    2. Level 2, enum item two
       which continues
 
-      Here I have the same amount of indentation, and it continues the
-      item above.
+      Here I have the same amount of indentation, and
+      it continues the item above.
 
  - Level 1, bullet item two
    which continues
 
-   Here I have the same amount of indentation, and it continues the
-   item above.
+   Here I have the same amount of indentation, and it
+   continues the item above.
 
    1. Level 2, enum item one
       which continues
 
-      Here I have the same amount of indentation, and it continues the
-      item above.
+      Here I have the same amount of indentation, and
+      it continues the item above.
 
    2. Level 2, enum item two
       which continues
 
-      Here I have the same amount of indentation, and it continues the
-      item above.
+      Here I have the same amount of indentation, and
+      it continues the item above.
 
       i.  Level 3, enum item i
 
-          Here I have the same amount of indentation, and it continues
-          the item above.
+          Here I have the same amount of indentation,
+          and it continues the item above.
 
       ii. Level 3, enum item ii
 
-          Here I have the same amount of indentation, and it continues
-          the item above.
+          Here I have the same amount of indentation,
+          and it continues the item above.
 
    3. Level 2, enum item three
       which continues
 
-      Here I have the same amount of indentation, and it continues the
-      item above.
+      Here I have the same amount of indentation, and
+      it continues the item above.
 
  - Back to Level 1, third bullet
 
-   Here I have the same amount of indentation, and it continues the
-   item above.
+   Here I have the same amount of indentation, and it
+   continues the item above.
 
    a. Level 2, enum item “a”
       which continues
 
-      Here I have the same amount of indentation, and it continues the
-      item above.
+      Here I have the same amount of indentation, and
+      it continues the item above.
 
    b. Level 2, enum item “b”
       which continues
 
-      Here I have the same amount of indentation, and it continues the
-      item above.
+      Here I have the same amount of indentation, and
+      it continues the item above.
 
          I. Level 3, enum item “I”
 
-            Here I have the same amount of indentation, and it continues the
-            item above.
+            Here I have the same amount of indentation,
+            and it continues the item above.
 
  - Back to the bullets
 
-   Here I have the same amount of indentation, and it continues the
-   item above.
+   Here I have the same amount of indentation, and it
+   continues the item above.
 
 </example>
 
@@ -849,7 +869,7 @@ Normal text.
 ** Generation of data tables
 
 
-Only very simple tables are supported.  The syntax is as follows (just keep the indentation consistent and separate each cell by one or more textbars.
+Only very simple tables are supported.  The syntax is as follows (just keep the indentation consistent and separate each cell by one or more textbars).
 
 <example>
      Triple bars ||| Separate footer fields
@@ -868,7 +888,7 @@ Only very simple tables are supported.  The syntax is as follows (just keep the 
 The ordering of the footer, header and table body blocks is irrelevant
 for the output (HTML requires you put first the header, then the
 footer, then the body). Ordering of the single rows is of course
-preserved. From this we come to the conclusion that you can't normally
+preserved. From this we come to the conclusion that you can’t normally
 typeset the pipe symbol without triggering a list. In =<example>= you
 can type it freely. Inside the cells you can do pretty much what you
 want (beside headers and lists): mark them up freely.
@@ -877,7 +897,7 @@ want (beside headers and lists): mark them up freely.
 
 When composing tables, please keep in mind the following:
 
- - tables are never splat over pages. If they don't fit a page, they
+ - tables are never splat over pages. If they don’t fit a page, they
    will run off the page. So keep them short or split them yourself.
 
  - tables *without* a caption are inserted at the point they are in the
@@ -899,17 +919,17 @@ descriptions.  The syntax is as follows.
      [[link target without description]]
 
 So, the home of this project is
-[[http://theanarchistlibrary.org][The Anarchist Library]],
-which can be found at [[http://theanarchistlibrary.org]]
-Bare links will not get the hyperlinking.
-So http://thisisspam.org won't get the hyperlinking.
-</example>
+[[http://amusewiki.org][AMuseWiki]],
+which can be found at
+[[http://amusewiki.org]] Bare links will not
+get the hyperlinking. So http://thisisspam.org won’t
+get the hyperlinking. </example>
 
 So, the home of this project is
-[[http://theanarchistlibrary.org][The Anarchist Library]],
-which can be found at [[http://theanarchistlibrary.org]]
+[[http://amusewiki.org][AMuseWiki]],
+which can be found at [[http://amusewiki.org]]
 Bare links will not get the hyperlinking.
-So http://thisisspam.org won't get the hyperlinking.
+So http://thisisspam.org won’t get the hyperlinking.
 
 *** Images
 
@@ -917,21 +937,21 @@ So http://thisisspam.org won't get the hyperlinking.
 Images are special case of this kind of linking.
 
 <example>
-[[logo.png]]
+[[m-l-manual-logo.png]]
 </example>
 
-We assume that we have the “logo.png” file on the same
+We assume that we have the “m-l-manual-logo.png” file on the same
 directory of the file, and the result is:
 
-[[logo.png]]
+[[m-l-manual-logo.png]]
 
-Now, let's add a caption.
+Now, let’s add a caption.
 
 <example>
-[[logo.png][This is *our* logo]]
+[[m-l-manual-logo.png][This is *our* logo]]
 </example>
 
-[[logo.png][This is *our* logo]]
+[[m-l-manual-logo.png][This is *our* logo]]
 
 Remote urls are not permitted. Also, the path checking is rather
 strict, so please use just alphanumeric filenames for your images.
@@ -942,40 +962,40 @@ By default, image width in the HTML output is kept to the original
 one, whatever it is, but limited via CSS, while in the PDF expands to
 fill the page width. This creates problems.
 
-Starting with version 0.07, it's possible to set the width of the
+Starting with version 0.07, it’s possible to set the width of the
 image, **in percent**, just appending it to the file name after a
 whitespace.
 
-It's also possible to make it a right or left float, adding the
-character =l= or =r=, or to mark it as a "fullpage" with =f=.
+It’s also possible to make it a right or left float, adding the
+character =l= or =r=, or to mark it as a “fullpage” with =f=.
 
 This one will have a width to 80% of the page width:
 
 <example>
-[[logo.png 80]]
+[[m-l-manual-logo.png 80]]
 </example>
 
 This one will have a width to 80% of the page width and will be a left
 float.
 
 <example>
-[[logo.png 80 l]]
+[[m-l-manual-logo.png 80 l]]
 </example>
 
 This one will have a width to 80% of the page width and will be a right
 float.
 
 <example>
-[[logo.png 80 r]]
+[[m-l-manual-logo.png 80 r]]
 </example>
 
 The Following will be marked as a fullpage.
 
 <example>
-[[logo.png f]]
+[[m-l-manual-logo.png f]]
 </example>
 
-Floating without a width doesn't make sense, as in the PDF will be no
+Floating without a width doesn’t make sense, as in the PDF will be no
 room for wrapping text around it.
 
 **** Examples
@@ -983,9 +1003,9 @@ room for wrapping text around it.
 The next figures use these codes:
 
 <example>
-[[logo.png 10r][right float]]
-[[logo.png 10l][left float]]
-[[logo.png 50f][full page]]
+[[m-l-manual-logo.png 10r][right float]]
+[[m-l-manual-logo.png 10l][left float]]
+[[m-l-manual-logo.png 50f][full page]]
 </example>
 
 Suggestions that I write my memoirs came to me when I had barely begun
@@ -1002,7 +1022,7 @@ years, I did not consider myself competent to undertake such a task.
 Moreover, I always lacked the necessary leisure for concentrated
 writing.
 
-[[logo.png 10r][right float]]
+[[m-l-manual-logo.png 10r][right float]]
 
 My enforced European inactivity left me enough time to read a great
 deal, including biographies and autobiographies. I discovered, much to
@@ -1012,7 +1032,7 @@ mellowness, is too often fraught with senility, narrowness, and petty
 rancour. I would not risk such a calamity, and I began to think
 seriously about writing my life.
 
-[[logo.png 10l][left float]]
+[[m-l-manual-logo.png 10l][left float]]
 
 The great difficulty that faced me was lack of historical data for my
 work. Almost everything in the way of books, correspondence, and
@@ -1051,7 +1071,7 @@ came to my aid with her usual readiness. Leonard did his share, and
 Van spent all his free time in research work for me.
 
 
-[[logo.png 50f][full page]]
+[[m-l-manual-logo.png 50f][full page]]
 
 
 
@@ -1062,7 +1082,7 @@ Van spent all his free time in research work for me.
 
 Four or more dashes indicate a horizontal rule.  Be sure to put blank
 lines around it, or it will be considered part of the proceeding or
-following paragraph, like this: ---------.
+following paragraph, like this: =---------=.
 
 Example
 
@@ -1093,38 +1113,40 @@ CSS.
 
 <example>
 <comment>
-This won't be published, but in the HTML is there, only hidden
+This won’t be published, but in the HTML is there, only hidden
 </comment>
 </example>
 
 <comment>
-This won't be published, but in the HTML is there, only hidden
+This won’t be published, but in the HTML is there, only hidden
 </comment>
 
 ** Plays and bibliographies
 
 
-Unlike the original Muse, this implementation doesn't support external
+Unlike the original Muse, this implementation doesn’t support external
 sources for citations, but provides an environment which can used to
 compose the list of cited works without resorting to lists, wrapping
 all in a <biblio> tag.
 
 <example>
 <biblio>
+
 The author, *Title*, published on
-[[http://theanarchistlibrary.org][The Anarchist Library]], with a
-very, very, very, very, very, very, very, very, very, very, very,
+[[http://amusewiki.org][AMuseWiki]], with a very, very,
+very, very, very, very, very, very, very, very, very,
 very, long description
 
-Another author, *Another title*, published in the real world. with a
-very, very, very, very, very, very, very, very, very, very, very,
-very, long description
+Another author, *Another title*, published in the real
+world. with a very, very, very, very, very, very, very,
+very, very, very, very, very, long description
+
 </biblio>
 </example>
 
 <biblio>
 The author, *Title*, published on
-[[http://theanarchistlibrary.org][The Anarchist Library]], with a
+[[http://amusewiki.org][AMuseWiki]], with a
 very, very, very, very, very, very, very, very, very, very, very,
 very, long description
 
@@ -1150,13 +1172,13 @@ hardcoding the spaces.
 We will bestow our selues: Reade on this booke, <br>
 That shew of such an exercise may colour <br>
 Your lonelinesse. We are oft too blame in this, <br>
-'Tis too much prou'd, that with Deuotions visage, <br>
-And pious Action, we do surge o're <br>
+‘Tis too much prou’d, that with Deuotions visage, <br>
+And pious Action, we do surge o’re <br>
 The diuell himselfe
 
-**King.** Oh 'tis true: <br>
+**King.** Oh ‘tis true: <br>
 How smart a lash that speech doth giue my Conscience? <br>
-The Harlots Cheeke beautied with plaist'ring Art <br>
+The Harlots Cheeke beautied with plaist’ring Art <br>
 Is not more vgly to the thing that helpes it, <br>
 Then is my deede, to my most painted word. <br>
 Oh heauie burthen!
@@ -1169,13 +1191,13 @@ Oh heauie burthen!
 We will bestow our selues: Reade on this booke, <br>
 That shew of such an exercise may colour <br>
 Your lonelinesse. We are oft too blame in this, <br>
-'Tis too much prou'd, that with Deuotions visage, <br>
-And pious Action, we do surge o're <br>
+‘Tis too much prou’d, that with Deuotions visage, <br>
+And pious Action, we do surge o’re <br>
 The diuell himselfe
 
-**King.** Oh 'tis true: <br>
+**King.** Oh ‘tis true: <br>
 How smart a lash that speech doth giue my Conscience? <br>
-The Harlots Cheeke beautied with plaist'ring Art <br>
+The Harlots Cheeke beautied with plaist’ring Art <br>
 Is not more vgly to the thing that helpes it, <br>
 Then is my deede, to my most painted word. <br>
 Oh heauie burthen!
@@ -1184,27 +1206,27 @@ Oh heauie burthen!
 
 * GNU Free Documentation License
 
-<example>
-                GNU Free Documentation License
-                 Version 1.3, 3 November 2008
+
+        GNU Free Documentation License<br>
+        Version 1.3, 3 November 2008
 
 
- Copyright (C) 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
-     <http://fsf.org/>
- Everyone is permitted to copy and distribute verbatim copies
- of this license document, but changing it is not allowed.
+   Copyright (C) 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+   [[http://fsf.org/]]
+   Everyone is permitted to copy and distribute verbatim copies
+   of this license document, but changing it is not allowed.
 
-0. PREAMBLE
+** 0. PREAMBLE
 
 The purpose of this License is to make a manual, textbook, or other
-functional and useful document "free" in the sense of freedom: to
+functional and useful document “free” in the sense of freedom: to
 assure everyone the effective freedom to copy and redistribute it,
 with or without modifying it, either commercially or noncommercially.
 Secondarily, this License preserves for the author and publisher a way
 to get credit for their work, while not being considered responsible
 for modifications made by others.
 
-This License is a kind of "copyleft", which means that derivative
+This License is a kind of “copyleft”, which means that derivative
 works of the document must themselves be free in the same sense.  It
 complements the GNU General Public License, which is a copyleft
 license designed for free software.
@@ -1218,25 +1240,25 @@ whether it is published as a printed book.  We recommend this License
 principally for works whose purpose is instruction or reference.
 
 
-1. APPLICABILITY AND DEFINITIONS
+** 1. APPLICABILITY AND DEFINITIONS
 
 This License applies to any manual or other work, in any medium, that
 contains a notice placed by the copyright holder saying it can be
 distributed under the terms of this License.  Such a notice grants a
 world-wide, royalty-free license, unlimited in duration, to use that
-work under the conditions stated herein.  The "Document", below,
+work under the conditions stated herein.  The “Document”, below,
 refers to any such manual or work.  Any member of the public is a
-licensee, and is addressed as "you".  You accept the license if you
+licensee, and is addressed as “you”.  You accept the license if you
 copy, modify or distribute the work in a way requiring permission
 under copyright law.
 
-A "Modified Version" of the Document means any work containing the
+A “Modified Version” of the Document means any work containing the
 Document or a portion of it, either copied verbatim, or with
 modifications and/or translated into another language.
 
-A "Secondary Section" is a named appendix or a front-matter section of
+A “Secondary Section” is a named appendix or a front-matter section of
 the Document that deals exclusively with the relationship of the
-publishers or authors of the Document to the Document's overall
+publishers or authors of the Document to the Document’s overall
 subject (or to related matters) and contains nothing that could fall
 directly within that overall subject.  (Thus, if the Document is in
 part a textbook of mathematics, a Secondary Section may not explain
@@ -1245,7 +1267,7 @@ connection with the subject or with related matters, or of legal,
 commercial, philosophical, ethical or political position regarding
 them.
 
-The "Invariant Sections" are certain Secondary Sections whose titles
+The “Invariant Sections” are certain Secondary Sections whose titles
 are designated, as being those of Invariant Sections, in the notice
 that says that the Document is released under this License.  If a
 section does not fit the above definition of Secondary then it is not
@@ -1253,12 +1275,12 @@ allowed to be designated as Invariant.  The Document may contain zero
 Invariant Sections.  If the Document does not identify any Invariant
 Sections then there are none.
 
-The "Cover Texts" are certain short passages of text that are listed,
+The “Cover Texts” are certain short passages of text that are listed,
 as Front-Cover Texts or Back-Cover Texts, in the notice that says that
 the Document is released under this License.  A Front-Cover Text may
 be at most 5 words, and a Back-Cover Text may be at most 25 words.
 
-A "Transparent" copy of the Document means a machine-readable copy,
+A “Transparent” copy of the Document means a machine-readable copy,
 represented in a format whose specification is available to the
 general public, that is suitable for revising the document
 straightforwardly with generic text editors or (for images composed of
@@ -1269,7 +1291,7 @@ to text formatters.  A copy made in an otherwise Transparent file
 format whose markup, or absence of markup, has been arranged to thwart
 or discourage subsequent modification by readers is not Transparent.
 An image format is not Transparent if used for any substantial amount
-of text.  A copy that is not "Transparent" is called "Opaque".
+of text.  A copy that is not “Transparent” is called “Opaque”.
 
 Examples of suitable formats for Transparent copies include plain
 ASCII without markup, Texinfo input format, LaTeX input format, SGML
@@ -1282,23 +1304,23 @@ processing tools are not generally available, and the
 machine-generated HTML, PostScript or PDF produced by some word
 processors for output purposes only.
 
-The "Title Page" means, for a printed book, the title page itself,
+The “Title Page” means, for a printed book, the title page itself,
 plus such following pages as are needed to hold, legibly, the material
 this License requires to appear in the title page.  For works in
-formats which do not have any title page as such, "Title Page" means
-the text near the most prominent appearance of the work's title,
+formats which do not have any title page as such, “Title Page” means
+the text near the most prominent appearance of the work’s title,
 preceding the beginning of the body of the text.
 
-The "publisher" means any person or entity that distributes copies of
+The “publisher” means any person or entity that distributes copies of
 the Document to the public.
 
-A section "Entitled XYZ" means a named subunit of the Document whose
+A section “Entitled XYZ” means a named subunit of the Document whose
 title either is precisely XYZ or contains XYZ in parentheses following
 text that translates XYZ in another language.  (Here XYZ stands for a
-specific section name mentioned below, such as "Acknowledgements",
-"Dedications", "Endorsements", or "History".)  To "Preserve the Title"
+specific section name mentioned below, such as “Acknowledgements”,
+“Dedications”, “Endorsements”, or “History”.)  To “Preserve the Title”
 of such a section when you modify the Document means that it remains a
-section "Entitled XYZ" according to this definition.
+section “Entitled XYZ” according to this definition.
 
 The Document may include Warranty Disclaimers next to the notice which
 states that this License applies to the Document.  These Warranty
@@ -1307,7 +1329,7 @@ License, but only as regards disclaiming warranties: any other
 implication that these Warranty Disclaimers may have is void and has
 no effect on the meaning of this License.
 
-2. VERBATIM COPYING
+** 2. VERBATIM COPYING
 
 You may copy and distribute the Document in any medium, either
 commercially or noncommercially, provided that this License, the
@@ -1323,11 +1345,11 @@ You may also lend copies, under the same conditions stated above, and
 you may publicly display copies.
 
 
-3. COPYING IN QUANTITY
+** 3. COPYING IN QUANTITY
 
 If you publish printed copies (or copies in media that commonly have
 printed covers) of the Document, numbering more than 100, and the
-Document's license notice requires Cover Texts, you must enclose the
+Document’s license notice requires Cover Texts, you must enclose the
 copies in covers that carry, clearly and legibly, all these Cover
 Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on
 the back cover.  Both covers must also clearly and legibly identify
@@ -1362,7 +1384,7 @@ give them a chance to provide you with an updated version of the
 Document.
 
 
-4. MODIFICATIONS
+** 4. MODIFICATIONS
 
 You may copy and distribute a Modified Version of the Document under
 the conditions of sections 2 and 3 above, provided that you release
@@ -1371,62 +1393,77 @@ Version filling the role of the Document, thus licensing distribution
 and modification of the Modified Version to whoever possesses a copy
 of it.  In addition, you must do these things in the Modified Version:
 
-A. Use in the Title Page (and on the covers, if any) a title distinct
-   from that of the Document, and from those of previous versions
-   (which should, if there were any, be listed in the History section
-   of the Document).  You may use the same title as a previous version
-   if the original publisher of that version gives permission.
-B. List on the Title Page, as authors, one or more persons or entities
-   responsible for authorship of the modifications in the Modified
-   Version, together with at least five of the principal authors of the
-   Document (all of its principal authors, if it has fewer than five),
-   unless they release you from this requirement.
-C. State on the Title page the name of the publisher of the
-   Modified Version, as the publisher.
-D. Preserve all the copyright notices of the Document.
-E. Add an appropriate copyright notice for your modifications
-   adjacent to the other copyright notices.
-F. Include, immediately after the copyright notices, a license notice
-   giving the public permission to use the Modified Version under the
-   terms of this License, in the form shown in the Addendum below.
-G. Preserve in that license notice the full lists of Invariant Sections
-   and required Cover Texts given in the Document's license notice.
-H. Include an unaltered copy of this License.
-I. Preserve the section Entitled "History", Preserve its Title, and add
-   to it an item stating at least the title, year, new authors, and
-   publisher of the Modified Version as given on the Title Page.  If
-   there is no section Entitled "History" in the Document, create one
-   stating the title, year, authors, and publisher of the Document as
-   given on its Title Page, then add an item describing the Modified
-   Version as stated in the previous sentence.
-J. Preserve the network location, if any, given in the Document for
-   public access to a Transparent copy of the Document, and likewise
-   the network locations given in the Document for previous versions
-   it was based on.  These may be placed in the "History" section.
-   You may omit a network location for a work that was published at
-   least four years before the Document itself, or if the original
-   publisher of the version it refers to gives permission.
-K. For any section Entitled "Acknowledgements" or "Dedications",
-   Preserve the Title of the section, and preserve in the section all
-   the substance and tone of each of the contributor acknowledgements
-   and/or dedications given therein.
-L. Preserve all the Invariant Sections of the Document,
-   unaltered in their text and in their titles.  Section numbers
-   or the equivalent are not considered part of the section titles.
-M. Delete any section Entitled "Endorsements".  Such a section
-   may not be included in the Modified Version.
-N. Do not retitle any existing section to be Entitled "Endorsements"
-   or to conflict in title with any Invariant Section.
-O. Preserve any Warranty Disclaimers.
+
+ A. Use in the Title Page (and on the covers, if any) a title distinct
+    from that of the Document, and from those of previous versions
+    (which should, if there were any, be listed in the History section
+    of the Document).  You may use the same title as a previous version
+    if the original publisher of that version gives permission.
+
+ A. List on the Title Page, as authors, one or more persons or entities
+    responsible for authorship of the modifications in the Modified
+    Version, together with at least five of the principal authors of the
+    Document (all of its principal authors, if it has fewer than five),
+    unless they release you from this requirement.
+
+ A. State on the Title page the name of the publisher of the
+    Modified Version, as the publisher.
+
+ A. Preserve all the copyright notices of the Document.
+
+ A. Add an appropriate copyright notice for your modifications
+    adjacent to the other copyright notices.
+
+ A. Include, immediately after the copyright notices, a license notice
+    giving the public permission to use the Modified Version under the
+    terms of this License, in the form shown in the Addendum below.
+
+ A. Preserve in that license notice the full lists of Invariant Sections
+    and required Cover Texts given in the Document’s license notice.
+
+ A. Include an unaltered copy of this License.
+
+ A. Preserve the section Entitled “History”, Preserve its Title, and add
+    to it an item stating at least the title, year, new authors, and
+    publisher of the Modified Version as given on the Title Page.  If
+    there is no section Entitled “History” in the Document, create one
+    stating the title, year, authors, and publisher of the Document as
+    given on its Title Page, then add an item describing the Modified
+    Version as stated in the previous sentence.
+
+ A. Preserve the network location, if any, given in the Document for
+    public access to a Transparent copy of the Document, and likewise
+    the network locations given in the Document for previous versions
+    it was based on.  These may be placed in the “History” section.
+    You may omit a network location for a work that was published at
+    least four years before the Document itself, or if the original
+    publisher of the version it refers to gives permission.
+
+ A. For any section Entitled “Acknowledgements” or “Dedications”,
+    Preserve the Title of the section, and preserve in the section all
+    the substance and tone of each of the contributor acknowledgements
+    and/or dedications given therein.
+
+ A. Preserve all the Invariant Sections of the Document,
+    unaltered in their text and in their titles.  Section numbers
+    or the equivalent are not considered part of the section titles.
+
+ A. Delete any section Entitled “Endorsements”.  Such a section
+    may not be included in the Modified Version.
+
+ A. Do not retitle any existing section to be Entitled “Endorsements”
+    or to conflict in title with any Invariant Section.
+
+ A. Preserve any Warranty Disclaimers.
 
 If the Modified Version includes new front-matter sections or
 appendices that qualify as Secondary Sections and contain no material
 copied from the Document, you may at your option designate some or all
 of these sections as invariant.  To do this, add their titles to the
-list of Invariant Sections in the Modified Version's license notice.
+list of Invariant Sections in the Modified Version’s license notice.
 These titles must be distinct from any other section titles.
 
-You may add a section Entitled "Endorsements", provided it contains
+You may add a section Entitled “Endorsements”, provided it contains
 nothing but endorsements of your Modified Version by various
 parties--for example, statements of peer review or that the text has
 been approved by an organization as the authoritative definition of a
@@ -1447,7 +1484,7 @@ give permission to use their names for publicity for or to assert or
 imply endorsement of any Modified Version.
 
 
-5. COMBINING DOCUMENTS
+** 5. COMBINING DOCUMENTS
 
 You may combine the Document with other documents released under this
 License, under the terms defined in section 4 above for modified
@@ -1465,14 +1502,14 @@ author or publisher of that section if known, or else a unique number.
 Make the same adjustment to the section titles in the list of
 Invariant Sections in the license notice of the combined work.
 
-In the combination, you must combine any sections Entitled "History"
+In the combination, you must combine any sections Entitled “History”
 in the various original documents, forming one section Entitled
-"History"; likewise combine any sections Entitled "Acknowledgements",
-and any sections Entitled "Dedications".  You must delete all sections
-Entitled "Endorsements".
+“History”; likewise combine any sections Entitled “Acknowledgements”,
+and any sections Entitled “Dedications”.  You must delete all sections
+Entitled “Endorsements”.
 
 
-6. COLLECTIONS OF DOCUMENTS
+** 6. COLLECTIONS OF DOCUMENTS
 
 You may make a collection consisting of the Document and other
 documents released under this License, and replace the individual
@@ -1488,27 +1525,27 @@ License in all other respects regarding verbatim copying of that
 document.
 
 
-7. AGGREGATION WITH INDEPENDENT WORKS
+** 7. AGGREGATION WITH INDEPENDENT WORKS
 
 A compilation of the Document or its derivatives with other separate
 and independent documents or works, in or on a volume of a storage or
-distribution medium, is called an "aggregate" if the copyright
+distribution medium, is called an “aggregate” if the copyright
 resulting from the compilation is not used to limit the legal rights
-of the compilation's users beyond what the individual works permit.
+of the compilation’s users beyond what the individual works permit.
 When the Document is included in an aggregate, this License does not
 apply to the other works in the aggregate which are not themselves
 derivative works of the Document.
 
 If the Cover Text requirement of section 3 is applicable to these
 copies of the Document, then if the Document is less than one half of
-the entire aggregate, the Document's Cover Texts may be placed on
+the entire aggregate, the Document’s Cover Texts may be placed on
 covers that bracket the Document within the aggregate, or the
 electronic equivalent of covers if the Document is in electronic form.
 Otherwise they must appear on printed covers that bracket the whole
 aggregate.
 
 
-8. TRANSLATION
+** 8. TRANSLATION
 
 Translation is considered a kind of modification, so you may
 distribute translations of the Document under the terms of section 4.
@@ -1523,13 +1560,13 @@ of those notices and disclaimers.  In case of a disagreement between
 the translation and the original version of this License or a notice
 or disclaimer, the original version will prevail.
 
-If a section in the Document is Entitled "Acknowledgements",
-"Dedications", or "History", the requirement (section 4) to Preserve
+If a section in the Document is Entitled “Acknowledgements”,
+“Dedications”, or “History”, the requirement (section 4) to Preserve
 its Title (section 1) will typically require changing the actual
 title.
 
 
-9. TERMINATION
+** 9. TERMINATION
 
 You may not copy, modify, sublicense, or distribute the Document
 except as expressly provided under this License.  Any attempt
@@ -1557,46 +1594,46 @@ reinstated, receipt of a copy of some or all of the same material does
 not give you any rights to use it.
 
 
-10. FUTURE REVISIONS OF THIS LICENSE
+** 10. FUTURE REVISIONS OF THIS LICENSE
 
 The Free Software Foundation may publish new, revised versions of the
 GNU Free Documentation License from time to time.  Such new versions
 will be similar in spirit to the present version, but may differ in
 detail to address new problems or concerns.  See
-http://www.gnu.org/copyleft/.
+[[http://www.gnu.org/copyleft/]].
 
 Each version of the License is given a distinguishing version number.
 If the Document specifies that a particular numbered version of this
-License "or any later version" applies to it, you have the option of
+License “or any later version” applies to it, you have the option of
 following the terms and conditions either of that specified version or
 of any later version that has been published (not as a draft) by the
 Free Software Foundation.  If the Document does not specify a version
 number of this License, you may choose any version ever published (not
 as a draft) by the Free Software Foundation.  If the Document
 specifies that a proxy can decide which future versions of this
-License can be used, that proxy's public statement of acceptance of a
+License can be used, that proxy’s public statement of acceptance of a
 version permanently authorizes you to choose that version for the
 Document.
 
-11. RELICENSING
+** 11. RELICENSING
 
-"Massive Multiauthor Collaboration Site" (or "MMC Site") means any
+“Massive Multiauthor Collaboration Site” (or “MMC Site”) means any
 World Wide Web server that publishes copyrightable works and also
 provides prominent facilities for anybody to edit those works.  A
 public wiki that anybody can edit is an example of such a server.  A
-"Massive Multiauthor Collaboration" (or "MMC") contained in the site
+“Massive Multiauthor Collaboration” (or “MMC”) contained in the site
 means any set of copyrightable works thus published on the MMC site.
 
-"CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0 
+“CC-BY-SA” means the Creative Commons Attribution-Share Alike 3.0 
 license published by Creative Commons Corporation, a not-for-profit 
 corporation with a principal place of business in San Francisco, 
 California, as well as future copyleft versions of that license 
 published by that same organization.
 
-"Incorporate" means to publish or republish a Document, in whole or in 
+“Incorporate” means to publish or republish a Document, in whole or in 
 part, as part of another Document.
 
-An MMC is "eligible for relicensing" if it is licensed under this 
+An MMC is “eligible for relicensing” if it is licensed under this 
 License, and if all works that were first published under this License 
 somewhere other than this MMC, and subsequently incorporated in whole or 
 in part into the MMC, (1) had no cover texts or invariant sections, and 
@@ -1607,25 +1644,28 @@ under CC-BY-SA on the same site at any time before August 1, 2009,
 provided the MMC is eligible for relicensing.
 
 
-ADDENDUM: How to use this License for your documents
+** ADDENDUM: How to use this License for your documents
 
 To use this License in a document you have written, include a copy of
 the License in the document and put the following copyright and
 license notices just after the title page:
 
-    Copyright (c)  YEAR  YOUR NAME.
-    Permission is granted to copy, distribute and/or modify this document
-    under the terms of the GNU Free Documentation License, Version 1.3
-    or any later version published by the Free Software Foundation;
-    with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
-    A copy of the license is included in the section entitled "GNU
-    Free Documentation License".
+<quote>
+Copyright (c)  YEAR  YOUR NAME.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.3
+or any later version published by the Free Software Foundation;
+with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
+A copy of the license is included in the section entitled “GNU
+Free Documentation License”.
+</quote>
 
 If you have Invariant Sections, Front-Cover Texts and Back-Cover Texts,
-replace the "with...Texts." line with this:
+replace the “with...Texts.” line with this:
 
-    with the Invariant Sections being LIST THEIR TITLES, with the
-    Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+  with the Invariant Sections being LIST THEIR TITLES, with the
+  Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
 
 If you have Invariant Sections without Cover Texts, or some other
 combination of the three, merge those two alternatives to suit the
@@ -1636,4 +1676,3 @@ recommend releasing these examples in parallel under your choice of
 free software license, such as the GNU General Public License,
 to permit their use in free software.
 
-</example>
