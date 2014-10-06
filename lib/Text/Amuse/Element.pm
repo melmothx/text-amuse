@@ -235,7 +235,6 @@ sub _parse_string {
         $self->type("newpage");
         $self->removed($2);
         $self->string($3);
-        $self->will_not_merge(1);
     }
 
     elsif ($l =~ m/^( {20,})([^ ].+)$/s) {
