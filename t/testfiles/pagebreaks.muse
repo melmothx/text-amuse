@@ -14,3 +14,21 @@ Blablabla
 
 Blablabla
 
+
+<example>
+
+Hello
+
+      * * * * *
+
+There
+
+</example>
+
+<quote>
+Hello
+      * * * * *
+
+There
+
+</quote>
