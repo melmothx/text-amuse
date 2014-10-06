@@ -298,9 +298,9 @@ sub is_start_block {
     my $self = shift;
     my $block = shift || "";
     if ($self->type eq 'startblock' and $self->block eq $block) {
-        return 1
+        return 1;
     } else {
-        return 0
+        return 0;
     }
 }
 
@@ -314,9 +314,9 @@ sub is_stop_block {
     my $self = shift;
     my $block = shift || "";
     if ($self->type eq 'stopblock' and $self->block eq $block) {
-        return 1
+        return 1;
     } else {
-        return 0
+        return 0;
     }
 }
 
@@ -332,9 +332,9 @@ sub is_regular_maybe {
     if ($self->type eq 'li' or
         $self->type eq 'null' or
         $self->type eq 'regular') {
-        return 1
+        return 1;
     } else {
-        return 0
+        return 0;
     }
 }
 
@@ -352,9 +352,9 @@ sub can_merge_next {
         $self->type ne 'null'       and
         $self->type ne 'table'      and
         $self->type ne 'comment') {
-        return 1
+        return 1;
     } else {
-        return 0
+        return 0;
     }
 }
 
@@ -368,7 +368,10 @@ sub can_be_merged {
     my $self = shift;
     return 0 if $self->will_not_merge;
     if ($self->type eq 'regular' or $self->type eq 'verse') {
-        return 1
+        return 1;
+    }
+    else {
+        return 0;
     }
 }
 
@@ -383,9 +386,9 @@ sub can_be_in_list {
     if ($self->type eq 'li' or
         $self->type eq 'null', or
         $self->type eq 'regular') {
-        return 1
+        return 1;
     } else {
-        return 0
+        return 0;
     }
 }
 
@@ -401,10 +404,10 @@ sub can_be_regular {
     if ($self->block eq 'quote' or
         $self->block eq 'center' or
         $self->block eq 'right') {
-        return 1
+        return 1;
     }
     else {
-        return 0
+        return 0;
     }
 }
 
