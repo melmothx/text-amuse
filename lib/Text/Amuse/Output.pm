@@ -145,9 +145,6 @@ sub process {
             if ($el->string =~ m/^\s*-----*\s*$/s) {
                 push @pieces, $self->manage_hr($el);
             }
-            elsif ($el->string =~ m/^\s*(\* ?){5}\s*$/s) {
-                push @pieces, $self->manage_newpage($el);
-            }
             # an image by itself, so avoid it wrapping with <p></p>,
             # but only if just 1 is found. With multiple one, we get
             # incorrect output anyway, so who cares?
@@ -191,6 +188,9 @@ sub process {
         }
         elsif ($el->type eq 'example') {
             push @pieces, $self->manage_example($el);
+        }
+        elsif ($el->type eq 'newpage') {
+            push @pieces, $self->manage_newpage($el);
         }
         else {
             die "Unrecognized element: " . $el->type;
@@ -963,11 +963,13 @@ sub manage_newpage {
     my ($self, $el) = @_;
     die "Wtf? " . $el->string if $el->string =~ m/\w/s; # don't eat chars by mistake
     if ($self->fmt eq 'html') {
-        return $self->manage_paragraph($el);
+        my $out = $self->blkstring(start => 'center') .
+          $self->manage_paragraph($el) .
+            $self->blkstring(stop => 'center');
+        return $out;
     }
     elsif ($self->fmt eq 'ltx') {
-        return $self->manage_paragraph($el)
-          . "\n\\cleardoublepage\n\n";
+        return "\n\\cleardoublepage\n\n";
     }
 }
 

@@ -13,7 +13,7 @@ use Data::Dumper;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 64;
+plan tests => 66;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -82,6 +82,7 @@ foreach my $testfile (qw/comments
                          captions
                          image2
                          table-captions
+                         pagebreaks
                          zeros
                          headings-with-fn
                         /) {
@@ -100,12 +101,12 @@ sub test_testfile {
     }
     my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
     my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
-    is_deeply ([ split /\n/, $document->as_latex ],
-               [ split /\n/, $latex ],
-               "LaTex for $base OK");
-    is_deeply ([ split /\n/, $document->as_html ],
-               [ split /\n/, $html],
-               "HTML for $base OK");
+    my @exp = split /\n/, $latex;
+    my @got = split /\n/, $document->as_latex;
+    is_deeply (\@got, \@exp, "LaTex for $base OK") or diag Dumper(\@got, \@exp);
+    @exp = split /\n/, $html;
+    @got = split /\n/, $document->as_html;
+    is_deeply (\@got, \@exp, "HTML for $base OK") or diag Dumper(\@got, \@exp);
     # print Dumper($document->document);
 }
 

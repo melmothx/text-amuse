@@ -98,6 +98,9 @@ t/testfiles/nbsp.muse
 t/testfiles/open-letter.muse
 t/testfiles/other.png
 t/testfiles/packing.muse
+t/testfiles/pagebreaks.exp.html
+t/testfiles/pagebreaks.exp.ltx
+t/testfiles/pagebreaks.muse
 t/testfiles/prova.muse
 t/testfiles/recursiv.muse
 t/testfiles/right.exp.html

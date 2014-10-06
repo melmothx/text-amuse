@@ -230,6 +230,14 @@ sub _parse_string {
         $self->string($3);
         $self->removed($1);
     }
+
+    elsif ($l =~ m/^((\s{6,})((\*\s?){5}))$/s) {
+        $self->type("newpage");
+        $self->removed($2);
+        $self->string($3);
+        $self->will_not_merge(1);
+    }
+
     elsif ($l =~ m/^( {20,})([^ ].+)$/s) {
         $self->block("right");
         $self->type("regular");
@@ -413,6 +421,7 @@ sub should_close_blocks {
     return 1 if $self->block eq 'example';
     return 1 if $self->block eq 'verse';
     return 1 if $self->block eq 'table';
+    return 1 if $self->type eq 'newpage';
     return 0;
 }
 
