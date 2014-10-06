@@ -342,6 +342,10 @@ sub other_languages {
 
 =head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP
 
+The updated manual can be found at
+L<http://www.amusewiki.org/library/manual> and is also present between
+the test files (C<t/testfiles/manual.muse>).
+
 =head3 Inline markup
 
 Underlining has been dropped.

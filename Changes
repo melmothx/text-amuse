@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.15 2014-10-06
+ - Moved the manual from the example directory into the testfile
+ - The page break marker (* * * * *) is removed from LaTeX output
+
 0.14 2014-07-20
 
  - Moved test for Devel::Size in its own size (fails with perl 5.20,
