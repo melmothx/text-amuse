@@ -16,7 +16,7 @@ binmode $builder->todo_output,    ":utf8";
 
 
 
-plan tests => 190;
+plan tests => 200;
 
 sub test_lang {
     my ($lang, $expected_code, $expected_lang) = @_;
@@ -65,6 +65,7 @@ my %langs = (
              fr => 'french',
              nl => 'dutch',
              mk => 'macedonian',
+             se => 'swedish',
             );
 
 foreach my $k (keys %langs) {
