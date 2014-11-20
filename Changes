@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.17 2014-11-20
+
+ - Corrected language code for swedish from se to sv
+
 0.16 2014-11-20
  - Added swedish language
 

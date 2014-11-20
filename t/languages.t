@@ -65,7 +65,7 @@ my %langs = (
              fr => 'french',
              nl => 'dutch',
              mk => 'macedonian',
-             se => 'swedish',
+             sv => 'swedish',
             );
 
 foreach my $k (keys %langs) {

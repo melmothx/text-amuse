@@ -13,11 +13,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.16
+Version 0.17
 
 =cut
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 
 =head1 SYNOPSIS
@@ -287,7 +287,7 @@ sub _language_mapping {
             pt => 'portuges',
             tr => 'turkish',
             mk => 'macedonian',
-            se => 'swedish',
+            sv => 'swedish',
            };
 }
 
