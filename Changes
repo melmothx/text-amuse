@@ -1,5 +1,8 @@
 Revision history for perl module Text::Amuse
 
+0.16 2014-11-20
+ - Added swedish language
+
 0.15 2014-10-06
  - Moved the manual from the example directory into the testfile
  - The page break marker (* * * * *) is removed from LaTeX output
