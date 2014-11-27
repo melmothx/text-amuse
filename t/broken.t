@@ -3,11 +3,16 @@ use strict;
 use warnings;
 use Test::More;
 use Text::Amuse::Document;
+use Text::Amuse;
 use File::Spec::Functions;
 use Data::Dumper;
 
-plan tests => 1;
+plan tests => 2;
 
 my $fn = Text::Amuse::Document->new(file => catfile(t => testfiles => 'broken.muse'));
 
 ok($fn->document);
+
+my $muse = Text::Amuse->new(file => catfile(t => testfiles => 'crashed-1.muse'));
+
+ok($muse->as_html, "HTML rendered");
