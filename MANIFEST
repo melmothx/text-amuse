@@ -56,6 +56,8 @@ t/testfiles/comments.muse
 t/testfiles/complete.exp.html
 t/testfiles/complete.exp.ltx
 t/testfiles/complete.muse
+t/testfiles/crashed-1.exp.html
+t/testfiles/crashed-1.exp.ltx
 t/testfiles/crashed-1.muse
 t/testfiles/example-2.muse
 t/testfiles/example-3.exp.html

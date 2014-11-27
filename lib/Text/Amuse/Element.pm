@@ -231,7 +231,7 @@ sub _parse_string {
         $self->removed($1);
     }
 
-    elsif ($l =~ m/^((\s{6,})((\*\s?){5}))$/s) {
+    elsif ($l =~ m/^((\s{6,})((\*\s?){5})\s*)$/s) {
         $self->type("newpage");
         $self->removed($2);
         $self->string($3);
@@ -347,14 +347,15 @@ Return true if the element will merge the next one
 sub can_merge_next {
     my $self = shift;
     return 0 if $self->will_not_merge;
-    if ($self->type ne 'stopblock'  and
-        $self->type ne 'startblock' and
-        $self->type ne 'null'       and
-        $self->type ne 'table'      and
-        $self->type ne 'comment') {
-        return 1;
-    } else {
+    if ($self->type eq 'stopblock'  or
+        $self->type eq 'startblock' or
+        $self->type eq 'null'       or
+        $self->type eq 'table'      or
+        $self->type eq 'newpage'    or
+        $self->type eq 'comment') {
         return 0;
+    } else {
+        return 1;
     }
 }
 

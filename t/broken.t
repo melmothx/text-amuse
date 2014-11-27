@@ -15,4 +15,6 @@ ok($fn->document);
 
 my $muse = Text::Amuse->new(file => catfile(t => testfiles => 'crashed-1.muse'));
 
-ok($muse->as_html, "HTML rendered");
+eval { $muse->as_html };
+
+ok(!$@, "No crash"); # or diag Dumper($muse);

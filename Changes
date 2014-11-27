@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.18 2014-11-27
+
+ - Fixed crash on page break markers (introduced in 0.15)
+
 0.17 2014-11-20
 
  - Corrected language code for swedish from se to sv
