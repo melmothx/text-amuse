@@ -13,11 +13,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 
 =head1 SYNOPSIS
@@ -289,6 +289,33 @@ sub _language_mapping {
             mk => 'macedonian',
             sv => 'swedish',
            };
+}
+
+
+=head3 header_defined
+
+Return a convenience hashref with the header fields set to true when
+they are defined in the document.
+
+This way, in the template you can write doc.header_defined.subtitle
+without doing crazy things like C<doc.header_as_html.subtitle.size>
+which relies on virtual methods.
+
+=cut
+
+sub header_defined {
+    my $self = shift;
+    unless (defined $self->{_header_defined_hashref}) {
+        my %fields;
+        my %header = $self->document->raw_header;
+        foreach my $k (keys %header) {
+            if (defined($header{$k}) and length($header{$k})) {
+                $fields{$k} = 1;
+            }
+        }
+        $self->{_header_defined_hashref} = \%fields;
+    }
+    return { %{ $self->{_header_defined_hashref} } };
 }
 
 

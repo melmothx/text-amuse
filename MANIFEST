@@ -19,6 +19,7 @@ t/changes.t
 t/elements.t
 t/footnotes.t
 t/functions.t
+t/header-defined.t
 t/headers.t
 t/images.t
 t/languages.t
