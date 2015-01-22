@@ -969,7 +969,7 @@ sub manage_newpage {
         return $out;
     }
     elsif ($self->fmt eq 'ltx') {
-        return "\n\\cleardoublepage\n\n";
+        return "\n\\clearpage\n\n";
     }
 }
 
