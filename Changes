@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.20 2015-01-22
+
+ - Fixed bug where page break marker created a \cleardoublepage
+   instead of simply \clearpage
+
 0.19 2015-01-13
 
  - Added method header_defined for easier handling in templates

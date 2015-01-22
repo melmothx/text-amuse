@@ -30,7 +30,10 @@ WriteMakefile(
     clean => { FILES => 'Text-Amuse-*' },
     META_MERGE => {
                    resources => {
-                                 repository => 'https://github.com/melmothx/text-amuse'
+                                 repository => 'https://github.com/melmothx/text-amuse',
+                                 homepage => 'http://amusewiki.org',
+                                 x_IRC => 'irc://chat.freenode.net/#amusewiki',
+                                 x_WebIRC => 'https://webchat.freenode.net/?channels=#amusewiki',
                                 },
                   },
 );
