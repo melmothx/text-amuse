@@ -21,6 +21,7 @@ t/footnotes.t
 t/functions.t
 t/header-defined.t
 t/headers.t
+t/hyphenation.t
 t/images.t
 t/languages.t
 t/lists.t

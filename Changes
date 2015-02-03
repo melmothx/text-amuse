@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.21 2015-02-03
+
+ - Added method hyphenation to get a validated string to insert into
+   LaTeX \hyphenation
+
 0.20 2015-01-22
 
  - Fixed bug where page break marker created a \cleardoublepage

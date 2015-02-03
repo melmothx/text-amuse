@@ -13,11 +13,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.20
+Version 0.21
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 
 =head1 SYNOPSIS
@@ -367,6 +367,38 @@ arrayref or undef.
 sub other_languages {
     return;
 }
+
+=head3 hyphenation
+
+Return a validated version of the C<#hyphenation> header, if present,
+or the empty string.
+
+=cut
+
+sub hyphenation {
+    my $self = shift;
+    unless (defined $self->{_doc_hyphenation}) {
+        my %header = $self->document->raw_header;
+        my $hyphenation = $header{hyphenation} || '';
+        my @patterns = split(/\s+/, $hyphenation);
+        my @validated;
+        foreach my $pattern (@patterns) {
+            if ($pattern =~ m/\A(
+                                  [[:alpha:]]+
+                                  (-[[:alpha:]]+)*
+                              )\z/x) {
+                push @validated, $1;
+            }
+        }
+        my $valid = '';
+        if (@validated) {
+            $valid = join(' ', @validated);
+        }
+        $self->{_doc_hyphenation} = $valid;
+    }
+    return $self->{_doc_hyphenation};
+}
+
 
 =head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP
 
