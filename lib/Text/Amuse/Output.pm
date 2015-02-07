@@ -655,6 +655,29 @@ even for the LaTeX format, even if does not produce usable output.
 This because we can test if we need to emit a table of contents
 looking at this without searching the whole output.
 
+The output is a list of hashref, where each hashref has the following keys:
+
+=over 4
+
+=item level
+
+The level of the header. Currently we store only levels 1-4, defining
+part(1), chapter(2), section(3) and subsection(4). Any other value
+means something is off (a.k.a., you found a bug).
+
+=item index
+
+The index of the entry, starting from 1.
+
+=item string
+
+The output.
+
+=back
+
+The hashrefs are returned as copies, so they are safe to
+manipulate.
+
 =cut
 
 sub table_of_contents {
