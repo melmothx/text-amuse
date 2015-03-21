@@ -1,5 +1,12 @@
 Revision history for perl module Text::Amuse
 
+0.22 2015-21-03
+
+ - Minor syntax change (documented in the manual): require indentation
+   to trigger a table.
+
+ - Do not consider footnotes as such if they have no text material
+
 0.21 2015-02-03
 
  - Added method hyphenation to get a validated string to insert into
