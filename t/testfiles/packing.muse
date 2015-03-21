@@ -30,8 +30,8 @@ nor the example
 </example>
 will not merge
 
-the | table
-will | merge
+ the | table
+ will | merge
        but not with a regular
 
  - the list

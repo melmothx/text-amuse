@@ -217,7 +217,7 @@ sub _parse_string {
     # TODO catch table only with a trailing space. This needs a
     # migration script, a Changes entry and a manual change. Too early
     # for this.
-    elsif ($l =~ m/\|/) {
+    elsif ($l =~ m/^(\s+)/ and $l =~ m/\|/) {
         $self->type("table");
         $self->string($l);
     }

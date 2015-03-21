@@ -154,7 +154,7 @@ is($parsed[19]->type, "example");
 is($parsed[20]->string, "will not merge\n");
 is($parsed[20]->type, "regular");
 
-is($parsed[22]->string, "the | table\nwill | merge\n");
+is($parsed[22]->string, " the | table\n will | merge\n");
 is($parsed[22]->type, "table");
 
 is($parsed[25]->string, "the list\nwill merge\n");

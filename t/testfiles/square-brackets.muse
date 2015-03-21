@@ -69,10 +69,10 @@ Test<sub>[test14=sub]</sub> Test<sup>[test15=sup]</sup> Test16<del>[test16=strik
 - [test24=nolist]
 
 
-[test25=tablecell] | [test26=tablecell]
-[test27=tableheader] || [test28=tableheader]
-[test29=tablefooter] ||| [test30=tablefooter]
-|+[test31=caption]+|
+ [test25=tablecell] | [test26=tablecell]
+ [test27=tableheader] || [test28=tableheader]
+ [test29=tablefooter] ||| [test30=tablefooter]
+ |+[test31=caption]+|
 
 [test32=back to text]
 

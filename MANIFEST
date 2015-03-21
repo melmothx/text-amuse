@@ -34,6 +34,7 @@ t/pod-coverage.t
 t/pod.t
 t/regexp.t
 t/splat.t
+t/tables.t
 t/testfiles/10_theses.exp.html
 t/testfiles/10_theses.exp.ltx
 t/testfiles/10_theses.muse
