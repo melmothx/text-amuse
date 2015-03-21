@@ -225,7 +225,7 @@ sub _parse_string {
         $self->removed($l);
         $self->type("comment");
     }
-    elsif ($l =~ m/^((\[[0-9]+\])\s+)(.*)$/s) {
+    elsif ($l =~ m/^((\[[0-9]+\])\s+)(.+)$/s) {
         $self->type("footnote");
         $self->string($3);
         $self->removed($1);
