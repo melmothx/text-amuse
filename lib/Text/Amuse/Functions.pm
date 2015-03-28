@@ -15,6 +15,7 @@ our @EXPORT_OK = qw/muse_format_line
                     muse_fast_scan_header
                     muse_to_html
                     muse_to_tex
+                    muse_to_object
                    /;
 
 
@@ -138,6 +139,10 @@ Header is discarded
 $body can also be a reference to a scalar to speed up the argument
 passing.
 
+=head2 muse_to_object($body);
+
+Same as above, but returns the L<Text::Amuse> document instead.
+
 =cut
 
 sub muse_to_html {
@@ -146,6 +151,10 @@ sub muse_to_html {
 
 sub muse_to_tex {
     return _format_on_the_fly(ltx => shift);
+}
+
+sub muse_to_object {
+    return _format_on_the_fly(obj => shift);
 }
 
 sub _format_on_the_fly {
@@ -166,6 +175,11 @@ sub _format_on_the_fly {
     }
     elsif ($format eq 'html') {
         return $doc->as_html;
+    }
+    elsif ($format eq 'obj') {
+        # dirty trick
+        $doc->{_private_temp_fh} = $fh;
+        return $doc;
     }
     else {
         die "Wrong usage, format can be only ltx or html!";
