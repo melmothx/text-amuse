@@ -12,7 +12,7 @@ if ($@) {
     exit;
 }
 else {
-    plan tests => 7;
+    plan tests => 10;
 }
 
 
@@ -21,6 +21,7 @@ else {
 
 my $document;
 foreach my $file (qw/packing.muse
+                     lists.muse
                      footnotes.muse/) {
     $document =
       Text::Amuse->new(file => catfile(t => testfiles => $file),
