@@ -19,23 +19,22 @@ Constructor. Accepts a string to be parsed
 =cut
 
 sub new {
-    my $class = shift;
-    my $line = shift;
+    my ($class, %args) = @_;
     # don't accept undefined values
-    die "Missing input!" unless (defined $line);
-    die "Too many arguments, I accept only a single string" if @_;
 
     my $self = {
-                rawline => $line,
-                block => "",      # the block it says to belog
-                type => "null", # the type
-                string => "",      # the string
-                removed => "", # the portion of the string removed
+                rawline => '',
+                block => '',      # the block it says to belog
+                type => 'null', # the type
+                string => '',      # the string
+                removed => '', # the portion of the string removed
                };
+    foreach my $accessor (keys %$self) {
+        if (exists $args{$accessor} and defined $args{$accessor}) {
+            $self->{$accessor} = $args{$accessor};
+        }
+    }
     bless $self, $class;
-    # initialize it
-    $self->_parse_string;
-    return $self;
 }
 
 =head3 rawline

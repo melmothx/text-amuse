@@ -207,9 +207,9 @@ sub parsed_body {
     return @{$self->{parsed_body}} if defined $self->{parsed_body};
     $self->_debug("Parsing body");
     # be sure to start with a null block
-    my @parsed = (Text::Amuse::Element->new("")); 
+    my @parsed = ($self->_construct_element(""));
     foreach my $l ($self->raw_body) {
-        push @parsed, Text::Amuse::Element->new($l);
+        push @parsed, $self->_construct_element($l);
     }
     $self->{parsed_body} = \@parsed;
     return @{$self->{parsed_body}};
@@ -599,6 +599,161 @@ sub _sanity_check {
         push @out, Text::Amuse::Element->new("</$block>");
     }
     $self->parsed_body(\@out);
+}
+
+sub _parse_string {
+    my ($self, $l) = @_;
+    die unless defined $l;
+    my %element = (
+                   rawline => $l,
+                  );
+    my $blockre = qr{(
+                         biblio   |
+                         play     |
+                         comment  |
+                         verse    |
+                         center   |
+                         right    |
+                         example  |
+                         quote
+                     )}x;
+    
+    # null line is default, do nothing
+    if ($l =~ m/^[\n\t ]*$/s) {
+        # do nothing, already default
+        $element{removed} = $l;
+        return %element;
+    }
+    if ($l =~ m!^(<($blockre)>\s*)$!s) {
+        $element{type} = "startblock";
+        $element{removed} = $1;
+        $element{block} = $2;
+        return %element;
+    }
+    if ($l =~ m!^(</($blockre)>\s*)$!s) {
+        $element{type} = "stopblock";
+        $element{removed} = $1;
+        $element{block} = $2;
+        return %element;
+    }
+    # headers
+    if ($l =~ m!^((\*{1,5}) )(.+)$!s) {
+        $element{type} = "h" . length($2);
+        $element{removed} = $1;
+        $element{string} = $3;
+        return %element;
+    }
+    if ($l =~ m/^( +\- +)(.*)/s) {
+        $element{type} = "li";
+        $element{removed} = $1;
+        $element{string} = $2;
+        $element{block} = "ul";
+        return %element;
+    }
+    if ($l =~ m/^((\s+)  # leading space and type $1
+                       (  # the type               $2
+                           [0-9]+   |
+                           [a-hA-H] |
+                           [ixvIXV]+  |
+                       )     
+                       \. # a single dot
+                       \s+)  # space
+                   (.*) # the string itself $3
+               /sx) {
+        my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
+        my $indent = length($whitespace);
+        $element{type} = "li";
+        $element{removed} = $remove;
+        $element{string} = $text;
+        my $list_type = $self->_identify_list_type($prefix);
+        $element{block} = $list_type;
+        return %element;
+    }
+    if ($l =~ m/^(\> )(.*)/s) {
+        $element{string} = $2;
+        $element{removed} = $1;
+        $element{type} = "verse";
+        return %element;
+    }
+    if ($l =~ m/^(\>)$/s) {
+        $element{string} = "\n";
+        $element{removed} = ">";
+        $element{type} = "verse";
+        return %element;
+    }
+    if ($l =~ m/^(\s+)/ and $l =~ m/\|/) {
+        $element{type} = "table";
+        $element{string} = $l;
+        return %element;
+    }
+    if ($l =~ m/^(\; (.+))$/s) {
+        $element{removed} = $l;
+        $element{type} = "comment";
+        return %element;
+    }
+    if ($l =~ m/^((\[[0-9]+\])\s+)(.+)$/s) {
+        $element{type} = "footnote";
+        $element{string} = $3;
+        $element{removed} = $1;
+        return %element;
+    }
+    if ($l =~ m/^((\s{6,})((\*\s?){5})\s*)$/s) {
+        $element{type} = "newpage";
+        $element{removed} = $2;
+        $element{string} = $3;
+        return %element;
+    }
+    if ($l =~ m/^( {20,})([^ ].+)$/s) {
+        $element{block} = "right";
+        $element{type} = "regular";
+        $element{removed} = $1;
+        $element{string} = $2;
+        return %element;
+    }
+    if ($l =~ m/^( {6,})([^ ].+)$/s) {
+        $element{block} = "center";
+        $element{type} = "regular";
+        $element{removed} = $1;
+        $element{string} = $2;
+        return %element;
+    }
+    if ($l =~ m/^( {2,})([^ ].+)$/s) {
+        $element{block} = "quote";
+        $element{type} = "regular";
+        $element{removed} = $1;
+        $element{string} = $2;
+        return %element;
+    }
+    # anything else is regular
+    $element{type} = "regular";
+    $element{string} = $l;
+    return %element;
+}
+
+
+sub _identify_list_type {
+    my ($self, $list_type) = @_;
+    my $type;
+    if ($list_type =~ m/[0-9]/) {
+        $type = "oln";
+    } elsif ($list_type =~ m/[a-h]/) {
+        $type = "ola";
+    } elsif ($list_type =~ m/[A-H]/) {
+        $type = "olA";
+    } elsif ($list_type =~ m/[ixvl]/) {
+        $type = "oli";
+    } elsif ($list_type =~ m/[IXVL]/) {
+        $type = "olI";
+    } else {
+        die "$type Unrecognized, fix your code\n";
+    }
+    return $type;
+}
+
+sub _construct_element {
+    my ($self, $line) = @_;
+    my %args = $self->_parse_string($line);
+    return Text::Amuse::Element->new(%args);
 }
 
 
