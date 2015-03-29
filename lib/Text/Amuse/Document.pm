@@ -209,8 +209,7 @@ sub parsed_body {
     # be sure to start with a null block
     my @parsed = (Text::Amuse::Element->new("")); 
     foreach my $l ($self->raw_body) {
-        my $element = Text::Amuse::Element->new($l, previous => $parsed[$#parsed]);
-        push @parsed, $element;
+        push @parsed, Text::Amuse::Element->new($l);
     }
     $self->{parsed_body} = \@parsed;
     return @{$self->{parsed_body}};

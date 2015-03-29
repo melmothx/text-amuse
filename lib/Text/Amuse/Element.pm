@@ -12,19 +12,18 @@ Text::Amuse::Element - Helper for Text::Amuse
 Everything here is pretty much internal only, underdocumented and
 subject to change.
 
-=head3 new($string, previous => $previous_element)
+=head3 new($string)
 
-Constructor. Accepts a string to be parsed, and an optional paired
-list of arguments.
-
-Accepted arguments: previous, with the previous element.
+Constructor. Accepts a string to be parsed
 
 =cut
 
 sub new {
-    my ($class, $line, %args) = @_;
+    my $class = shift;
+    my $line = shift;
     # don't accept undefined values
     die "Missing input!" unless (defined $line);
+    die "Too many arguments, I accept only a single string" if @_;
 
     my $self = {
                 rawline => $line,
@@ -32,36 +31,11 @@ sub new {
                 type => "null", # the type
                 string => "",      # the string
                 removed => "", # the portion of the string removed
-
-                # unclear if this should be weakened, but tests say
-                # we're fine, because it's not circular. If there was
-                # a ->next, then it should be weakened.
-                previous => $args{previous},
                };
     bless $self, $class;
     # initialize it
     $self->_parse_string;
-    # and finally assert that we didn't screw up
-    my $origline = $self->rawline;
-    my $test = $self->removed . $self->string;
-    die "We screw up: <$origline> ne <$test>\n"
-      if $origline ne $test;
-    die "We screw up: input line <$line> ne rawline <$test>\n"
-      if $line ne $test;
-    die "We screw up: rawline <$origline> ne input line <$line>\n"
-      if $origline ne $line;
-
     return $self;
-}
-
-=head3 previous
-
-The previous object of the same class (if any).
-
-=cut
-
-sub previous {
-    return shift->{previous};
 }
 
 =head3 rawline
@@ -177,6 +151,7 @@ sub _block_re {
                  example  |
                  quote    |
                  li | ul | ola | olA | oli | olI | oln # these are private
+
              )}x
 }
 
@@ -188,35 +163,30 @@ sub _parse_string {
     if ($l =~ m/^[\n\t ]*$/s) {
         # do nothing, already default
         $self->removed($l);
-        return;
     }
-    if ($l =~ m!^(<($blockre)>\s*)$!s) {
+    elsif ($l =~ m!^(<($blockre)>\s*)$!s) {
         $self->type("startblock");
         $self->removed($1);
         $self->block($2);
-        return;
     }
-    if ($l =~ m!^(</($blockre)>\s*)$!s) {
+    elsif ($l =~ m!^(</($blockre)>\s*)$!s) {
         $self->type("stopblock");
         $self->removed($1);
         $self->block($2);
-        return;
     }
     # headers
-    if ($l =~ m!^((\*{1,5}) )(.+)$!s) {
+    elsif ($l =~ m!^((\*{1,5}) )(.+)$!s) {
         $self->type("h" . length($2));
         $self->removed($1);
         $self->string($3);
-        return;
     }
-    if ($l =~ m/^( +\- +)(.*)/s) {
+    elsif ($l =~ m/^( +\- +)(.*)/s) {
         $self->type("li");
         $self->removed($1);
         $self->string($2);
         $self->block("ul");
-        return;
     }
-    if ($l =~ m/^(\s+  # leading space and type $1
+    elsif ($l =~ m/^(\s+  # leading space and type $1
                        (  # the type               $2
                            [0-9]+   |
                            [a-hA-H] |
@@ -231,67 +201,69 @@ sub _parse_string {
         $self->string($3);
         $self->_identify_list_type($2); # this will set the type;
         die "Something went wrong" if $self->type eq "null";
-        return;
     }
-    if ($l =~ m/^(\> )(.*)/s) {
+    elsif ($l =~ m/^(\> )(.*)/s) {
         $self->string($2);
         $self->removed($1);
         $self->type("verse");
-        return;
     }
-    if ($l =~ m/^(\>)$/s) {
+    # autofix
+    elsif ($l =~ m/^(\>)$/s) {
         $self->string("\n");
         $self->removed(">");
         $self->type("verse");
-        return;
     }
-    if ($l =~ m/^(\s+)/ and $l =~ m/\|/) {
+
+    # TODO catch table only with a trailing space. This needs a
+    # migration script, a Changes entry and a manual change. Too early
+    # for this.
+    elsif ($l =~ m/^(\s+)/ and $l =~ m/\|/) {
         $self->type("table");
         $self->string($l);
-        return;
     }
-    if ($l =~ m/^(\; (.+))$/s) {
+    elsif ($l =~ m/^(\; (.+))$/s) {
         $self->removed($l);
         $self->type("comment");
-        return;
     }
-    if ($l =~ m/^((\[[0-9]+\])\s+)(.+)$/s) {
+    elsif ($l =~ m/^((\[[0-9]+\])\s+)(.+)$/s) {
         $self->type("footnote");
         $self->string($3);
         $self->removed($1);
-        return;
     }
-    if ($l =~ m/^((\s{6,})((\*\s?){5})\s*)$/s) {
+
+    elsif ($l =~ m/^((\s{6,})((\*\s?){5})\s*)$/s) {
         $self->type("newpage");
         $self->removed($2);
         $self->string($3);
-        return;
     }
-    if ($l =~ m/^( {20,})([^ ].+)$/s) {
+
+    elsif ($l =~ m/^( {20,})([^ ].+)$/s) {
         $self->block("right");
         $self->type("regular");
         $self->removed($1);
         $self->string($2);
-        return;
     }
-    if ($l =~ m/^( {6,})([^ ].+)$/s) {
+    elsif ($l =~ m/^( {6,})([^ ].+)$/s) {
         $self->block("center");
         $self->type("regular");
         $self->removed($1);
         $self->string($2);
-        return;
     }
-    if ($l =~ m/^( {2,})([^ ].+)$/s) {
+    elsif ($l =~ m/^( {2,})([^ ].+)$/s) {
         $self->block("quote");
         $self->type("regular");
         $self->removed($1);
         $self->string($2);
-        return;
     }
-    # anything else is regular
-    $self->type("regular");
-    $self->string($l);
-    return;
+    else {
+        $self->type("regular");
+        $self->string($l);
+    }
+    # and finally assert that we didn't screw up
+    my $origline = $self->rawline;
+    my $test = $self->removed . $self->string;
+    die "We screw up: <$origline> ne <$test>\n"
+      unless $origline eq $test;
 }
 
 
