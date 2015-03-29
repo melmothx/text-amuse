@@ -47,15 +47,9 @@ It returns the only L<Text::Amuse::Element> which composes the body.
 
 sub document {
     my $self = shift;
-    my $el = Text::Amuse::Element->new($self->string);
-
-    # restore the mangling;
-    my $string = $el->string;
-    my $removed = $el->removed;
-    $el->string($removed . $string);
-    $el->removed("");
-    $el->type("standalone");
-    return $el;
+    my $el = Text::Amuse::Element->new(type => 'standalone',
+                                       string => $self->string);
+    return ($el);
 }
 
 =head2 Fake methods

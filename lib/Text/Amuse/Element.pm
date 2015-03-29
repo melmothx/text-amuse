@@ -20,8 +20,6 @@ Constructor. Accepts a string to be parsed
 
 sub new {
     my ($class, %args) = @_;
-    # don't accept undefined values
-
     my $self = {
                 rawline => '',
                 block => '',      # the block it says to belog
@@ -204,13 +202,13 @@ sub _parse_string {
     elsif ($l =~ m/^(\> )(.*)/s) {
         $self->string($2);
         $self->removed($1);
-        $self->type("verse");
+        $self->type("versep");
     }
     # autofix
     elsif ($l =~ m/^(\>)$/s) {
         $self->string("\n");
         $self->removed(">");
-        $self->type("verse");
+        $self->type("versep");
     }
 
     # TODO catch table only with a trailing space. This needs a
@@ -440,5 +438,43 @@ sub add_to_string {
     $self->_reset_rawline(); # we modify the string, so throw away the rawline
     $self->string(join("", $orig, @args));
 }
+
+=head3 append($element)
+
+Append the element passed as argument to this one, setting th raw_line
+
+=cut
+
+sub append {
+    my ($self, $element) = @_;
+    $self->{rawline} .= $element->rawline;
+    my $type = $self->type;
+    if ($type eq 'example' or $type eq 'verse') {
+        $self->{string} .= $element->rawline;
+    }
+    else {
+        $self->{string} .= $element->string;
+    }
+
+}
+
+=head3 can_append($element)
+
+=cut
+
+sub can_append {
+    my ($self, $element) = @_;
+    if ($self->can_merge_next && $element->can_be_merged) {
+        return 1;
+    }
+    # same type
+    foreach my $type (qw/table versep null/) {
+        if ($self->type eq $type and $element->type eq $type) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 
 1;

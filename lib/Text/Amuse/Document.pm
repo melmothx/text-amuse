@@ -199,20 +199,157 @@ The first block is guaranteed to be a null block
 
 =cut
 
-sub parsed_body {
+sub _parse_body {
     my $self = shift;
-    if (@_) {
-        $self->{parsed_body} = shift;
-    }
-    return @{$self->{parsed_body}} if defined $self->{parsed_body};
     $self->_debug("Parsing body");
-    # be sure to start with a null block
+
+    # be sure to start with a null block and reset the state
     my @parsed = ($self->_construct_element(""));
+    $self->_current_el(undef);
+
     foreach my $l ($self->raw_body) {
-        push @parsed, $self->_construct_element($l);
+        # if doesn't return anything, the thing got merged
+        if (my $el = $self->_construct_element($l)) {
+            push @parsed, $el;
+        }
     }
-    $self->{parsed_body} = \@parsed;
-    return @{$self->{parsed_body}};
+    # turn the versep into verse now that the merging is done
+    foreach my $el (@parsed) {
+        if ($el->type eq 'versep') {
+            $el->type('verse');
+        }
+    }
+    my @out;
+    my @listpile;
+  LISTP:
+    while (my $el = shift @parsed) {
+        # li, null or regular
+        if ($el->type eq 'li') {
+            # now, let'
+            if (@listpile) {
+                # same indentation, continue
+                if ($el->indentation == $listpile[$#listpile]->{indentation}) {
+                    push @out, Text::Amuse::Element->new(block => 'li', type => 'stopblock');
+                    push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                }
+
+                # indentation is major, open a new level
+                elsif ($el->indentation > $listpile[$#listpile]->{indentation}) {
+                    push @listpile, { block => $el->block, indentation => $el->indentation };
+                    push @out, Text::Amuse::Element->new(block => $el->block, type => 'startblock');
+                    push @listpile, { block => 'li', indentation => $el->indentation };
+                    push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                }
+
+                # indentation is minor, pop the pile until we reach the level
+                else {
+                    # close the lists until we get the the right level
+                    while(@listpile and $el->indentation < $listpile[$#listpile]->{indentation}) {
+                        my $pending = pop(@listpile)->{block};
+                        push @out, Text::Amuse::Element->new(block => $pending, type => 'stopblock');
+                    }
+                    if (@listpile) {
+                        push @out, Text::Amuse::Element->new(block => 'li', type => 'stopblock');
+                        push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                    }
+                    # if by chance, we emptied all, start anew.
+                    else {
+                        push @listpile, { block => $el->block, indentation => $el->indentation };
+                        push @out, Text::Amuse::Element->new(block => $el->block, type => 'startblock');
+                        push @listpile, { block => 'li', indentation => $el->indentation };
+                        push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                    }
+                }
+            }
+            # no list pile, this is the first element
+            else {
+                push @listpile, { block => $el->block, indentation => $el->indentation };
+                push @out, Text::Amuse::Element->new(block => $el->block, type => 'startblock');
+                push @listpile, { block => 'li', indentation => $el->indentation };
+                push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+            }
+            $el->type('regular'); # flip the type to regular
+            $el->block('');
+        }
+        elsif ($el->type eq 'regular') {
+            # the type is regular: It can only close or continue
+            while (@listpile and $el->indentation < $listpile[$#listpile]->{indentation}) {
+                my $pending = pop(@listpile)->{block};
+                push @out, Text::Amuse::Element->new(block => $pending, type => 'stopblock');
+            }
+        }
+        push @out, $el;
+    }
+
+    my @body_no_footnotes;
+    # footnote processing
+    my %footnotes;
+    while (@out) {
+        my $el = shift @out;
+        if ($el->type eq 'footnote') {
+            if ($el->removed =~ m/\[([0-9]+)\]/) {
+                warn "Overwriting footnote number $1" if exists $footnotes{$1};
+                $footnotes{$1} = $el;
+            }
+            else { die "Something is wrong here! <" . $el->removed . ">"
+                     . $el->string . "!" }
+        }
+        else {
+            push @body_no_footnotes, $el;
+        }
+    }
+    $self->_raw_footnotes(\%footnotes);
+
+    # unroll the blocks
+    while (@body_no_footnotes) {
+        my $el = shift @body_no_footnotes;
+        if ($el->can_be_regular) {
+            my $block = $el->block;
+            $el->block("");
+            push @out, Text::Amuse::Element->new(type => 'startblock', block => $block);
+            push @out, $el;
+            push @out, Text::Amuse::Element->new(type => 'stopblock', block => $block);
+        }
+        else {
+            push @out, $el;
+        }
+    }
+
+    my (@checked, @pile);
+    while (@out) {
+        my $el = shift @out;
+        if ($el->type eq 'startblock') {
+            push @pile, $el->block;
+            $self->_debug("Pushing " . $el->block);
+            die "Uh?\n" unless $el->block;
+        }
+        elsif ($el->type eq 'stopblock') {
+            my $exp = pop @pile;
+            unless ($exp and $exp eq $el->block) {
+                warn "Couldn't retrieve " . $el->block . " from the pile\n";
+                # put it back
+                push @pile, $exp if $exp;
+                # so what to do here? just removed it
+                next;
+            }
+        }
+        elsif (@pile and $el->should_close_blocks) {
+            while (@pile) {
+                my $block = shift(@pile);
+                warn "Forcing the closing of $block\n";
+                push @checked, Text::Amuse::Element->new(type => 'stopblock', block => $block);
+            }
+        }
+        push @checked, $el;
+    }
+    # do we still have things into the pile?
+    while (@pile) {
+        my $block = shift(@pile);
+        $self->_debug("forcing the closing of $block");
+        # force the closing
+        push @checked, Text::Amuse::Element->new(type => 'stopblock', block => $block);
+    }
+    return [ grep { $_->type ne 'null' } @checked ];
 }
 
 =head2 document
@@ -228,29 +365,26 @@ sub document {
     unless (defined $self->{_parsed_document}) {
         # order matters!
         # pack the examples
-        $self->_catch_example;
+        # $self->_catch_example; # done
 
         # pack the verses
-        $self->_catch_verse;
+        # $self->_catch_verse; # done
 
         # then pack the lines
-        $self->_pack_lines;
+        # $self->_pack_lines;
 
         # then process the lists, using the indentation
-        $self->_process_lists;
+        # $self->_process_lists;
 
         # then unroll the blocks
-        $self->_unroll_blocks;
+        # $self->_unroll_blocks;
 
         # then store the footnotes
-        $self->_store_footnotes;
+        # $self->_store_footnotes;
 
         # last run to check if we don't miss anything and remove the nulls
-        $self->_remove_nulls;
-
-        $self->_sanity_check;
-
-        $self->{_parsed_document} = [$self->parsed_body];
+        # $self->_remove_nulls;
+        $self->{_parsed_document} = $self->_parse_body;
     }
     return @{$self->{_parsed_document}}
 }
@@ -288,32 +422,6 @@ sub _raw_footnotes {
 }
 
 
-# <example> is greedy, and will stop only at another </example> or at
-# the end of input.
-sub _catch_example {
-    my $self = shift;
-    my @els  = $self->parsed_body;
-    my @out;
-    while (@els) {
-        my $el = shift @els;
-        if ($el->is_start_block('example')) {
-            # then enter a subloop and slurp until we find a stop
-            while (my $e = shift(@els)) {
-                if ($e->is_stop_block('example')) {
-                    last
-                } else {
-                    $el->add_to_string($e->rawline)
-                }
-            }
-            # now we exited the hell loop. We change the element
-            $el->will_not_merge(1);
-            $el->type("example");
-        }
-        push @out, $el;
-    }
-    # and we reset the parsed body;
-    $self->parsed_body(\@out);
-}
 
 # verses are the other big problem, because they are not regular
 # strings and can't be nested (as the example, but it's a slightly
@@ -561,48 +669,9 @@ sub _remove_nulls {
     $self->parsed_body(\@out);
 }
 
-sub _sanity_check {
-    my $self = shift;
-    my @els = $self->parsed_body;
-    my @pile;
-    my @out;
-    while (my $el = shift(@els)) {
-        if ($el->type eq 'startblock') {
-            push @pile, $el->block;
-            $self->_debug("Pushing " . $el->block);
-            die "Uh?\n" unless $el->block;
-        }
-        elsif ($el->type eq 'stopblock') {
-            my $exp = pop @pile;
-            unless ($exp and $exp eq $el->block) {
-                warn "Couldn't retrieve " . $el->block . " from the pile\n";
-                # put it back
-                push @pile, $exp if $exp;
-                # so what to do here? just removed it
-                next;
-            }
-        }
-        elsif (@pile and $el->should_close_blocks) {
-            while (@pile) {
-                my $block = shift(@pile);
-                warn "Forcing the closing of $block\n";
-                push @out, Text::Amuse::Element->new("</$block>");
-            }
-        }
-        push @out, $el;
-    }
-    # do we still have things into the pile?
-    while (@pile) {
-        my $block = shift(@pile);
-        $self->_debug("forcing the closing of $block");
-        # force the closing
-        push @out, Text::Amuse::Element->new("</$block>");
-    }
-    $self->parsed_body(\@out);
-}
 
 sub _parse_string {
-    my ($self, $l) = @_;
+    my ($self, $l, %opts) = @_;
     die unless defined $l;
     my %element = (
                    rawline => $l,
@@ -650,35 +719,37 @@ sub _parse_string {
         $element{block} = "ul";
         return %element;
     }
-    if ($l =~ m/^((\s+)  # leading space and type $1
-                       (  # the type               $2
-                           [0-9]+   |
-                           [a-hA-H] |
-                           [ixvIXV]+  |
-                       )     
-                       \. # a single dot
-                       \s+)  # space
-                   (.*) # the string itself $3
-               /sx) {
-        my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
-        my $indent = length($whitespace);
-        $element{type} = "li";
-        $element{removed} = $remove;
-        $element{string} = $text;
-        my $list_type = $self->_identify_list_type($prefix);
-        $element{block} = $list_type;
-        return %element;
+    if (!$opts{nolist}) {
+        if ($l =~ m/^((\s+)  # leading space and type $1
+                        (  # the type               $2
+                            [0-9]+   |
+                            [a-hA-H] |
+                            [ixvIXV]+  |
+                        )     
+                        \. # a single dot
+                        \s+)  # space
+                    (.*) # the string itself $3
+                   /sx) {
+            my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
+            my $indent = length($whitespace);
+            $element{type} = "li";
+            $element{removed} = $remove;
+            $element{string} = $text;
+            my $list_type = $self->_identify_list_type($prefix);
+            $element{block} = $list_type;
+            return %element;
+        }
     }
     if ($l =~ m/^(\> )(.*)/s) {
         $element{string} = $2;
         $element{removed} = $1;
-        $element{type} = "verse";
+        $element{type} = "versep";
         return %element;
     }
     if ($l =~ m/^(\>)$/s) {
         $element{string} = "\n";
         $element{removed} = ">";
-        $element{type} = "verse";
+        $element{type} = "versep";
         return %element;
     }
     if ($l =~ m/^(\s+)/ and $l =~ m/\|/) {
@@ -750,10 +821,52 @@ sub _identify_list_type {
     return $type;
 }
 
+sub _current_el {
+    my $self = shift;
+    if (@_) {
+        $self->{_current_el} = shift;
+    }
+    return $self->{_current_el};
+}
+
 sub _construct_element {
     my ($self, $line) = @_;
+    my $current = $self->_current_el;
     my %args = $self->_parse_string($line);
-    return Text::Amuse::Element->new(%args);
+    my $element = Text::Amuse::Element->new(%args);
+
+    # catch the examples. and the verse
+    # <example> is greedy, and will stop only at another </example> or
+    # at the end of input.
+
+    foreach my $block (qw/example verse/) {
+        if ($current && $current->type eq $block) {
+            if ($element->is_stop_block($block)) {
+                $self->_current_el(undef);
+                return;
+            }
+            else {
+                # maybe check if we want to stop at headings if verse?
+                $current->append($element);
+                return;
+            }
+        }
+        elsif ($element->is_start_block($block)) {
+            $current = Text::Amuse::Element->new(type => $block);
+            $self->_current_el($current);
+            return $current;
+        }
+    }
+
+    # Pack the lines
+    if ($current && $current->can_append($element)) {
+        $current->append($element);
+        return;
+    }
+
+    $self->_current_el($element);
+    return $element;
+    
 }
 
 

@@ -423,8 +423,6 @@ foreach my $e ($list->document) {
 
 is_deeply(\@good, \@expected);
 
-
-
 dump_doc($list);
 
 sub dump_doc {
