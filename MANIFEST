@@ -17,7 +17,6 @@ t/broken.t
 t/caching.t
 t/changes.t
 t/elements.t
-t/false-lists.t
 t/footnotes.t
 t/functions.t
 t/header-defined.t
@@ -29,7 +28,6 @@ t/lists.t
 t/manifest.t
 t/memory-cycles.t
 t/memory-size.t
-t/muse-to-object.t
 t/on-the-fly.t
 t/output.t
 t/pod-coverage.t

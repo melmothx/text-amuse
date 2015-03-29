@@ -50,9 +50,7 @@ sub new {
       if $line ne $test;
     die "We screw up: rawline <$origline> ne input line <$line>\n"
       if $origline ne $line;
-    # and delete the previous, it is going to become obsolete after
-    # the parsing.
-    # delete $self->{previous};
+
     return $self;
 }
 
@@ -231,8 +229,7 @@ sub _parse_string {
         $self->type("li");
         $self->removed($1);
         $self->string($3);
-        my $list_type = $self->_identify_list_type($2); # this will set the type;
-        $self->block($list_type);
+        $self->_identify_list_type($2); # this will set the type;
         die "Something went wrong" if $self->type eq "null";
         return;
     }
@@ -314,7 +311,7 @@ sub _identify_list_type {
     } else {
         die "$type Unrecognized, fix your code\n";
     }
-    return $type;
+    $self->block($type);
 }
 
 =head2 HELPERS
