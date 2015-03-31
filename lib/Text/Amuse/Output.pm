@@ -132,6 +132,9 @@ sub process {
     $self->reset_toc_stack;
     # loop over the parsed elements
     foreach my $el ($self->document->document) {
+        if ($el->type eq 'null') {
+            next;
+        }
         if ($el->type eq 'startblock') {
             die "startblock with string passed!: " . $el->string if $el->string;
             push @pieces, $self->blkstring(start => $el->block);

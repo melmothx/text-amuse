@@ -225,7 +225,6 @@ sub _parse_body {
     while (my $el = shift @parsed) {
         # li, null or regular
         if ($el->type eq 'li') {
-            # now, let'
             if (@listpile) {
                 # same indentation, continue
                 if ($el->indentation == $listpile[$#listpile]->{indentation}) {
@@ -279,6 +278,11 @@ sub _parse_body {
             }
         }
         push @out, $el;
+    }
+    # end of input?
+    while (@listpile) {
+        my $pending = pop(@listpile)->{block};
+        push @out, Text::Amuse::Element->new(block => $pending, type => 'stopblock');
     }
 
     my @body_no_footnotes;
@@ -349,7 +353,7 @@ sub _parse_body {
         # force the closing
         push @checked, Text::Amuse::Element->new(type => 'stopblock', block => $block);
     }
-    return [ grep { $_->type ne 'null' } @checked ];
+    return \@checked;
 }
 
 =head2 document
@@ -843,7 +847,8 @@ sub _construct_element {
         if ($current && $current->type eq $block) {
             if ($element->is_stop_block($block)) {
                 $self->_current_el(undef);
-                return;
+                return Text::Amuse::Element->new(type => 'null',
+                                                 rawline => $element->rawline);
             }
             else {
                 # maybe check if we want to stop at headings if verse?
@@ -852,7 +857,8 @@ sub _construct_element {
             }
         }
         elsif ($element->is_start_block($block)) {
-            $current = Text::Amuse::Element->new(type => $block);
+            $current = Text::Amuse::Element->new(type => $block,
+                                                 rawline => $element->rawline);
             $self->_current_el($current);
             return $current;
         }
