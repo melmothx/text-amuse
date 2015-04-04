@@ -10,7 +10,8 @@ sub test_line {
     my $string = shift;
     my $exp = shift;
     print "Testing <$string>\n";
-    my $el = Text::Amuse::Document->_construct_element($string);
+    my $doc = Text::Amuse::Document->new(file => $0); # just to make it happy
+    my $el = $doc->_construct_element($string);
     is($el->type, $exp->{type}, "type ok: $exp->{type}");
     is($el->block, $exp->{block}, "block ok: $exp->{block}");
     is($el->removed, $exp->{removed}, "removed ok");
@@ -104,8 +105,8 @@ test_line("     c. ciao", {
                            indentation => 8,
                       });
 
-foreach my $bl (qw/biblio play comment verse
-                   center right example quote/) {
+foreach my $bl (qw/biblio play comment
+                   center right quote/) {
     test_line("<$bl> \n", {
                           type => "startblock",
                           block => $bl,
@@ -116,9 +117,22 @@ foreach my $bl (qw/biblio play comment verse
                           block => $bl,
                           removed => "</$bl> \n",
                          });
-
-
 };
+
+foreach my $bl (qw/verse example/) {
+    test_line("<$bl> \n", {
+                             type => $bl,
+                             block => $bl,
+                             removed => "<$bl> \n",
+                            });
+    test_line("</$bl> \n", {
+                             type => "stopblock",
+                             block => $bl,
+                             removed => "</$bl> \n",
+                            });
+
+}
+
 
 foreach my $bl (qw/biblio play comment verse
                    center right example quote/) {
@@ -136,8 +150,8 @@ foreach my $bl (qw/biblio play comment verse
 };
 
 test_line(">  a verse", {
-                         type => "verse",
-                         block => "verse",
+                         type => "versep",
+                         block => "versep",
                          removed => "> ",
                          indentation => 2,
                        });
