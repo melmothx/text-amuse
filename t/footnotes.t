@@ -13,8 +13,8 @@ my $fn = Text::Amuse::Document->new(file => catfile(t => testfiles => 'footnotes
 
 my @got = $fn->document;
 
-is(scalar @got, 1, "Only one element");
-
+is(scalar(grep { $_->type ne 'null'} @got), 1,
+   "Only one not null element") or diag Dumper(\@got);
 is($fn->get_footnote(1)->string, "first\n");
 is($fn->get_footnote(2)->string, "second\nthird\n");
 is($fn->get_footnote(3)->string, "third\n");
