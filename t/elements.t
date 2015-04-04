@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 use Text::Amuse::Document;
 
-plan tests => 248;
+plan tests => 252;
 
 sub test_line {
     my $string = shift;
@@ -130,7 +130,9 @@ foreach my $bl (qw/verse example/) {
                              block => $bl,
                              removed => "</$bl> \n",
                             });
-
+    my %args = Text::Amuse::Document->_parse_string("<$bl> \n");
+    is $args{type}, 'startblock', "but parsing creates the startblock";
+    is $args{block}, $bl;
 }
 
 
