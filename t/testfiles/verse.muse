@@ -5,7 +5,7 @@ Regular.
 <verse>
 A line of Emacs verse;
   forgive its being so terse.
-
+</verse>
 
 ** Another
 
@@ -19,7 +19,8 @@ A line of Emacs verse; [2]
 In terms of terse verse,
         you could do worse. [1]
 
- A. This poetry will stop here, even if it's not close
+ A. This poetry will stop here.
+</verse>
 
 [1] The author
 
