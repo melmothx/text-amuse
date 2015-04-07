@@ -76,11 +76,11 @@ MUSE
     like $html, qr{1968.*1968}s, "Found the date in HTML";
     like $html, qr{fn_back3}, "Found an html footnote";
     unlike $html, qr{fn_back1968}, "1968 is not a footnote";
-    diag $html;
+    # diag $html;
     like $ltx, qr{1968.*1968}s, "Found the date in TeX";
     unlike $ltx, qr/\\footnote\{\}/, "Not a footnote";
     like $ltx, qr/\\footnote\{fusnota\}/, "Found footnote";
-    diag $ltx;
-    diag $html;
+    # diag $ltx;
+    # diag $html;
 }
 

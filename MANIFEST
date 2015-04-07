@@ -70,6 +70,9 @@ t/testfiles/example-3.exp.html
 t/testfiles/example-3.exp.ltx
 t/testfiles/example-3.muse
 t/testfiles/example.muse
+t/testfiles/false-lists.exp.html
+t/testfiles/false-lists.exp.ltx
+t/testfiles/false-lists.muse
 t/testfiles/float.png
 t/testfiles/footnotes.exp.html
 t/testfiles/footnotes.exp.ltx
@@ -81,6 +84,9 @@ t/testfiles/headings-with-fn.muse
 t/testfiles/headings.exp.html
 t/testfiles/headings.exp.ltx
 t/testfiles/headings.muse
+t/testfiles/high-num-list.exp.html
+t/testfiles/high-num-list.exp.ltx
+t/testfiles/high-num-list.muse
 t/testfiles/image2.exp.html
 t/testfiles/image2.exp.ltx
 t/testfiles/image2.muse

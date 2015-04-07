@@ -16,8 +16,6 @@ plan tests => 208;
 
 my $list = Text::Amuse->new(file => catfile(t => testfiles => 'lists.muse'));
 
-my @good;
-
 my @expected = (
                 {
                  'string' => 'Normal text.
@@ -424,7 +422,7 @@ is scalar(@good), scalar(@expected), "Element count is ok";
 my $count = 0;
 while (my $exp = shift @expected) {
     my $el = shift @good;
-    diag "testing " . ++$count . ' ' .  $el->rawline;
+    # diag "testing " . ++$count . ' ' .  $el->rawline;
     is $el->type, $exp->{type}, "type $exp->{type}" or die Dumper($el, $exp);
     is $el->block, $exp->{block}, "block $exp->{block}" or die Dumper($el, $exp);
     is $el->string, $exp->{string}, "string $exp->{string}" or die Dumper($el, $exp);

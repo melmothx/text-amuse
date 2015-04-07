@@ -12,7 +12,7 @@ if ($@) {
     exit;
 }
 else {
-    plan tests => 7;
+    plan tests => 9;
 }
 
 
@@ -33,8 +33,8 @@ foreach my $file (qw/packing.muse
 $document =
   Text::Amuse->new(file => catfile(t => testfiles => "recursiv.muse"));
 
-diag $document->as_html;
-diag $document->as_latex;
+ok $document->as_html;
+ok $document->as_latex;
 memory_cycle_ok($document, "Memory cycles OK");
 
 
