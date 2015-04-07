@@ -83,13 +83,13 @@ is($parsed[1]->string, $expected_example, "Content looks ok");
 my $poetry = Text::Amuse::Document->new(file => testfile("verse.muse"),
                               debug => 1);
 
-@parsed = $poetry->elements;
-is($parsed[3]->type, "verse", "verse ok");
-is($parsed[3]->string,
+@parsed = grep { $_->type ne 'null' } $poetry->elements;
+is($parsed[1]->type, "verse", "verse ok");
+is($parsed[1]->string,
    "A line of Emacs verse;\n  forgive its being so terse.\n\n\n",
    "content looks ok");
-is($parsed[4]->type, "h2", "h2 ok");
-is($parsed[9]->type, "verse", "another verse");
+is($parsed[2]->type, "h2", "h2 ok");
+is($parsed[3]->type, "verse", "another verse");
 my $exppoetry = <<'EOF';
 A line of Emacs verse; [2]
   forgive its being so terse. [3]
@@ -101,11 +101,15 @@ In terms of terse verse,
 
 EOF
 
-is($parsed[9]->string, $exppoetry, "content ok, list not interpreted");
-is($parsed[10]->type, "footnote", "footnote not eaten");
-is($parsed[10]->string, "The author\n", "Footnote ok");
-# print $parsed[9]->string;
-# dump_content($poetry);
+is($parsed[3]->string, $exppoetry, "content ok, list not interpreted");
+is scalar(@parsed), 4, "End of parsed";
+foreach my $fn (1..3) {
+    my $footnote = $poetry->get_footnote($fn);
+    ok ($footnote, "Found footnote $fn: " . $footnote->string) or die "Missing footnote!";
+}
+is ($poetry->get_footnote(1)->string, "The author\n", "Footnote 1 ok");
+is ($poetry->get_footnote(1)->string, "Another author\n", "Footnote 2 ok");
+is ($poetry->get_footnote(1)->string, "This sucks\n", "Footnote 3 ok");
 
 my $packs = Text::Amuse::Document->new(file => catfile(t => testfiles => 'packing.muse'));
 @parsed = $packs->elements;
