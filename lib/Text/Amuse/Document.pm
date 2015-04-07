@@ -247,10 +247,16 @@ sub _parse_body {
                 else { die "Not reached"; }
             }
             # no list pile, this is the first element
-            else {
+            elsif ($self->_list_element_can_be_first($el)) {
                 my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
                 push @out, $open, $openli;
                 push @listpile, $close, $closeli;
+            }
+            else {
+                # reparse and should become quote/center/right
+                push @out, $self->_reparse_nolist($el);
+                # call next to avoid being mangled.
+                next LISTP;
             }
             $el->become_regular;
         }
@@ -540,12 +546,46 @@ sub _identify_list_type {
     return $type;
 }
 
+sub _list_element_can_be_first {
+    my ($self, $el) = @_;
+    return unless $el->type eq 'li';
+    my $type = $el->block;
+    my $prefix = $el->removed;
+    if ($prefix =~ m/^\s{1,6}  # leading space
+                     (  # the type               $1
+                         - | ((1|a|A|i|I)\.)
+                     )
+                     \s+  # space
+                     $/sx) {
+        my $id = $1;
+        if    ($type eq 'ul'  and $id eq '-' ) { return 1; }
+        elsif ($type eq 'oln' and $id eq '1.') { return 1; }
+        elsif ($type eq 'ola' and $id eq 'a.') { return 1; }
+        elsif ($type eq 'olA' and $id eq 'A.') { return 1; }
+        elsif ($type eq 'oli' and $id eq 'i.') { return 1; }
+        elsif ($type eq 'olI' and $id eq 'I.') { return 1; }
+    }
+    return;
+}
+
 sub _current_el {
     my $self = shift;
     if (@_) {
         $self->{_current_el} = shift;
     }
     return $self->{_current_el};
+}
+
+sub _reparse_nolist {
+    my ($self, $element) = @_;
+    my %args = $self->_parse_string($element->rawline, nolist => 1);
+    my $el = Text::Amuse::Element->new(%args);
+    if ($el->type eq 'regular') {
+        return $el;
+    }
+    else {
+        die "Reparsing of " . $element->rawline . " led to " . $el->type;
+    }
 }
 
 sub _construct_element {
