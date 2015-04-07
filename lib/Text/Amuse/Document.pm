@@ -276,8 +276,10 @@ sub _parse_body {
             while (@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
                 push @out, pop @listpile;
             }
-            $el->type('regular'); # flip the type to regular
-            $el->block('');
+            if (@listpile) {
+                $el->type('regular'); # flip the type to regular if in list
+                $el->block('');
+            }
         }
         push @out, $el;
     }
