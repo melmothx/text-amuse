@@ -421,9 +421,19 @@ foreach my $e ($list->document) {
                 };
 }
 
-is_deeply(\@good, \@expected);
+my @good = grep { $_->type ne 'null' } $list->elements;
 
-dump_doc($list);
+# is scalar(@good), scalar(@expected), "Element count is ok";
+while (my $exp = shift @expected) {
+    my $el = shift @good;
+    diag "testing " . $el->rawline;
+    is $el->type, $exp->{type};
+    is $el->block, $exp->{block};
+    is $el->string, $exp->{string};
+}
+
+
+# dump_doc($list);
 
 sub dump_doc {
     my $obj = shift;
