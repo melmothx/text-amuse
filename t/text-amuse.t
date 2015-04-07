@@ -6,7 +6,7 @@ use Text::Amuse::Document;
 use File::Spec::Functions;
 use Data::Dumper;
 
-plan tests => 81;
+plan tests => 93;
 
 diag "Constructor";
 
@@ -116,71 +116,76 @@ is ($poetry->get_footnote(2)->string, "Another author\n", "Footnote 2 ok");
 is ($poetry->get_footnote(3)->string, "This sucks\n", "Footnote 3 ok");
 
 my $packs = Text::Amuse::Document->new(file => catfile(t => testfiles => 'packing.muse'));
-@parsed = $packs->elements;
+@parsed = grep { $_->type ne 'null' } $packs->elements;
+
+is($parsed[0]->string, "this title\nwill merge\n");
+is($parsed[0]->type, "h1");
 
 is($parsed[1]->string, "this title\nwill merge\n");
-is($parsed[1]->type, "h1");
+is($parsed[1]->type, "h2");
+
+is($parsed[2]->string, "this title\nwill merge\n");
+is($parsed[2]->type, "h3");
 
 is($parsed[3]->string, "this title\nwill merge\n");
-is($parsed[3]->type, "h2");
+is($parsed[3]->type, "h4");
 
-is($parsed[5]->string, "this title\nwill merge\n");
-is($parsed[5]->type, "h3");
+is($parsed[4]->string, "this title\nwill merge\n");
+is($parsed[4]->type, "h5");
 
-is($parsed[7]->string, "this title\nwill merge\n");
-is($parsed[7]->type, "h4");
+is($parsed[5]->type, 'startblock');
+is($parsed[5]->block, 'play');
 
-is($parsed[9]->string, "this title\nwill merge\n");
-is($parsed[9]->type, "h5");
+is($parsed[6]->string, "This will not merge (of course)\n");
+is($parsed[6]->type, "regular");
 
-is($parsed[12]->string, "This will not merge (of course)\n");
+is($parsed[7]->type, 'stopblock');
+is($parsed[7]->block, 'play');
+
+
+is($parsed[8]->string, "we continue without merging (ugly but valid)\n");
+is($parsed[8]->type, "regular");
+
+is($parsed[9]->string, "Verse will not merge (of course)\n");
+is($parsed[9]->type, "verse");
+
+is($parsed[10]->string, "and we continue without merging (ugly but valid) [1]\n");
+is($parsed[10]->type, "regular");
+
+is($parsed[11]->string, "nor the example\n");
+is($parsed[11]->type, "example");
+
+is($parsed[12]->string, "will not merge\n");
 is($parsed[12]->type, "regular");
 
-is($parsed[14]->string, "we continue without merging (ugly but valid)\n");
-is($parsed[14]->type, "regular");
+is($parsed[13]->string, " the | table\n will | merge\n");
+is($parsed[13]->type, "table");
 
-is($parsed[16]->string, "Verse will not merge (of course)\n");
-is($parsed[16]->type, "verse");
+is($parsed[14]->block, 'center');
+is($parsed[15]->string, "but not with a regular\n");
 
-is($parsed[17]->string, "and we continue without merging (ugly but valid) [1]\n");
-is($parsed[17]->type, "regular");
+is($parsed[16]->block, "center");
+is($parsed[16]->type, "stopblock");
 
-is($parsed[19]->string, "nor the example\n");
-is($parsed[19]->type, "example");
+is($parsed[17]->block, "ul");
+is($parsed[18]->block, "li");
+is($parsed[19]->string, "the list\nwill merge\n");
 
-is($parsed[20]->string, "will not merge\n");
-is($parsed[20]->type, "regular");
+is($parsed[20]->block, "ola");
+is($parsed[21]->block, "li");
+is($parsed[22]->string, "the list\nwill merge\n");
+is($parsed[23]->block, "li");
+is($parsed[23]->type, "stopblock");
+is($parsed[24]->block, "ola");
+is($parsed[24]->type, "stopblock");
+is($parsed[25]->block, "li");
+is($parsed[25]->type, "stopblock");
+is($parsed[26]->block, "ul");
+is($parsed[26]->type, "stopblock");
 
-is($parsed[22]->string, " the | table\n will | merge\n");
-is($parsed[22]->type, "table");
-
-is($parsed[25]->string, "the list\nwill merge\n");
-is($parsed[25]->type, "li");
-is($parsed[25]->block, "ul");
-
-is($parsed[27]->string, "the list\nwill merge\n");
-is($parsed[27]->type, "li");
-is($parsed[27]->block, "ola");
-
-is($parsed[29]->string, "the footnote\nwill merge\n");
-is($parsed[29]->type, "footnote");
-
-is($parsed[31]->string, "");
-is($parsed[32]->string, "will not merge\n");
-
-
-sub dump_content {
-    my $obj = shift;
-    foreach my $i ($obj->elements) {
-        if ($i->type eq 'null') {
-            print "** NULL **\n";
-            die "null with content?" if $i->string =~ m/\S/;
-        } else {
-            print "====Start type:", $i->type, "======\n",
-              $i->string, "====Stop===\n";
-        }
-    }
-}
+is($parsed[27]->block, "comment");
+is($parsed[28]->type, "regular");
+is scalar(@parsed), 29;
 
 sub testfile {
     return catfile(t => testfiles => shift);

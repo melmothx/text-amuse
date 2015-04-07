@@ -37,7 +37,7 @@ will not merge
  - the list
 will merge
 
- a. the list
+   a. the list
 will merge
 
 [1] the footnote

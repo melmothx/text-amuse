@@ -272,6 +272,15 @@ sub _parse_body {
                 $el->block('');
             }
         }
+        elsif ($el->type eq 'null') {
+            # pass
+        }
+        else {
+            # something else: close the pile
+            while (@listpile) {
+                push @out, pop @listpile;
+            }
+        }
         push @out, $el;
     }
     # end of input?
@@ -637,6 +646,5 @@ sub _create_blocks_for_new_level {
     my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
     return ($open, $openli, $closeli, $close);
 }
-
 
 1;
