@@ -34,7 +34,7 @@ is_deeply {$muse->raw_header},
   { title => "1 2 3 4", author => "hello" },
   "header ok";
 
-is(scalar ($muse->elements), 4, "Found three elements");
+is(scalar $muse->elements, 3, "Found three elements");
 # diag "Testing if I can call rawline, block, type, string, ";
 # diag "removed, indentation on each element";
 foreach my $el ($muse->elements) {
@@ -49,22 +49,19 @@ foreach my $el ($muse->elements) {
 my $example =
   Text::Amuse::Document->new(file => catfile(t => testfiles => 'example.muse'));
 
-my @parsed = $example->elements;
+my @parsed = grep { $_->type ne 'null' } $example->elements;
+is scalar(@parsed), 2, "Two blocks";
 
-is($parsed[0]->string, "", "First is empty");
-is($parsed[1]->type, "example", "Type set to example");
-is($parsed[2]->string, "", "Third is empty");
-is($parsed[3]->type, "example", "Type set to example");
-is($parsed[4]->string, "", "Last is empty");
+is($parsed[0]->type, "example", "Type set to example");
+is($parsed[1]->type, "example", "Type set to example") or die Dumper(\@parsed);
 
 $example = Text::Amuse::Document->new(file => catfile(t => testfiles => 'example-2.muse'));
 
-@parsed = $example->elements;
-is(scalar @parsed, 4, "Four element, <example> wasn't closed");
-is($parsed[0]->string, "", "First is empty");
-is($parsed[1]->type, "example", "Type set to example");
-is($parsed[2]->string, "", "Third is empty");
-is($parsed[3]->type, "example", "Type set to example");
+@parsed = grep { $_->type ne 'null' } $example->elements;
+is(scalar @parsed, 2, "Two element, <example> wasn't closed");
+
+is($parsed[0]->type, "example", "Type set to example");
+is($parsed[1]->type, "example", "Type set to example") or die Dumper(\@parsed);
 
 # we have to add a "\n" at the end, because it's inserted automatically
 my $expected_example = <<'EOF';
@@ -79,7 +76,7 @@ my $expected_example = <<'EOF';
 
 EOF
 
-is($parsed[3]->string, $expected_example, "Content looks ok");
+is($parsed[1]->string, $expected_example, "Content looks ok");
 
 # dump_content($example);
 
