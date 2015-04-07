@@ -848,6 +848,7 @@ sub _construct_element {
             if ($element->is_stop_block($block)) {
                 $self->_current_el(undef);
                 return Text::Amuse::Element->new(type => 'null',
+                                                 removed => $element->rawline,
                                                  rawline => $element->rawline);
             }
             else {
@@ -858,6 +859,7 @@ sub _construct_element {
         }
         elsif ($element->is_start_block($block)) {
             $current = Text::Amuse::Element->new(type => $block,
+                                                 removed => $element->rawline,
                                                  rawline => $element->rawline);
             $self->_current_el($current);
             return $current;
