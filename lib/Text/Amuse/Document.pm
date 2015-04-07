@@ -227,62 +227,60 @@ sub _parse_body {
         if ($el->type eq 'li') {
             if (@listpile) {
                 # same indentation, continue
-                if ($el->indentation == $listpile[$#listpile]->{indentation}) {
-                    push @out, Text::Amuse::Element->new(block => 'li', type => 'stopblock');
-                    push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                if ($el->indentation == $listpile[$#listpile]->indentation) {
+                    my ($open, $close) = $self->_create_block_pair(li => $el->indentation);
+                    push @out, $close, $open;
                 }
 
                 # indentation is major, open a new level
-                elsif ($el->indentation > $listpile[$#listpile]->{indentation}) {
-                    push @listpile, { block => $el->block, indentation => $el->indentation };
-                    push @out, Text::Amuse::Element->new(block => $el->block, type => 'startblock');
-                    push @listpile, { block => 'li', indentation => $el->indentation };
-                    push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                elsif ($el->indentation > $listpile[$#listpile]->indentation) {
+                    my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
+                    push @out, $open, $openli;
+                    push @listpile, $close, $closeli;
                 }
 
                 # indentation is minor, pop the pile until we reach the level
-                else {
+                elsif ($el->indentation < $listpile[$#listpile]->indentation) {
                     # close the lists until we get the the right level
-                    while(@listpile and $el->indentation < $listpile[$#listpile]->{indentation}) {
-                        my $pending = pop(@listpile)->{block};
-                        push @out, Text::Amuse::Element->new(block => $pending, type => 'stopblock');
+                    while(@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
+                        push @out, pop @listpile;
                     }
+                    # continue if open
                     if (@listpile) {
-                        push @out, Text::Amuse::Element->new(block => 'li', type => 'stopblock');
-                        push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                        my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
+                        push @out, $closeli, $openli;
                     }
                     # if by chance, we emptied all, start anew.
                     else {
-                        push @listpile, { block => $el->block, indentation => $el->indentation };
-                        push @out, Text::Amuse::Element->new(block => $el->block, type => 'startblock');
-                        push @listpile, { block => 'li', indentation => $el->indentation };
-                        push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                        my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
+                        push @out, $open, $openli;
+                        push @listpile, $close, $closeli;
                     }
+                }
+                else {
+                    die "Not reached";
                 }
             }
             # no list pile, this is the first element
             else {
-                push @listpile, { block => $el->block, indentation => $el->indentation };
-                push @out, Text::Amuse::Element->new(block => $el->block, type => 'startblock');
-                push @listpile, { block => 'li', indentation => $el->indentation };
-                push @out, Text::Amuse::Element->new(block => 'li', type => 'startblock');
+                my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
+                push @out, $open, $openli;
+                push @listpile, $close, $closeli;
             }
             $el->type('regular'); # flip the type to regular
             $el->block('');
         }
         elsif ($el->type eq 'regular') {
             # the type is regular: It can only close or continue
-            while (@listpile and $el->indentation < $listpile[$#listpile]->{indentation}) {
-                my $pending = pop(@listpile)->{block};
-                push @out, Text::Amuse::Element->new(block => $pending, type => 'stopblock');
+            while (@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
+                push @out, pop @listpile;
             }
         }
         push @out, $el;
     }
     # end of input?
     while (@listpile) {
-        my $pending = pop(@listpile)->{block};
-        push @out, Text::Amuse::Element->new(block => $pending, type => 'stopblock');
+        push @out, pop @listpile;
     }
 
     my @body_no_footnotes;
@@ -875,6 +873,48 @@ sub _construct_element {
     $self->_current_el($element);
     return $element;
     
+}
+
+sub _create_block {
+    my ($self, $open_close, $block, $indentation) = @_;
+    die unless $open_close && $block;
+    my $type;
+    if ($open_close eq 'open') {
+        $type = 'startblock';
+    }
+    elsif ($open_close eq 'close') {
+        $type = 'stopblock';
+    }
+    else {
+        die "$open_close is not a valid op";
+    }
+    my $removed = '';
+    if ($indentation) {
+        $removed = ' ' x $indentation;
+    }
+    return Text::Amuse::Element->new(block => $block,
+                                     type => $type,
+                                     removed => $removed);
+}
+
+sub _create_closing_block {
+    my ($self, $el) = @_;
+    return $self->_create_block(close => $el->block,
+                                $el->indentation);
+}
+
+sub _create_block_pair {
+    my ($self, $type, $indent) = @_;
+    my $open = $self->_create_block(open => $type, $indent);
+    my $close = $self->_create_closing_block($open);
+    return ($open, $close);
+}
+
+sub _create_blocks_for_new_level {
+    my ($self, $el) = @_;
+    my ($open, $close) = $self->_create_block_pair($el->block, $el->indentation);
+    my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
+    return ($open, $openli, $closeli, $close);
 }
 
 

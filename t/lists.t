@@ -421,7 +421,7 @@ foreach my $e ($list->document) {
                 };
 }
 
-my @good = grep { $_->type ne 'null' } $list->elements;
+my @good = grep { $_->type ne 'null' } $list->document;
 
 # is scalar(@good), scalar(@expected), "Element count is ok";
 while (my $exp = shift @expected) {
