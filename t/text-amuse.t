@@ -86,10 +86,12 @@ my $poetry = Text::Amuse::Document->new(file => testfile("verse.muse"),
 @parsed = grep { $_->type ne 'null' } $poetry->elements;
 is($parsed[1]->type, "verse", "verse ok");
 is($parsed[1]->string,
-   "A line of Emacs verse;\n  forgive its being so terse.\n\n\n",
+   "A line of Emacs verse;\n  forgive its being so terse.\n",
    "content looks ok");
 is($parsed[2]->type, "h2", "h2 ok");
-is($parsed[3]->type, "verse", "another verse");
+
+is($parsed[3]->type, "regular");
+is($parsed[4]->type, "verse", "another verse");
 my $exppoetry = <<'EOF';
 A line of Emacs verse; [2]
   forgive its being so terse. [3]
@@ -97,19 +99,21 @@ A line of Emacs verse; [2]
 In terms of terse verse,
         you could do worse. [1]
 
- A. This poetry will stop here, even if it's not close
-
+ A. This poetry will stop here.
 EOF
 
-is($parsed[3]->string, $exppoetry, "content ok, list not interpreted");
-is scalar(@parsed), 4, "End of parsed";
+is($parsed[4]->string, $exppoetry, "content ok, list not interpreted");
+is_deeply([split /(\s+)/, $parsed[4]->string],
+          [split /(\s+)/, $exppoetry]);
+is scalar(@parsed), 5, "End of parsed";
 foreach my $fn (1..3) {
     my $footnote = $poetry->get_footnote($fn);
+    chomp $footnote;
     ok ($footnote, "Found footnote $fn: " . $footnote->string) or die "Missing footnote!";
 }
 is ($poetry->get_footnote(1)->string, "The author\n", "Footnote 1 ok");
-is ($poetry->get_footnote(1)->string, "Another author\n", "Footnote 2 ok");
-is ($poetry->get_footnote(1)->string, "This sucks\n", "Footnote 3 ok");
+is ($poetry->get_footnote(2)->string, "Another author\n", "Footnote 2 ok");
+is ($poetry->get_footnote(3)->string, "This sucks\n", "Footnote 3 ok");
 
 my $packs = Text::Amuse::Document->new(file => catfile(t => testfiles => 'packing.muse'));
 @parsed = $packs->elements;
