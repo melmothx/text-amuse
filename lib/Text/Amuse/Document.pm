@@ -437,35 +437,6 @@ sub _parse_string {
         $element{string} = $3;
         return %element;
     }
-    if ($l =~ m/^( +\- +)(.*)/s) {
-        $element{type} = "li";
-        $element{removed} = $1;
-        $element{string} = $2;
-        $element{block} = "ul";
-        return %element;
-    }
-    if (!$opts{nolist}) {
-        if ($l =~ m/^((\s+)  # leading space and type $1
-                        (  # the type               $2
-                            [0-9]+   |
-                            [a-zA-Z] |
-                            [ixvl]+  |
-                            [IXVL]+
-                        )
-                        \. #  single dot
-                        \s+)  # space
-                    (.*) # the string itself $4
-                   /sx) {
-            my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
-            my $indent = length($whitespace);
-            $element{type} = "li";
-            $element{removed} = $remove;
-            $element{string} = $text;
-            my $list_type = $self->_identify_list_type($prefix);
-            $element{block} = $list_type;
-            return %element;
-        }
-    }
     if ($l =~ m/^(\> )(.*)/s) {
         $element{string} = $2;
         $element{removed} = $1;
@@ -478,7 +449,7 @@ sub _parse_string {
         $element{type} = "versep";
         return %element;
     }
-    if ($l =~ m/^(\s+)/s and $l =~ m/\|/) {
+    if ($l =~ m/^(\x{20}+)/s and $l =~ m/\|/) {
         $element{type} = "table";
         $element{string} = $l;
         return %element;
@@ -488,33 +459,62 @@ sub _parse_string {
         $element{type} = "comment";
         return %element;
     }
-    if ($l =~ m/^((\[[0-9]+\])\s+)(.+)$/s) {
+    if ($l =~ m/^((\[[0-9]+\])\x{20}+)(.+)$/s) {
         $element{type} = "footnote";
         $element{string} = $3;
         $element{removed} = $1;
         return %element;
     }
-    if ($l =~ m/^((\s{6,})((\*\s?){5})\s*)$/s) {
+    if ($l =~ m/^((\x{20}{6,})((\*\x{20}?){5})\s*)$/s) {
         $element{type} = "newpage";
         $element{removed} = $2;
         $element{string} = $3;
         return %element;
     }
-    if ($l =~ m/^(\s{20,})([^ ].+)$/s) {
+    if (!$opts{nolist}) {
+        if ($l =~ m/^(\x{20}+\-\x{20}+)(.*)/s) {
+            $element{type} = "li";
+            $element{removed} = $1;
+            $element{string} = $2;
+            $element{block} = "ul";
+            return %element;
+        }
+        if ($l =~ m/^((\x{20}+)  # leading space and type $1
+                        (  # the type               $2
+                            [0-9]+   |
+                            [a-zA-Z] |
+                            [ixvl]+  |
+                            [IXVL]+
+                        )
+                        \. #  single dot
+                        \x{20}+)  # space
+                    (.*) # the string itself $4
+                   /sx) {
+            my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
+            my $indent = length($whitespace);
+            $element{type} = "li";
+            $element{removed} = $remove;
+            $element{string} = $text;
+            my $list_type = $self->_identify_list_type($prefix);
+            $element{block} = $list_type;
+            return %element;
+        }
+    }
+    if ($l =~ m/^(\x{20}{20,})([^ ].+)$/s) {
         $element{block} = "right";
         $element{type} = "regular";
         $element{removed} = $1;
         $element{string} = $2;
         return %element;
     }
-    if ($l =~ m/^(\s{6,})([^ ].+)$/s) {
+    if ($l =~ m/^(\x{20}{6,})([^ ].+)$/s) {
         $element{block} = "center";
         $element{type} = "regular";
         $element{removed} = $1;
         $element{string} = $2;
         return %element;
     }
-    if ($l =~ m/^(\s{2,})([^ ].+)$/s) {
+    if ($l =~ m/^(\x{20}{2,})([^ ].+)$/s) {
         $element{block} = "quote";
         $element{type} = "regular";
         $element{removed} = $1;
