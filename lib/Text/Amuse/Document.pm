@@ -531,7 +531,7 @@ sub _parse_string {
 sub _identify_list_type {
     my ($self, $list_type) = @_;
     my $type;
-    if ($list_type =~ m/\A[0-9]\z/) {
+    if ($list_type =~ m/\A[0-9]+\z/) {
         $type = "oln";
     } elsif ($list_type =~ m/\A[ixvl]+\z/) {
         $type = "oli";
@@ -542,7 +542,7 @@ sub _identify_list_type {
     } elsif ($list_type =~ m/\A[A-Z]\z/) {
         $type = "olA";
     } else {
-        die "$type Unrecognized, fix your code\n";
+        die "$list_type unrecognized, fix your code\n";
     }
     return $type;
 }
