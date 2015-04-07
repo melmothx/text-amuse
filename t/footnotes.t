@@ -11,7 +11,7 @@ plan tests => 24;
 
 my $fn = Text::Amuse::Document->new(file => catfile(t => testfiles => 'footnotes.muse'));
 
-my @got = $fn->document;
+my @got = $fn->elements;
 
 is(scalar(grep { $_->type ne 'null'} @got), 1,
    "Only one not null element") or diag Dumper(\@got);

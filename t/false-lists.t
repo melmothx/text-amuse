@@ -28,7 +28,7 @@ MUSE
     unlike ($html, qr{list-style-type}, "Not a list");
     my $doc = muse_to_object($muse);
     # parse
-    my @parsed = $doc->document->document;
+    my @parsed = $doc->document->elements;
     is (scalar(@parsed), 7, "Found 7 elements");
     my $false_list = $parsed[3];
     is ($false_list->type, 'regular');
@@ -66,7 +66,7 @@ MUSE
     my $html = muse_to_html($muse);
     like ($html, qr{list-style-type}, "It's a list");
     my $doc = muse_to_object($muse);
-    my @parsed = $doc->document->document;
+    my @parsed = $doc->document->elements;
     # print Dumper(\@parsed);
     my $list = $parsed[17];
     is ($list->type, 'li', "list is ok");

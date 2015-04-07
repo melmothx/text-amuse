@@ -61,7 +61,7 @@ my @expected = (
                 }
                );
 
-my @got = grep { $_->type ne 'null' } $doc->document;
+my @got = grep { $_->type ne 'null' } $doc->elements;
 
 is scalar(@got), scalar(@expected), "Element count is ok";
 my $count = 0;

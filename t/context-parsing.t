@@ -37,7 +37,7 @@ Test
 MUSE
 
     my $doc = muse_to_object($muse);
-    my @elements = $doc->document->document;
+    my @elements = $doc->document->elements;
     my @expected = ([null => 'null'],
                     [regular => 'regular'],
                     [null => 'null'],

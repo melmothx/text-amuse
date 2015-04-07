@@ -38,14 +38,14 @@ sub string {
     return shift->{_raw_string};
 }
 
-=head3 document
+=head3 elements
 
 It returns the only L<Text::Amuse::Element> which composes the body.
 
 =cut
 
 
-sub document {
+sub elements {
     my $self = shift;
     my $el = Text::Amuse::Element->new(type => 'standalone',
                                        string => $self->string);

@@ -109,7 +109,6 @@ sub test_testfile {
     @exp = split /\n/, $html;
     @got = split /\n/, $document->as_html;
     is_deeply (\@got, \@exp, "HTML for $base OK") or diag Dumper(\@got, \@exp);
-    # print Dumper($document->document);
 }
 
 sub write_to_file {

@@ -418,7 +418,7 @@ item above.
                 }
                );
 
-my @good = grep { $_->type ne 'null' } $list->document->document;
+my @good = grep { $_->type ne 'null' } $list->document->elements;
 
 is scalar(@good), scalar(@expected), "Element count is ok";
 my $count = 0;
@@ -446,7 +446,7 @@ sub dump_doc {
 </head>
 <body>
 };
-    foreach my $el ($obj->document) {
+    foreach my $el ($obj->elements) {
         my $block = $el->block;
         if ($block =~ m/(ol)/) {
             $block = $1;

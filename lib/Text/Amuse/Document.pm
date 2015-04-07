@@ -190,15 +190,6 @@ sub raw_body {
     return @{$self->{raw_body}}
 }
 
-=head2 parsed_body (internal, but documented)
-
-Accessor to the list of parsed lines. Each line will come as a
-L<Text::Amuse::Element> object
-
-The first block is guaranteed to be a null block
-
-=cut
-
 sub _parse_body {
     my $self = shift;
     $self->_debug("Parsing body");
@@ -341,7 +332,7 @@ sub _parse_body {
         elsif (@pile and $el->should_close_blocks) {
             while (@pile) {
                 my $block = pop @pile;
-                warn "Forcing the closing of $block\n";
+                warn "Forcing the closing of " . $block->block . "\n";
                 push @parsed, $block;
             }
         }
@@ -354,33 +345,17 @@ sub _parse_body {
     return \@parsed;
 }
 
-=head2 document
+=head2 elements
 
 Return the list of the elements which compose the body, once they have
-properly parsed and packed. Nulls and footnotes are removed. (To get
-the footnotes use the accessor below).
+properly parsed and packed. Footnotes are removed. (To get the
+footnotes use the accessor below).
 
 =cut
 
-sub document {
+sub elements {
     my $self = shift;
     unless (defined $self->{_parsed_document}) {
-        # order matters!
-        # pack the examples
-        # $self->_catch_example; # done
-
-        # pack the verses
-        # $self->_catch_verse; # done
-
-        # then pack the lines
-        # $self->_pack_lines;
-
-        # then process the lists, using the indentation
-        # $self->_process_lists;
-
-        # then unroll the blocks
-        # $self->_unroll_blocks;
-
         # then store the footnotes
         # $self->_store_footnotes;
 
@@ -422,255 +397,6 @@ sub _raw_footnotes {
     }
     return $self->{_raw_footnotes};
 }
-
-
-
-# verses are the other big problem, because they are not regular
-# strings and can't be nested (as the example, but it's a slightly
-# different case.
-
-sub _catch_verse {
-    my $self = shift;
-    my @els = $self->parsed_body;
-    my @out;
-    while (@els) {
-        my $el = shift @els;
-        if ($el->is_start_block('verse')) {
-            while (my $e = shift(@els)) {
-                # stop if we find a closed environment
-                last if $e->is_stop_block('verse');
-                if ($e->is_regular_maybe) {
-                    $el->add_to_string($e->rawline)
-                } else {
-                    # argh, too late! Put it back
-                    $self->_debug("Rewinding");
-                    unshift @els, $e;
-                    last;
-                }
-            }
-            $el->will_not_merge(1);
-            $el->type("verse"); # change the type
-        }
-        push @out, $el;
-    }
-    # and finally reset
-    $self->parsed_body(\@out);
-}
-
-sub _pack_lines {
-    my $self = shift;
-    my @els = $self->parsed_body;
-    die "Can't process an empty list\n" unless (@els);
-    my @out;
-    # insert the first.
-    push @out, shift(@els);
-    while (my $el = shift(@els)) {
-        my $last = $out[$#out];
-        # same type, same indentation
-        if ($el->can_be_merged and # basically, only regular
-            $last->can_merge_next) {
-            $last->add_to_string($el->string)
-        }
-        # tables will merge only with themselves
-        elsif ($el->type eq 'table' and
-               $last->type eq 'table') {
-            $last->add_to_string($el->string)
-        }
-        else {
-            push @out, $el;
-        }
-    }
-    $self->parsed_body(\@out);
-}
-
-sub _process_lists {
-    my $self = shift;
-    my @els = $self->parsed_body;
-    die "Can't process an empty list\n" unless (@els);
-    my @out;
-    my @listpile;
-
-    while (my $el = shift(@els)) {
-
-        # first, check if can be in list. If not, empty the queue.
-        unless ($el->can_be_in_list) {
-            while (@listpile) {
-                my $pending = pop(@listpile)->{block};
-                # we create an element to close all
-                push @out, Text::Amuse::Element->new("</$pending>");
-            }
-            # push the element
-            push @out, $el;
-            next;
-        }
-        # ignore the null, just push it into the output
-        if ($el->type eq 'null') {
-            push @out, $el;
-            next;
-        }
-        # are we actually in a list?
-        unless (@listpile or $el->type eq 'li') {
-            # no? good!
-            push @out, $el;
-            next 
-        }
-        
-        # if we're still here, we are actually in a list
-        # no pile, this is the first element
-
-        unless (@listpile) {
-            die "Something went wrong!\n" unless $el->type eq 'li';
-            # first the block type;
-            my $block = $el->block;
-            push @listpile, { block => $block,
-                              indentation => $el->indentation };
-            push @listpile, { block => "li",
-                              indentation => $el->indentation };
-            push @out, Text::Amuse::Element->new("<$block>");
-            push @out, Text::Amuse::Element->new("<li>");
-            # change the type, it's a paragraph now
-            $el->type('regular');
-            push @out, $el;
-            next;
-        }
-        
-        # if we're here, we have an existing list, so we check the
-        # indentation.
-        
-        # the type is regular: It can only close or continue
-        if ($el->type eq 'regular') {
-            $el->block(""); # it's no more a quote/center/right
-            # equal or major indentation, just append and next
-            if ($el->indentation >= $listpile[$#listpile]->{indentation}) {
-                push @out, $el;
-                next;
-            }
-            # and while it's minor, pop the pile
-            while (@listpile and $el->indentation < $listpile[$#listpile]->{indentation}) {
-                my $pending = pop(@listpile)->{block};
-                push @out, Text::Amuse::Element->new("</$pending>");
-                # print "Listpile: ", Dumper(\@listpile), "\nElement:", Dumper($el);
-            }
-            # all done
-            push @out, $el;
-            next;
-        }
-
-        # check if it's all OK
-        die "We broke the module!" unless $el->type eq 'li';
-        # we're here, change the type as we're done
-        $el->type('regular');
-
-        if ($el->indentation == $listpile[$#listpile]->{indentation}) {
-            # if the indentation is equal, we don't need to touch the pile,
-            # as it was useless to pop and push the same li element.
-            push @out, Text::Amuse::Element->new("</li>");
-            push @out, Text::Amuse::Element->new("<li>");
-            push @out, $el;
-            next;
-        }
-        # indentation is major, open a new level
-        elsif ($el->indentation > $listpile[$#listpile]->{indentation}) {
-            my $block = $el->block;
-            push @listpile, { block => $block,
-                              indentation => $el->indentation };
-            push @listpile, { block => "li",
-                              indentation => $el->indentation };
-            push @out, Text::Amuse::Element->new("<$block>");
-            push @out, Text::Amuse::Element->new("<li>");
-            push @out, $el;
-            next;
-        }
-        # if it's minor, we pop from the pile until we are ok
-        while(@listpile and
-              $el->indentation < $listpile[$#listpile]->{indentation}) {
-            my $pending = pop(@listpile)->{block};
-            push @out, Text::Amuse::Element->new("</$pending>");
-        }
-        # here we reached the desired level
-        if (@listpile) {
-            push @out, Text::Amuse::Element->new("</li>");
-            push @out, Text::Amuse::Element->new("<li>");
-        }
-        # if by chance, we emptied all, something is wrong, so start anew.
-        else {
-            my $block = $el->block;
-            push @listpile, { block => $block,
-                              indentation => $el->indentation };
-            push @listpile, { block => "li",
-                              indentation => $el->indentation };
-            push @out, Text::Amuse::Element->new("<$block>");
-            push @out, Text::Amuse::Element->new("<li>");
-
-        }
-        push @out, $el;
-    }
-
-    # be sure to have the pile empty
-    while (@listpile) {
-        my $pending = pop(@listpile)->{block};
-        # we create an element to close all
-        push @out, Text::Amuse::Element->new("</$pending>");
-    }
-    foreach my $check (@out) {
-        die "Found a stray type!" . $check->string . ":" . $check->type
-          if $check->type =~ m/^(li|[uo]l)/;
-    }
-    $self->parsed_body(\@out);    
-}
-
-sub _unroll_blocks {
-    my $self = shift;
-    my @els = $self->parsed_body;
-    my @out;
-    while (my $el = shift @els) {
-        if ($el->can_be_regular) {
-            my $block = $el->block;
-            $el->block("");
-            push @out, Text::Amuse::Element->new("<$block>");
-            push @out, $el;
-            push @out, Text::Amuse::Element->new("</$block>");
-        }
-        else { push @out, $el }
-    }
-    $self->parsed_body(\@out);
-}
-
-sub _store_footnotes {
-    my $self = shift;
-    my @els = $self->parsed_body;
-    my @out;
-    my %footnotes;
-    while (my $el = shift(@els)) {
-        if ($el->type eq 'footnote') {
-            if ($el->removed =~ m/\[([0-9]+)\]/) {
-                warn "Overwriting footnote number $1" if exists $footnotes{$1};
-                $footnotes{$1} = $el;
-            }
-            else { die "Something is wrong here! <" . $el->removed . ">"
-                     . $el->string . "!" }
-        }
-        else {
-            push @out, $el;
-        }
-    }
-    $self->parsed_body(\@out);
-    $self->_raw_footnotes(\%footnotes);
-    return;
-}
-
-sub _remove_nulls {
-    my $self = shift;
-    my @els = $self->parsed_body;
-    my @out;
-    while (my $el = shift(@els)) {
-        unless ($el->type eq 'null') {
-            push @out, $el;
-        }
-    }
-    $self->parsed_body(\@out);
-}
-
 
 sub _parse_string {
     my ($self, $l, %opts) = @_;

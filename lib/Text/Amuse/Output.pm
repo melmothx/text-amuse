@@ -131,7 +131,7 @@ sub process {
     my $imagere = $self->image_re;
     $self->reset_toc_stack;
     # loop over the parsed elements
-    foreach my $el ($self->document->document) {
+    foreach my $el ($self->document->elements) {
         if ($el->type eq 'null') {
             next;
         }
