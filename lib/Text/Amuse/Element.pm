@@ -329,5 +329,16 @@ sub can_append {
     return 0;
 }
 
+=head3 become_regular
+
+Set block to empty string and type to regular
+
+=cut
+
+sub become_regular {
+    my $self = shift;
+    $self->type('regular');
+    $self->block('');
+}
 
 1;

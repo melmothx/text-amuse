@@ -215,7 +215,6 @@ sub _parse_body {
   LISTP:
     while (@parsed) {
         my $el = shift @parsed;
-        # li, null or regular
         if ($el->type eq 'li') {
             if (@listpile) {
                 # same indentation, continue
@@ -223,35 +222,29 @@ sub _parse_body {
                     my ($open, $close) = $self->_create_block_pair(li => $el->indentation);
                     push @out, $close, $open;
                 }
-
                 # indentation is major, open a new level
                 elsif ($el->indentation > $listpile[$#listpile]->indentation) {
                     my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
                     push @out, $open, $openli;
                     push @listpile, $close, $closeli;
                 }
-
                 # indentation is minor, pop the pile until we reach the level
                 elsif ($el->indentation < $listpile[$#listpile]->indentation) {
                     # close the lists until we get the the right level
                     while(@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
                         push @out, pop @listpile;
                     }
-                    # continue if open
-                    if (@listpile) {
+                    if (@listpile) { # continue if open
                         my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
                         push @out, $closeli, $openli;
                     }
-                    # if by chance, we emptied all, start anew.
-                    else {
+                    else { # if by chance, we emptied all, start anew.
                         my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
                         push @out, $open, $openli;
                         push @listpile, $close, $closeli;
                     }
                 }
-                else {
-                    die "Not reached";
-                }
+                else { die "Not reached"; }
             }
             # no list pile, this is the first element
             else {
@@ -259,8 +252,7 @@ sub _parse_body {
                 push @out, $open, $openli;
                 push @listpile, $close, $closeli;
             }
-            $el->type('regular'); # flip the type to regular
-            $el->block('');
+            $el->become_regular;
         }
         elsif ($el->type eq 'regular') {
             # the type is regular: It can only close or continue
@@ -268,15 +260,10 @@ sub _parse_body {
                 push @out, pop @listpile;
             }
             if (@listpile) {
-                $el->type('regular'); # flip the type to regular if in list
-                $el->block('');
+                $el->become_regular;
             }
         }
-        elsif ($el->type eq 'null') {
-            # pass
-        }
-        else {
-            # something else: close the pile
+        elsif ($el->type ne 'null') { # something else: close the pile
             while (@listpile) {
                 push @out, pop @listpile;
             }
