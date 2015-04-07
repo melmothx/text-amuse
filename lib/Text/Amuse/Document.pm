@@ -411,7 +411,7 @@ sub _parse_string {
                          example  |
                          quote
                      )}x;
-    
+
     # null line is default, do nothing
     if ($l =~ m/^[\n\t ]*$/s) {
         # do nothing, already default
@@ -451,7 +451,7 @@ sub _parse_string {
                             [a-zA-Z] |
                             [ixvl]+  |
                             [IXVL]+
-                        )     
+                        )
                         \. #  single dot
                         \s+)  # space
                     (.*) # the string itself $4
@@ -630,7 +630,6 @@ sub _construct_element {
 
     $self->_current_el($element);
     return $element;
-    
 }
 
 sub _create_block {
