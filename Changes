@@ -1,6 +1,14 @@
 Revision history for perl module Text::Amuse
 
-0.22 2015-21-03
+0.30 2015-04-07
+
+ - Refactoring of the element parsing (in context, hence the major
+   version bump)
+
+ - Fixed false positive on list detection because of lists being too
+   greedy
+
+0.22 2015-03-21
 
  - Minor syntax change (documented in the manual): require indentation
    to trigger a table.

@@ -13,11 +13,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.22
+Version 0.30
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.30';
 
 
 =head1 SYNOPSIS
@@ -440,9 +440,10 @@ Marco Pessotto, C<< <melmothx at gmail.com> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to the author's email. If
-you find a bug, please provide a minimal muse file which reproduces
-the problem (so I can add it to the test suite).
+Please report any bugs or feature requests to the author's email or
+just use the CPAN's RT. If you find a bug, please provide a minimal
+muse file which reproduces the problem (so I can add it to the test
+suite).
 
 =head1 SUPPORT
 
@@ -450,7 +451,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Text::Amuse
 
-Repository available at Gitorious: L<https://gitorious.org/text-amuse>
+Repository available at Github: L<https://github.com/melmothx/text-amuse>
 
 =head1 SEE ALSO
 
