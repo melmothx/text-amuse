@@ -34,10 +34,10 @@ is_deeply {$muse->raw_header},
   { title => "1 2 3 4", author => "hello" },
   "header ok";
 
-is(scalar ($muse->parsed_body), 4, "Found three elements");
+is(scalar ($muse->elements), 4, "Found three elements");
 # diag "Testing if I can call rawline, block, type, string, ";
 # diag "removed, indentation on each element";
-foreach my $el ($muse->parsed_body) {
+foreach my $el ($muse->elements) {
     ok defined($el->rawline), "el: " . $el->rawline;
     ok defined($el->block),   "el: " . $el->block;
     ok defined($el->type),    "el: " . $el->type;
@@ -49,8 +49,7 @@ foreach my $el ($muse->parsed_body) {
 my $example =
   Text::Amuse::Document->new(file => catfile(t => testfiles => 'example.muse'));
 
-$example->_catch_example;
-my @parsed = $example->parsed_body;
+my @parsed = $example->elements;
 
 is($parsed[0]->string, "", "First is empty");
 is($parsed[1]->type, "example", "Type set to example");
@@ -60,8 +59,7 @@ is($parsed[4]->string, "", "Last is empty");
 
 $example = Text::Amuse::Document->new(file => catfile(t => testfiles => 'example-2.muse'));
 
-$example->_catch_example;
-@parsed = $example->parsed_body;
+@parsed = $example->elements;
 is(scalar @parsed, 4, "Four element, <example> wasn't closed");
 is($parsed[0]->string, "", "First is empty");
 is($parsed[1]->type, "example", "Type set to example");
@@ -88,10 +86,7 @@ is($parsed[3]->string, $expected_example, "Content looks ok");
 my $poetry = Text::Amuse::Document->new(file => testfile("verse.muse"),
                               debug => 1);
 
-$poetry->_catch_example;
-$poetry->_catch_verse;
-
-@parsed = $poetry->parsed_body;
+@parsed = $poetry->elements;
 is($parsed[3]->type, "verse", "verse ok");
 is($parsed[3]->string,
    "A line of Emacs verse;\n  forgive its being so terse.\n\n\n",
@@ -116,10 +111,7 @@ is($parsed[10]->string, "The author\n", "Footnote ok");
 # dump_content($poetry);
 
 my $packs = Text::Amuse::Document->new(file => catfile(t => testfiles => 'packing.muse'));
-$packs->_catch_example;
-$packs->_catch_verse;
-$packs->_pack_lines;
-@parsed = $packs->parsed_body;
+@parsed = $packs->elements;
 
 is($parsed[1]->string, "this title\nwill merge\n");
 is($parsed[1]->type, "h1");
@@ -174,7 +166,7 @@ is($parsed[32]->string, "will not merge\n");
 
 sub dump_content {
     my $obj = shift;
-    foreach my $i ($obj->parsed_body) {
+    foreach my $i ($obj->elements) {
         if ($i->type eq 'null') {
             print "** NULL **\n";
             die "null with content?" if $i->string =~ m/\S/;

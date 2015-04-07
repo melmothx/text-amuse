@@ -356,11 +356,6 @@ footnotes use the accessor below).
 sub elements {
     my $self = shift;
     unless (defined $self->{_parsed_document}) {
-        # then store the footnotes
-        # $self->_store_footnotes;
-
-        # last run to check if we don't miss anything and remove the nulls
-        # $self->_remove_nulls;
         $self->{_parsed_document} = $self->_parse_body;
     }
     return @{$self->{_parsed_document}}
