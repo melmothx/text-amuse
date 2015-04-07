@@ -276,6 +276,8 @@ sub _parse_body {
             while (@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
                 push @out, pop @listpile;
             }
+            $el->type('regular'); # flip the type to regular
+            $el->block('');
         }
         push @out, $el;
     }
@@ -302,7 +304,7 @@ sub _parse_body {
     }
     $self->_raw_footnotes(\%footnotes);
 
-    # unroll the blocks
+    # unroll the quote/center/right blocks
     while (@parsed) {
         my $el = shift @parsed;
         if ($el->can_be_regular) {

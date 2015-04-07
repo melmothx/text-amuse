@@ -2,13 +2,19 @@ use 5.010001;
 use strict;
 use warnings;
 use Test::More;
-use Text::Amuse::Document;
+use Text::Amuse;
 use File::Spec::Functions;
 use Data::Dumper;
 
-plan tests => 1;
+my $builder = Test::More->builder;
+binmode $builder->output,         ":utf8";
+binmode $builder->failure_output, ":utf8";
+binmode $builder->todo_output,    ":utf8";
 
-my $list = Text::Amuse::Document->new(file => catfile(t => testfiles => 'lists.muse'));
+
+plan tests => 208;
+
+my $list = Text::Amuse->new(file => catfile(t => testfiles => 'lists.muse'));
 
 my @good;
 
@@ -33,7 +39,7 @@ my @expected = (
                  'string' => 'Level 1, bullet item one, this is the first paragraph. I can break
 the line, keeping the same amount of indentation
 ',
-                 'block' => 'ul',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -57,7 +63,7 @@ item above.
                  'string' => 'Level 2, enum item one. i can break the line, keeping the same
 amount of indentation
 ',
-                 'block' => 'oln',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -81,7 +87,7 @@ item above.
                  'string' => 'Level 2, enum item two
 which continues
 ',
-                 'block' => 'oln',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -115,7 +121,7 @@ item above.
                  'string' => 'Level 1, bullet item two
 which continues
 ',
-                 'block' => 'ul',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -139,7 +145,7 @@ item above.
                  'string' => 'Level 2, enum item one
 which continues
 ',
-                 'block' => 'oln',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -163,7 +169,7 @@ item above.
                  'string' => 'Level 2, enum item two
 which continues
 ',
-                 'block' => 'oln',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -186,7 +192,7 @@ item above.
                 {
                  'string' => 'Level 3, enum item i
 ',
-                 'block' => 'oli',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -209,7 +215,7 @@ the item above.
                 {
                  'string' => 'Level 3, enum item ii
 ',
-                 'block' => 'oli',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -243,7 +249,7 @@ the item above.
                  'string' => 'Level 2, enum item three
 which continues
 ',
-                 'block' => 'oln',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -276,7 +282,7 @@ item above.
                 {
                  'string' => 'Back to Level 1, third bullet
 ',
-                 'block' => 'ul',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -300,7 +306,7 @@ item above.
                  'string' => "Level 2, enum item \x{201c}a\x{201d}
 which continues
 ",
-                 'block' => 'ola',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -324,7 +330,7 @@ item above.
                  'string' => "Level 2, enum item \x{201c}b\x{201d}
 which continues
 ",
-                 'block' => 'ola',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -347,7 +353,7 @@ item above.
                 {
                  'string' => "Level 3, enum item \x{201c}I\x{201d}
 ",
-                 'block' => 'olI',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -390,7 +396,7 @@ item above.
                 {
                  'string' => 'Back to the bullets
 ',
-                 'block' => 'ul',
+                 'block' => 'regular',
                  'type' => 'regular'
                 },
                 {
@@ -412,24 +418,16 @@ item above.
                 }
                );
 
-foreach my $e ($list->document) {
-    next if $e->type eq 'null';
-    push @good, {
-                 type  => $e->type,
-                 block => $e->block,
-                 string => $e->string,
-                };
-}
+my @good = grep { $_->type ne 'null' } $list->document->document;
 
-my @good = grep { $_->type ne 'null' } $list->document;
-
-# is scalar(@good), scalar(@expected), "Element count is ok";
+is scalar(@good), scalar(@expected), "Element count is ok";
+my $count = 0;
 while (my $exp = shift @expected) {
     my $el = shift @good;
-    diag "testing " . $el->rawline;
-    is $el->type, $exp->{type};
-    is $el->block, $exp->{block};
-    is $el->string, $exp->{string};
+    diag "testing " . ++$count . ' ' .  $el->rawline;
+    is $el->type, $exp->{type}, "type $exp->{type}" or die Dumper($el, $exp);
+    is $el->block, $exp->{block}, "block $exp->{block}" or die Dumper($el, $exp);
+    is $el->string, $exp->{string}, "string $exp->{string}" or die Dumper($el, $exp);
 }
 
 
