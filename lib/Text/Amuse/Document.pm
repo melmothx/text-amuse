@@ -286,7 +286,7 @@ sub _parse_body {
     while (@out) {
         my $el = shift @out;
         if ($el->type eq 'footnote') {
-            if ($el->removed =~ m/\[([0-9]+)\]/) {
+            if ($el->removed =~ m/\A\[([0-9]+)\]\s+\z/) {
                 warn "Overwriting footnote number $1" if exists $footnotes{$1};
                 $footnotes{$1} = $el;
             }
@@ -448,12 +448,13 @@ sub _parse_string {
         if ($l =~ m/^((\s+)  # leading space and type $1
                         (  # the type               $2
                             [0-9]+   |
-                            [a-hA-H] |
-                            [ixvIXV]+  |
+                            [a-zA-Z] |
+                            [ixvl]+  |
+                            [IXVL]+
                         )     
-                        \. # a single dot
+                        \. #  single dot
                         \s+)  # space
-                    (.*) # the string itself $3
+                    (.*) # the string itself $4
                    /sx) {
             my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
             my $indent = length($whitespace);
@@ -477,7 +478,7 @@ sub _parse_string {
         $element{type} = "versep";
         return %element;
     }
-    if ($l =~ m/^(\s+)/ and $l =~ m/\|/) {
+    if ($l =~ m/^(\s+)/s and $l =~ m/\|/) {
         $element{type} = "table";
         $element{string} = $l;
         return %element;
@@ -499,21 +500,21 @@ sub _parse_string {
         $element{string} = $3;
         return %element;
     }
-    if ($l =~ m/^( {20,})([^ ].+)$/s) {
+    if ($l =~ m/^(\s{20,})([^ ].+)$/s) {
         $element{block} = "right";
         $element{type} = "regular";
         $element{removed} = $1;
         $element{string} = $2;
         return %element;
     }
-    if ($l =~ m/^( {6,})([^ ].+)$/s) {
+    if ($l =~ m/^(\s{6,})([^ ].+)$/s) {
         $element{block} = "center";
         $element{type} = "regular";
         $element{removed} = $1;
         $element{string} = $2;
         return %element;
     }
-    if ($l =~ m/^( {2,})([^ ].+)$/s) {
+    if ($l =~ m/^(\s{2,})([^ ].+)$/s) {
         $element{block} = "quote";
         $element{type} = "regular";
         $element{removed} = $1;
@@ -530,16 +531,16 @@ sub _parse_string {
 sub _identify_list_type {
     my ($self, $list_type) = @_;
     my $type;
-    if ($list_type =~ m/[0-9]/) {
+    if ($list_type =~ m/\A[0-9]\z/) {
         $type = "oln";
-    } elsif ($list_type =~ m/[a-h]/) {
-        $type = "ola";
-    } elsif ($list_type =~ m/[A-H]/) {
-        $type = "olA";
-    } elsif ($list_type =~ m/[ixvl]/) {
+    } elsif ($list_type =~ m/\A[ixvl]+\z/) {
         $type = "oli";
-    } elsif ($list_type =~ m/[IXVL]/) {
+    } elsif ($list_type =~ m/\A[IXVL]+\z/) {
         $type = "olI";
+    } elsif ($list_type =~ m/\A[a-z]\z/) {
+        $type = "ola";
+    } elsif ($list_type =~ m/\A[A-Z]\z/) {
+        $type = "olA";
     } else {
         die "$type Unrecognized, fix your code\n";
     }
