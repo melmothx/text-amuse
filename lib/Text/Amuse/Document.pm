@@ -222,7 +222,8 @@ sub _parse_body {
     my @out;
     my @listpile;
   LISTP:
-    while (my $el = shift @parsed) {
+    while (@parsed) {
+        my $el = shift @parsed;
         # li, null or regular
         if ($el->type eq 'li') {
             if (@listpile) {
@@ -283,8 +284,7 @@ sub _parse_body {
         push @out, pop @listpile;
     }
 
-    my @body_no_footnotes;
-    # footnote processing
+    # now we use parsed as output
     my %footnotes;
     while (@out) {
         my $el = shift @out;
@@ -297,37 +297,36 @@ sub _parse_body {
                      . $el->string . "!" }
         }
         else {
-            push @body_no_footnotes, $el;
+            push @parsed, $el;
         }
     }
     $self->_raw_footnotes(\%footnotes);
 
     # unroll the blocks
-    while (@body_no_footnotes) {
-        my $el = shift @body_no_footnotes;
+    while (@parsed) {
+        my $el = shift @parsed;
         if ($el->can_be_regular) {
-            my $block = $el->block;
+            my ($open, $close) = $self->_create_block_pair($el->block,
+                                                           $el->indentation);
             $el->block("");
-            push @out, Text::Amuse::Element->new(type => 'startblock', block => $block);
-            push @out, $el;
-            push @out, Text::Amuse::Element->new(type => 'stopblock', block => $block);
+            push @out, $open, $el, $close;
         }
         else {
             push @out, $el;
         }
     }
 
-    my (@checked, @pile);
+    my @pile;
     while (@out) {
         my $el = shift @out;
         if ($el->type eq 'startblock') {
-            push @pile, $el->block;
+            push @pile, $self->_create_closing_block($el);
             $self->_debug("Pushing " . $el->block);
             die "Uh?\n" unless $el->block;
         }
         elsif ($el->type eq 'stopblock') {
             my $exp = pop @pile;
-            unless ($exp and $exp eq $el->block) {
+            unless ($exp and $exp->block eq $el->block) {
                 warn "Couldn't retrieve " . $el->block . " from the pile\n";
                 # put it back
                 push @pile, $exp if $exp;
@@ -337,21 +336,18 @@ sub _parse_body {
         }
         elsif (@pile and $el->should_close_blocks) {
             while (@pile) {
-                my $block = shift(@pile);
+                my $block = pop @pile;
                 warn "Forcing the closing of $block\n";
-                push @checked, Text::Amuse::Element->new(type => 'stopblock', block => $block);
+                push @parsed, $block;
             }
         }
-        push @checked, $el;
+        push @parsed, $el;
     }
     # do we still have things into the pile?
     while (@pile) {
-        my $block = shift(@pile);
-        $self->_debug("forcing the closing of $block");
-        # force the closing
-        push @checked, Text::Amuse::Element->new(type => 'stopblock', block => $block);
+        push @parsed, pop @pile;
     }
-    return \@checked;
+    return \@parsed;
 }
 
 =head2 document
