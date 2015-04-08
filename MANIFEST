@@ -65,10 +65,14 @@ t/testfiles/complete.muse
 t/testfiles/crashed-1.exp.html
 t/testfiles/crashed-1.exp.ltx
 t/testfiles/crashed-1.muse
+t/testfiles/example-2.exp.html
+t/testfiles/example-2.exp.ltx
 t/testfiles/example-2.muse
 t/testfiles/example-3.exp.html
 t/testfiles/example-3.exp.ltx
 t/testfiles/example-3.muse
+t/testfiles/example.exp.html
+t/testfiles/example.exp.ltx
 t/testfiles/example.muse
 t/testfiles/false-lists.exp.html
 t/testfiles/false-lists.exp.ltx
@@ -115,8 +119,12 @@ t/testfiles/myimage.png
 t/testfiles/nbsp.exp.html
 t/testfiles/nbsp.exp.ltx
 t/testfiles/nbsp.muse
+t/testfiles/open-letter.exp.html
+t/testfiles/open-letter.exp.ltx
 t/testfiles/open-letter.muse
 t/testfiles/other.png
+t/testfiles/packing.exp.html
+t/testfiles/packing.exp.ltx
 t/testfiles/packing.muse
 t/testfiles/pagebreaks.exp.html
 t/testfiles/pagebreaks.exp.ltx

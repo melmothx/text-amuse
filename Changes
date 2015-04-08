@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.31 2015-04-08
+
+ - Fixed long-standing bug when a visible new line is appended to the
+   <example> stanzas.
+
 0.30 2015-04-07
 
  - Refactoring of the element parsing (in context, hence the major
