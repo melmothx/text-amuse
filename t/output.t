@@ -13,7 +13,7 @@ use Data::Dumper;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 78;
+plan tests => 86;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -91,6 +91,10 @@ foreach my $testfile (qw/comments
                          unroll
                          false-lists
                          high-num-list
+                         example-2
+                         example
+                         open-letter
+                         packing
                         /) {
     test_testfile($testfile);
 }
