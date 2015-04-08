@@ -8,7 +8,7 @@ WriteMakefile(
     AUTHOR           => q{Marco Pessotto <melmothx@gmail.com>},
     VERSION_FROM     => 'lib/Text/Amuse.pm',
     ABSTRACT_FROM    => 'lib/Text/Amuse.pm',
-    LICENSE          => 'Artistic_2_0',
+    LICENSE          => 'Perl_5',
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.010001,
     CONFIGURE_REQUIRES => {
