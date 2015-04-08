@@ -1176,8 +1176,8 @@ sub blk_table {
                                                        },
                                               stop => {
                                                        tex => "\n\\stoplines\n",
-                                                       html => "\n</pre>\n",
-                                                       ltx => "\n\\end{alltt}\n\n",
+                                                       html => "</pre>\n",
+                                                       ltx => "\\end{alltt}\n\n",
                                                       },
                                              },
                                   
