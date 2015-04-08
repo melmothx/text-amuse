@@ -11,6 +11,10 @@ if ($@) {
     plan skip_all => "Devel::Size required for testing memory usage";
     exit;
 }
+elsif (!$ENV{RELEASE_TESTING}) {
+    plan skip_all => 'Not required for installation';
+    exit;
+}
 else {
     plan tests => 4;
 }
