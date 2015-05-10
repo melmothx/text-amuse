@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.32 2015-05-10
+
+ - Ignore spaces in latex output before <br>. This was causing weird
+   spacing in right and center paragraphs with <br>
+
 0.31 2015-04-08
 
  - Fixed long-standing bug when a visible new line is appended to the

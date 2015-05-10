@@ -41,7 +41,7 @@ HTML
 
 my $exptex = << 'TEX';
 
-\emph{em} \forcelinebreak  \textbf{strong} \forcelinebreak  \textbf{\emph{emStrong}} \texttt{code} \emph{em}
+\emph{em}\forcelinebreak  \textbf{strong}\forcelinebreak  \textbf{\emph{emStrong}} \texttt{code} \emph{em}
 \textbf{strong} \emph{\textbf{EmStrong}}
 \emph{em} \textbf{strong} \textbf{\emph{emStrong}} \texttt{code} \emph{em}
 \textbf{strong} \emph{\textbf{EmStrong}}

@@ -483,7 +483,7 @@ sub muse_inline_syntax_to_ltx {
     $string =~ s!<sup>(.+?)</sup>!\\textsuperscript{$1}!gs;
     $string =~ s!<sub>(.+?)</sub>!\\textsubscript{$1}!gs;
     $string =~ s!^[\s]*<br ?/?>[\s]*$!\n\\bigskip\n!gs;
-    $string =~ s!<br ?/?>!\\forcelinebreak !gs;
+    $string =~ s! *<br ?/?>!\\forcelinebreak !gs;
     return $string;
 }
 
