@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.33 2015-06-20
+
+ - Added polish support
+
 0.32 2015-05-10
 
  - Ignore spaces in latex output before <br>. This was causing weird

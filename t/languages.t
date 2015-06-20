@@ -16,7 +16,34 @@ binmode $builder->todo_output,    ":utf8";
 
 
 
-plan tests => 200;
+my %langs = (
+             en => 'english',
+             it => 'italian',
+             sr => 'serbian',
+             hr => 'croatian',
+             ru => 'russian',
+             es => 'spanish',
+             pt => 'portuges',
+             de => 'german',
+             fr => 'french',
+             nl => 'dutch',
+             mk => 'macedonian',
+             sv => 'swedish',
+             pl => 'polish',
+            );
+
+plan tests => (scalar(keys %langs) + 8) * 10;
+
+foreach my $k (keys %langs) {
+    test_lang($k, $k, $langs{$k});
+}
+
+foreach my $fake ("as", "lòasdf", "alkd", "alksdàa", "aàsdflk",  "aasdfà",  "aòlsdf" , "laò") {
+    test_lang($fake, en => "english");
+    # print $fake, "\n";
+}
+
+
 
 sub test_lang {
     my ($lang, $expected_code, $expected_lang) = @_;
@@ -51,29 +78,5 @@ sub test_lang {
     is($doc->as_latex, "\nHello\n\n", "body ok");
     ok(!$doc->other_language_codes);
     ok(!$doc->other_languages);
-}
-
-my %langs = (
-             en => 'english',
-             it => 'italian',
-             sr => 'serbian',
-             hr => 'croatian',
-             ru => 'russian',
-             es => 'spanish',
-             pt => 'portuges',
-             de => 'german',
-             fr => 'french',
-             nl => 'dutch',
-             mk => 'macedonian',
-             sv => 'swedish',
-            );
-
-foreach my $k (keys %langs) {
-    test_lang($k, $k, $langs{$k});
-}
-
-foreach my $fake ("as", "lòasdf", "alkd", "alksdàa", "aàsdflk",  "aasdfà",  "aòlsdf" , "laò") {
-    test_lang($fake, en => "english");
-    # print $fake, "\n";
 }
 
