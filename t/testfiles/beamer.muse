@@ -3,6 +3,8 @@
 #slides yes
 #test
 
+This material is just ignored
+
 * Part
 
 ** Chapter
@@ -61,5 +63,9 @@ balblabla
 
 ; noslide
 
-blab labla bal
+blab labla ignored chunck
+
+
+*** Test
+
 

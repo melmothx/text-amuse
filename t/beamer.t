@@ -6,14 +6,18 @@ use warnings;
 use Text::Amuse;
 use Data::Dumper;
 use File::Spec::Functions qw/catfile catdir/;
-use Test::More tests => 1;
+use Test::More tests => 3;
 use File::Temp;
 
 my $doc =
   Text::Amuse->new(file => catfile(t => testfiles => 'beamer.muse'),
                    debug => 0);
 
-ok($doc->as_beamer);
+my $body = $doc->as_beamer;
+ok($body, "beamer body produced");
+unlike($body, qr/ignore/, "Ignored parts are ignored");
+like($body, qr/Subsubsection.*This.*is.*the.*list/s, "Found the first list");
+
 
 if ($ENV{RELEASE_TESTING}) {
     # check if it compiles;
@@ -36,7 +40,7 @@ TEX
     my $out = 'beamer-test.tex';
     write_to_file($out, $tex, $doc->as_beamer, "\\end{document}\n");
     for (1..3) {
-        system(xelatex => $out);
+        system(xelatex => '-interaction=batchmode', $out);
     }
     $out =~ s/tex$/pdf/;
     diag "Output on " . catfile($testdir, $out). "\n";
