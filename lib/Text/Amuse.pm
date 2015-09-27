@@ -6,6 +6,7 @@ use warnings;
 # use Data::Dumper;
 use Text::Amuse::Document;
 use Text::Amuse::Output;
+use Text::Amuse::Beamer;
 
 =head1 NAME
 
@@ -210,6 +211,40 @@ sub as_latex {
     return unless defined wantarray;
     return join("", @{ $self->{_latex_output_strings} });
 }
+
+=head3 as_beamer
+
+Output the document as LaTeX, but wrap each section which doesn't
+contain a comment C<; noslide> inside a frame.
+
+The output is produced only if the header has a C<#slides> header with
+some value (e.g., 1, yes, ok, whatever) and if there is sectioning.
+
+E.g., the following will no produce slides:
+
+  #title Foo
+  #slides
+
+But this would
+
+  #title Foo
+  #slides 1
+
+The value of the header is totally insignificant.
+
+=cut
+
+sub as_beamer {
+    my $self = shift;
+    my $out = '';
+    if ($self->wants_toc && $self->header_defined->{slides}) {
+        my $latex = $self->_latex_obj->process;
+        $out = Text::Amuse::Beamer->new(latex => $latex)->process;
+    }
+    return $out;
+}
+
+
 
 =head3 wants_toc
 

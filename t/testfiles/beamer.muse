@@ -1,0 +1,54 @@
+#title My slides
+#lang it
+#slides yes
+#test
+
+* Part
+
+** Chapter
+
+*** Section
+
+**** Subsection
+
+***** Subsubsection
+
+ - This
+ - is
+ - the
+ - list
+
+**** Another
+
+ - This 1
+ - is 1 
+ - the 1
+ - list 1
+
+*** Section
+
+ - Very
+ - Important
+
+** Chapter
+
+ - Hello there
+
+*** This is ignored
+
+;  noslide
+
+This thing should be ignored
+
+** And back
+
+ - This another part
+
+*** Another ignore
+
+balblabla
+
+; noslide
+
+blab labla bal
+
