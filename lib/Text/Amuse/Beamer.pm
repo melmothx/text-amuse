@@ -100,7 +100,12 @@ sub _render {
             push @out, $el;
         }
     }
-    return join('', @out);
+    if (@out) {
+        return join('', @out);
+    }
+    else {
+        return '';
+    }
 }
 
 
