@@ -21,6 +21,4 @@ t/testfiles/build/*
 examples/*
 !examples/manual.muse
 !examples/logo.png
-
-
-
+t/beamer/*

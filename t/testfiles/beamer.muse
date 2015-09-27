@@ -32,7 +32,14 @@
 
 ** Chapter
 
+*** Subchapter
+
  - Hello there
+
+**** subsubchapter
+
+ 1. ciao
+ 2. bella
 
 *** This is ignored
 
@@ -42,7 +49,11 @@ This thing should be ignored
 
 ** And back
 
+*** Another section
+
  - This another part
+
+ - Hello world
 
 *** Another ignore
 

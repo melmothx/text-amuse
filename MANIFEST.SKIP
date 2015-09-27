@@ -30,3 +30,5 @@
 \.rej$
 t/testfiles/build/.*$
 examples/.*(html|epub|log|pdf|tex)$
+t/beamer/*
+

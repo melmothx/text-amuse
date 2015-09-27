@@ -2,6 +2,7 @@ package Text::Amuse::Beamer;
 use strict;
 use warnings;
 use utf8;
+# use Data::Dumper;
 
 =head1 NAME
 
@@ -44,8 +45,63 @@ sub latex {
 
 sub process {
     my $self = shift;
-    my $out = '';
-    return $out;
+    my $latex = $self->latex;
+    my @out;
+    # these chunks correspond to the various elements found, so if
+    # it's an heading, it's guaranteed to be this way.
+
+    my ($in_frame, $in_text, @current, $current_title);
+    # print Dumper($latex);
+    foreach my $piece (@$latex) {
+        if ($piece =~ /\A\s*\\(
+                           part|
+                           chapter|
+                           section|
+                           subsection|
+                           subsubsection)
+                       ({(.+)}\s*\z)/x) {
+            $in_frame = $3;
+            if (@current) {
+                push @out, { title => $current_title || '',
+                             body => [@current] };
+                @current = ();
+            }
+            push @out, $piece;
+            $current_title = $in_frame;
+        }
+        elsif (defined $in_frame) {
+            push @current, $piece;
+        }
+    }
+    # flush;
+    if ($in_frame && @current) {
+        push @out, { title => $current_title,
+                     body => [@current] };
+    }
+    return $self->_render(\@out);
 }
+
+sub _render {
+    my ($self, $list) = @_;
+    my @out;
+  ELEMENT:
+    foreach my $el (@$list) {
+        if (ref($el)) {
+            my $body = join('', @{$el->{body}});
+            if ($body =~ m/\\begin\{comment\}\s*;\s+noslide\s*\\end{comment}/) {
+                # and remove the previous element with the chapter
+                pop @out if @out;
+                next ELEMENT;
+            }
+            push @out, "\n\\begin{frame}{$el->{title}}\n", $body,
+              "\\end{frame}\n\n";
+        }
+        else {
+            push @out, $el;
+        }
+    }
+    return join('', @out);
+}
+
 
 1;
