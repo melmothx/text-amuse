@@ -28,6 +28,7 @@ sub new {
                 removed => '', # the portion of the string removed
                 attribute => '', # optional attribute for desclists
                 indentation => 0,
+                attribute_type => '',
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -151,6 +152,16 @@ Accessor to attribute
 
 sub attribute {
     return shift->{attribute};
+}
+
+=head2 attribute_type
+
+Accessor to attribute_type
+
+=cut
+
+sub attribute_type {
+    return shift->{attribute_type};
 }
 
 =head2 HELPERS

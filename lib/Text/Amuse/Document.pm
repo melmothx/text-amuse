@@ -215,7 +215,7 @@ sub _parse_body {
   LISTP:
     while (@parsed) {
         my $el = shift @parsed;
-        if ($el->type eq 'li') {
+        if ($el->type eq 'li' or $el->type eq 'dd') {
             if (@listpile) {
                 # same indentation, continue
                 if ($el->indentation == $listpile[$#listpile]->indentation) {
@@ -468,6 +468,25 @@ sub _parse_string {
         $element{string} = $3;
         return %element;
     }
+    if ($l =~ m/\A
+                (\x{20}+) # 1. initial space and indentation
+                (.+) # 2. desc title
+                (\x{20}+) # 3. space
+                (\:\:) # 4 . separator
+                ((\x{20}?)(.*)) # 5 6. space 7. text
+                \z
+               /xs) {
+        $self->_debug("Match! on $l");
+        $element{block} = 'dl';
+        $element{type} = 'dd';
+        $element{string} = $7;
+        $element{attribute} = $2;
+        $element{attribute_type} = 'dt';
+        $element{removed} = $1 . $2 . $3 . $4 . $6;
+        $element{indentation} = length($1) + 2;
+        $self->_debug(Dumper(\%element));
+        return %element;
+    }
     if (!$opts{nolist}) {
         if ($l =~ m/^(\x{20}+\-\x{20}+)(.*)/s) {
             $element{type} = "li";
@@ -653,7 +672,13 @@ sub _create_block {
 
 sub _opening_blocks {
     my ($self, $el) = @_;
-    my @out = ($self->_create_block(open => $el->type, $el->indentation));
+    my @out;
+    if ($el->attribute && $el->attribute_type) {
+        @out = ($self->_create_block(open => $el->attribute_type, $el->indentation),
+                Text::Amuse::Element->new(type => 'dt', string => $el->attribute),
+                $self->_create_block(close => $el->attribute_type, $el->indentation));
+    }
+    push @out, $self->_create_block(open => $el->type, $el->indentation);
     return @out;
 }
 
@@ -665,13 +690,13 @@ sub _closing_blocks {
 sub _opening_blocks_new_level {
     my ($self, $el) = @_;
     my @out = ($self->_create_block(open => $el->block, $el->indentation),
-               $self->_create_block(open => $el->type, $el->indentation ));
+               $self->_opening_blocks($el));
     return @out;
 }
 sub _closing_blocks_new_level {
     my ($self, $el) = @_;
     my @out = ($self->_create_block(close => $el->block, $el->indentation),
-               $self->_create_block(close => $el->type, $el->indentation ));
+               $self->_closing_blocks($el));
     return @out;
 }
 
