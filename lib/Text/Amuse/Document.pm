@@ -476,7 +476,6 @@ sub _parse_string {
                 ((\x{20}?)(.*)) # 5 6. space 7. text
                 \z
                /xs) {
-        $self->_debug("Match! on $l");
         $element{block} = 'dl';
         $element{type} = 'dd';
         $element{string} = $7;
@@ -484,7 +483,6 @@ sub _parse_string {
         $element{attribute_type} = 'dt';
         $element{removed} = $1 . $2 . $3 . $4 . $6;
         $element{indentation} = length($1) + 2;
-        $self->_debug(Dumper(\%element));
         return %element;
     }
     if (!$opts{nolist}) {
