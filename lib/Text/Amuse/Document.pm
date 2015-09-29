@@ -219,14 +219,13 @@ sub _parse_body {
             if (@listpile) {
                 # same indentation, continue
                 if ($el->indentation == $listpile[$#listpile]->indentation) {
-                    my ($open, $close) = $self->_create_block_pair(li => $el->indentation);
-                    push @out, $close, $open;
+                    push @out, pop @listpile, $self->_opening_blocks($el);
+                    push @listpile, $self->_closing_blocks($el);
                 }
                 # indentation is major, open a new level
                 elsif ($el->indentation > $listpile[$#listpile]->indentation) {
-                    my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
-                    push @out, $open, $openli;
-                    push @listpile, $close, $closeli;
+                    push @out, $self->_opening_blocks_new_level($el);
+                    push @listpile, $self->_closing_blocks_new_level($el);
                 }
                 # indentation is minor, pop the pile until we reach the level
                 elsif ($el->indentation < $listpile[$#listpile]->indentation) {
@@ -235,22 +234,20 @@ sub _parse_body {
                         push @out, pop @listpile;
                     }
                     if (@listpile) { # continue if open
-                        my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
-                        push @out, $closeli, $openli;
+                        push @out, pop @listpile, $self->_opening_blocks($el);
+                        push @listpile, $self->_closing_blocks($el);
                     }
                     else { # if by chance, we emptied all, start anew.
-                        my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
-                        push @out, $open, $openli;
-                        push @listpile, $close, $closeli;
+                        push @out, $self->_opening_blocks_new_level($el);
+                        push @listpile, $self->_closing_blocks_new_level($el);
                     }
                 }
                 else { die "Not reached"; }
             }
             # no list pile, this is the first element
             elsif ($self->_list_element_can_be_first($el)) {
-                my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
-                push @out, $open, $openli;
-                push @listpile, $close, $closeli;
+                push @out, $self->_opening_blocks_new_level($el);
+                push @listpile, $self->_closing_blocks_new_level($el);
             }
             else {
                 # reparse and should become quote/center/right
@@ -303,8 +300,8 @@ sub _parse_body {
     while (@parsed) {
         my $el = shift @parsed;
         if ($el->can_be_regular) {
-            my ($open, $close) = $self->_create_block_pair($el->block,
-                                                           $el->indentation);
+            my $open =  $self->_create_block(open => $el->block, $el->indentation);
+            my $close = $self->_create_block(close => $el->block, $el->indentation);
             $el->block("");
             push @out, $open, $el, $close;
         }
@@ -317,7 +314,7 @@ sub _parse_body {
     while (@out) {
         my $el = shift @out;
         if ($el->type eq 'startblock') {
-            push @pile, $self->_create_closing_block($el);
+            push @pile, $self->_create_block(close => $el->block, $el->indentation);
             $self->_debug("Pushing " . $el->block);
             die "Uh?\n" unless $el->block;
         }
@@ -654,24 +651,28 @@ sub _create_block {
                                      removed => $removed);
 }
 
-sub _create_closing_block {
+sub _opening_blocks {
     my ($self, $el) = @_;
-    return $self->_create_block(close => $el->block,
-                                $el->indentation);
+    my @out = ($self->_create_block(open => $el->type, $el->indentation));
+    return @out;
 }
 
-sub _create_block_pair {
-    my ($self, $type, $indent) = @_;
-    my $open = $self->_create_block(open => $type, $indent);
-    my $close = $self->_create_closing_block($open);
-    return ($open, $close);
-}
-
-sub _create_blocks_for_new_level {
+sub _closing_blocks {
     my ($self, $el) = @_;
-    my ($open, $close) = $self->_create_block_pair($el->block, $el->indentation);
-    my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
-    return ($open, $openli, $closeli, $close);
+    my @out = ($self->_create_block(close => $el->type, $el->indentation));
+    return @out;
+}
+sub _opening_blocks_new_level {
+    my ($self, $el) = @_;
+    my @out = ($self->_create_block(open => $el->block, $el->indentation),
+               $self->_create_block(open => $el->type, $el->indentation ));
+    return @out;
+}
+sub _closing_blocks_new_level {
+    my ($self, $el) = @_;
+    my @out = ($self->_create_block(close => $el->block, $el->indentation),
+               $self->_create_block(close => $el->type, $el->indentation ));
+    return @out;
 }
 
 1;
