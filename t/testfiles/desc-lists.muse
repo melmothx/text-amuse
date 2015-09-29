@@ -15,9 +15,8 @@ Normal text.
  - Level 1, bullet item one
    1. Level 2, enum item one
    2. Level 2, enum item two
-
-     desc :: term
-     desc []{}^_%\$# :: []{}^_%\$#
+   desc :: term
+   desc []{}^_%\$# :: []{}^_%\$#
 
  - Level 1, bullet item two
    1. Level 2, enum item three
