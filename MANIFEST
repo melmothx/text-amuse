@@ -18,6 +18,7 @@ t/broken.t
 t/caching.t
 t/changes.t
 t/context-parsing.t
+t/description-lists.t
 t/elements.t
 t/false-lists.t
 t/footnotes.t
@@ -67,6 +68,7 @@ t/testfiles/complete.muse
 t/testfiles/crashed-1.exp.html
 t/testfiles/crashed-1.exp.ltx
 t/testfiles/crashed-1.muse
+t/testfiles/desc-lists.muse
 t/testfiles/example-2.exp.html
 t/testfiles/example-2.exp.ltx
 t/testfiles/example-2.muse
