@@ -563,6 +563,8 @@ sub _identify_list_type {
 
 sub _list_element_can_be_first {
     my ($self, $el) = @_;
+    # every dd can be the first
+    return 1 if $el->type eq 'dd';
     return unless $el->type eq 'li';
     my $type = $el->block;
     my $prefix = $el->removed;
