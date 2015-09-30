@@ -225,8 +225,20 @@ sub _parse_body {
             if (@listpile) {
                 # same indentation, continue
                 if (_indentation_kinda_equal($el, $listpile[$#listpile])) {
-                    push @out, pop @listpile, $self->_opening_blocks($el);
-                    push @listpile, $self->_closing_blocks($el);
+                    if (_element_is_same_kind_as_in_list($el, \@listpile)) {
+                        push @out, pop @listpile, $self->_opening_blocks($el);
+                        push @listpile, $self->_closing_blocks($el);
+                    }
+                    else {
+                        my $top = $listpile[$#listpile];
+                        while (@listpile and _indentation_kinda_equal($top, $listpile[$#listpile])) {
+                            # empty the pile until the indentation drops.
+                            push @out, pop @listpile;
+                        }
+                        # and open a new level
+                        push @out, $self->_opening_blocks_new_level($el);
+                        push @listpile, $self->_closing_blocks_new_level($el);
+                    }
                 }
                 # indentation is major, open a new level
                 elsif (_indentation_kinda_major($el, $listpile[$#listpile])) {
@@ -488,7 +500,7 @@ sub _parse_string {
         $element{attribute} = $2;
         $element{attribute_type} = 'dt';
         $element{removed} = $1 . $2 . $3 . $4 . $6;
-        $element{indentation} = length($1) + 2;
+        $element{indentation} = length($1);
         return %element;
     }
     if (!$opts{nolist}) {
@@ -756,5 +768,21 @@ sub _compare_tolerant {
         return IEQUAL;
     }
 }
+
+sub _element_is_same_kind_as_in_list {
+    my ($el, $list) = @_;
+    my $find = $el->block;
+    my $found = 0;
+    for (my $i = $#$list; $i >= 0; $i--) {
+        my $block = $list->[$i]->block;
+        next if ($block eq 'li' or $block eq 'dd');
+        if ($block eq $find) {
+            $found = 1;
+        }
+        last;
+    }
+    return $found;
+}
+
 
 1;
