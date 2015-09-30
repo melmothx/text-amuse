@@ -4,6 +4,12 @@ use 5.010001;
 use strict;
 use warnings;
 use Text::Amuse::Element;
+use constant {
+    IMAJOR => 1,
+    IEQUAL => 0,
+    IMINOR => -1,
+};
+
 # use Data::Dumper;
 
 =head1 NAME
@@ -218,19 +224,19 @@ sub _parse_body {
         if ($el->type eq 'li' or $el->type eq 'dd') {
             if (@listpile) {
                 # same indentation, continue
-                if ($el->indentation == $listpile[$#listpile]->indentation) {
+                if (_indentation_kinda_equal($el, $listpile[$#listpile])) {
                     push @out, pop @listpile, $self->_opening_blocks($el);
                     push @listpile, $self->_closing_blocks($el);
                 }
                 # indentation is major, open a new level
-                elsif ($el->indentation > $listpile[$#listpile]->indentation) {
+                elsif (_indentation_kinda_major($el, $listpile[$#listpile])) {
                     push @out, $self->_opening_blocks_new_level($el);
                     push @listpile, $self->_closing_blocks_new_level($el);
                 }
                 # indentation is minor, pop the pile until we reach the level
-                elsif ($el->indentation < $listpile[$#listpile]->indentation) {
+                elsif (_indentation_kinda_minor($el, $listpile[$#listpile])) {
                     # close the lists until we get the the right level
-                    while(@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
+                    while(@listpile and _indentation_kinda_minor($el, $listpile[$#listpile])) {
                         push @out, pop @listpile;
                     }
                     if (@listpile) { # continue if open
@@ -259,7 +265,7 @@ sub _parse_body {
         }
         elsif ($el->type eq 'regular') {
             # the type is regular: It can only close or continue
-            while (@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
+            while (@listpile and _indentation_kinda_minor($el, $listpile[$#listpile])) {
                 push @out, pop @listpile;
             }
             if (@listpile) {
@@ -486,11 +492,12 @@ sub _parse_string {
         return %element;
     }
     if (!$opts{nolist}) {
-        if ($l =~ m/^(\x{20}+\-\x{20}+)(.*)/s) {
+        if ($l =~ m/^((\x{20}+)\-\x{20}+)(.*)/s) {
             $element{type} = "li";
             $element{removed} = $1;
-            $element{string} = $2;
+            $element{string} = $3;
             $element{block} = "ul";
+            $element{indentation} = length($2);
             return %element;
         }
         if ($l =~ m/^((\x{20}+)  # leading space and type $1
@@ -505,11 +512,11 @@ sub _parse_string {
                     (.*) # the string itself $4
                    /sx) {
             my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
-            my $indent = length($whitespace);
             $element{type} = "li";
             $element{removed} = $remove;
             $element{string} = $text;
             my $list_type = $self->_identify_list_type($prefix);
+            $element{indentation} = length($whitespace);
             $element{block} = $list_type;
             return %element;
         }
@@ -698,6 +705,56 @@ sub _closing_blocks_new_level {
     my @out = ($self->_create_block(close => $el->block, $el->indentation),
                $self->_closing_blocks($el));
     return @out;
+}
+
+sub _indentation_kinda_minor {
+    my $result = _indentation_compare(@_);
+    if ($result == IMINOR) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _indentation_kinda_major {
+    my $result = _indentation_compare(@_);
+    if ($result == IMAJOR) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _indentation_kinda_equal {
+    my $result = _indentation_compare(@_);
+    if ($result == IEQUAL) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _indentation_compare {
+    my ($first, $second) = @_;
+    my $one_indent = $first->indentation;
+    my $two_indent = $second->indentation;
+    return _compare_tolerant($one_indent, $two_indent);
+}
+
+sub _compare_tolerant {
+    my ($one_indent, $two_indent) = @_;
+    # tolerance is zero if one of them is 0
+    my $tolerance = 0;
+    if ($one_indent && $two_indent) {
+        $tolerance = 1;
+    }
+    my $diff = $one_indent - $two_indent;
+    if ($diff - $tolerance > 0) {
+        return IMAJOR;
+    }
+    elsif ($diff + $tolerance < 0) {
+        return IMINOR;
+    }
+    else {
+        return IEQUAL;
+    }
 }
 
 1;
