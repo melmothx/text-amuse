@@ -16,8 +16,8 @@ is (-1, Text::Amuse::Document::_compare_tolerant(1, 5), '1 < 5');
 is (1, Text::Amuse::Document::_compare_tolerant(5, 1), '5 > 1');
 is (0, Text::Amuse::Document::_compare_tolerant(1, 2), '1 == 2');
 
-is (-1, Text::Amuse::Document::_compare_tolerant(2, 5), '2 < 5');
-is (1, Text::Amuse::Document::_compare_tolerant(5, 2), '5 > 2');
+is (-1, Text::Amuse::Document::_compare_tolerant(2, 4), '2 < 4');
+is (1, Text::Amuse::Document::_compare_tolerant(4, 2), '4 > 2');
 is (0, Text::Amuse::Document::_compare_tolerant(2, 3), '2 == 3');
 
 is (0, Text::Amuse::Document::_compare_tolerant(3, 3), '3 == 3');
