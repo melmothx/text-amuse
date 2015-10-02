@@ -223,44 +223,37 @@ sub _parse_body {
         my $el = shift @parsed;
         if ($el->type eq 'li' or $el->type eq 'dd') {
             if (@listpile) {
-                # same indentation, continue
-                if (_indentation_kinda_equal($el, $listpile[$#listpile])) {
-                    if (_element_is_same_kind_as_in_list($el, \@listpile)) {
-                        push @out, pop @listpile, $self->_opening_blocks($el);
-                        push @listpile, $self->_closing_blocks($el);
-                    }
-                    else {
-                        my $top = $listpile[$#listpile];
-                        while (@listpile and _indentation_kinda_equal($top, $listpile[$#listpile])) {
-                            # empty the pile until the indentation drops.
-                            push @out, pop @listpile;
-                        }
-                        # and open a new level
-                        push @out, $self->_opening_blocks_new_level($el);
-                        push @listpile, $self->_closing_blocks_new_level($el);
-                    }
-                }
                 # indentation is major, open a new level
-                elsif (_indentation_kinda_major($el, $listpile[$#listpile])) {
+                if (_indentation_kinda_major($el, $listpile[$#listpile])) {
                     push @out, $self->_opening_blocks_new_level($el);
                     push @listpile, $self->_closing_blocks_new_level($el);
                 }
-                # indentation is minor, pop the pile until we reach the level
-                elsif (_indentation_kinda_minor($el, $listpile[$#listpile])) {
+                else {
                     # close the lists until we get the the right level
                     while(@listpile and _indentation_kinda_minor($el, $listpile[$#listpile])) {
                         push @out, pop @listpile;
                     }
                     if (@listpile) { # continue if open
-                        push @out, pop @listpile, $self->_opening_blocks($el);
-                        push @listpile, $self->_closing_blocks($el);
+                        if (_element_is_same_kind_as_in_list($el, \@listpile)) {
+                            push @out, pop @listpile, $self->_opening_blocks($el);
+                            push @listpile, $self->_closing_blocks($el);
+                        }
+                        else {
+                            my $top = $listpile[$#listpile];
+                            while (@listpile and _indentation_kinda_equal($top, $listpile[$#listpile])) {
+                                # empty the pile until the indentation drops.
+                                push @out, pop @listpile;
+                            }
+                            # and open a new level
+                            push @out, $self->_opening_blocks_new_level($el);
+                            push @listpile, $self->_closing_blocks_new_level($el);
+                        }
                     }
                     else { # if by chance, we emptied all, start anew.
                         push @out, $self->_opening_blocks_new_level($el);
                         push @listpile, $self->_closing_blocks_new_level($el);
                     }
                 }
-                else { die "Not reached"; }
             }
             # no list pile, this is the first element
             elsif ($self->_list_element_can_be_first($el)) {
