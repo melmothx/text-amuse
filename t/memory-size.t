@@ -48,6 +48,6 @@ ok($doc->as_latex);
 ok($doc->as_splat_html);
 
 my $totalsize = Devel::Size::total_size($doc);
-ok(($totalsize  < 40_000_000), "Size lesser than 40 Mb ("
+ok(($totalsize  < 60_000_000), "Size lesser than 60 Mb ("
    . sprintf('%0.3f', $totalsize / 1_000_000) . " Mb)");
 

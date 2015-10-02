@@ -163,6 +163,9 @@ sub process {
         elsif ($el->type eq 'standalone') {
             push @pieces, $self->manage_regular($el);
         }
+        elsif ($el->type eq 'dt') {
+            push @pieces, $self->manage_regular($el);
+        }
         elsif ($el->type =~ m/h[1-6]/) {
 
             # if we want a split html, we cut here and flush the footnotes
@@ -1372,6 +1375,36 @@ sub blk_table {
                                                ltx => "\n\n",
                                               },
                                      },
+                 dl => {
+                        start => {
+                                  ltx => "\n\\begin{description}\n",
+                                  html => "\n<dl>\n",
+                                 },
+                        stop => {
+                                 ltx => "\n\\end{description}\n",
+                                 html => "\n</dl>\n",
+                                },
+                       },
+                 dt => {
+                        start => {
+                                  ltx => "\n\\item[{",
+                                  html => "<dt>",
+                                 },
+                        stop => {
+                                 ltx => "}] ",
+                                 html => "</dt>",
+                                },
+                       },
+                 dd => {
+                        start => {
+                                  ltx => "",
+                                  html => "\n<dd>",
+                                 },
+                        stop => {
+                                 ltx => "",
+                                 html => "</dd>\n",
+                                },
+                       },
                 };
     return $table;
 }

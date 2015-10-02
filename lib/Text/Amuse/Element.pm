@@ -26,11 +26,19 @@ sub new {
                 type => 'null', # the type
                 string => '',      # the string
                 removed => '', # the portion of the string removed
+                attribute => '', # optional attribute for desclists
+                indentation => 0,
+                attribute_type => '',
                };
+    my %provided;
     foreach my $accessor (keys %$self) {
         if (exists $args{$accessor} and defined $args{$accessor}) {
             $self->{$accessor} = $args{$accessor};
+            $provided{$accessor} = 1;
         }
+    }
+    unless ($provided{indentation}) {
+        $self->{indentation} = length($self->{removed});
     }
     bless $self, $class;
 }
@@ -120,7 +128,7 @@ The portion of the string stripped out
 sub removed {
     my $self = shift;
     if (@_) {
-        $self->{removed} = shift;
+        die "Read only attribute!";
     }
     return $self->{removed};
 }
@@ -132,8 +140,28 @@ The indentation level, as a numerical value
 =cut
 
 sub indentation {
-    my $self = shift;
-    return length($self->removed);
+    return shift->{indentation};
+}
+
+
+=head2 attribute
+
+Accessor to attribute
+
+=cut
+
+sub attribute {
+    return shift->{attribute};
+}
+
+=head2 attribute_type
+
+Accessor to attribute_type
+
+=cut
+
+sub attribute_type {
+    return shift->{attribute_type};
 }
 
 =head2 HELPERS

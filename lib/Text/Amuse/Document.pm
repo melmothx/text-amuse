@@ -4,6 +4,12 @@ use 5.010001;
 use strict;
 use warnings;
 use Text::Amuse::Element;
+use constant {
+    IMAJOR => 1,
+    IEQUAL => 0,
+    IMINOR => -1,
+};
+
 # use Data::Dumper;
 
 =head1 NAME
@@ -215,42 +221,44 @@ sub _parse_body {
   LISTP:
     while (@parsed) {
         my $el = shift @parsed;
-        if ($el->type eq 'li') {
+        if ($el->type eq 'li' or $el->type eq 'dd') {
             if (@listpile) {
-                # same indentation, continue
-                if ($el->indentation == $listpile[$#listpile]->indentation) {
-                    my ($open, $close) = $self->_create_block_pair(li => $el->indentation);
-                    push @out, $close, $open;
-                }
                 # indentation is major, open a new level
-                elsif ($el->indentation > $listpile[$#listpile]->indentation) {
-                    my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
-                    push @out, $open, $openli;
-                    push @listpile, $close, $closeli;
+                if (_indentation_kinda_major($el, $listpile[$#listpile])) {
+                    push @out, $self->_opening_blocks_new_level($el);
+                    push @listpile, $self->_closing_blocks_new_level($el);
                 }
-                # indentation is minor, pop the pile until we reach the level
-                elsif ($el->indentation < $listpile[$#listpile]->indentation) {
+                else {
                     # close the lists until we get the the right level
-                    while(@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
+                    while(@listpile and _indentation_kinda_minor($el, $listpile[$#listpile])) {
                         push @out, pop @listpile;
                     }
                     if (@listpile) { # continue if open
-                        my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
-                        push @out, $closeli, $openli;
+                        if (_element_is_same_kind_as_in_list($el, \@listpile)) {
+                            push @out, pop @listpile, $self->_opening_blocks($el);
+                            push @listpile, $self->_closing_blocks($el);
+                        }
+                        else {
+                            my $top = $listpile[$#listpile];
+                            while (@listpile and _indentation_kinda_equal($top, $listpile[$#listpile])) {
+                                # empty the pile until the indentation drops.
+                                push @out, pop @listpile;
+                            }
+                            # and open a new level
+                            push @out, $self->_opening_blocks_new_level($el);
+                            push @listpile, $self->_closing_blocks_new_level($el);
+                        }
                     }
                     else { # if by chance, we emptied all, start anew.
-                        my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
-                        push @out, $open, $openli;
-                        push @listpile, $close, $closeli;
+                        push @out, $self->_opening_blocks_new_level($el);
+                        push @listpile, $self->_closing_blocks_new_level($el);
                     }
                 }
-                else { die "Not reached"; }
             }
             # no list pile, this is the first element
             elsif ($self->_list_element_can_be_first($el)) {
-                my ($open, $openli, $closeli, $close) = $self->_create_blocks_for_new_level($el);
-                push @out, $open, $openli;
-                push @listpile, $close, $closeli;
+                push @out, $self->_opening_blocks_new_level($el);
+                push @listpile, $self->_closing_blocks_new_level($el);
             }
             else {
                 # reparse and should become quote/center/right
@@ -262,7 +270,7 @@ sub _parse_body {
         }
         elsif ($el->type eq 'regular') {
             # the type is regular: It can only close or continue
-            while (@listpile and $el->indentation < $listpile[$#listpile]->indentation) {
+            while (@listpile and _indentation_kinda_minor($el, $listpile[$#listpile])) {
                 push @out, pop @listpile;
             }
             if (@listpile) {
@@ -303,8 +311,8 @@ sub _parse_body {
     while (@parsed) {
         my $el = shift @parsed;
         if ($el->can_be_regular) {
-            my ($open, $close) = $self->_create_block_pair($el->block,
-                                                           $el->indentation);
+            my $open =  $self->_create_block(open => $el->block, $el->indentation);
+            my $close = $self->_create_block(close => $el->block, $el->indentation);
             $el->block("");
             push @out, $open, $el, $close;
         }
@@ -317,7 +325,7 @@ sub _parse_body {
     while (@out) {
         my $el = shift @out;
         if ($el->type eq 'startblock') {
-            push @pile, $self->_create_closing_block($el);
+            push @pile, $self->_create_block(close => $el->block, $el->indentation);
             $self->_debug("Pushing " . $el->block);
             die "Uh?\n" unless $el->block;
         }
@@ -471,12 +479,30 @@ sub _parse_string {
         $element{string} = $3;
         return %element;
     }
+    if ($l =~ m/\A
+                (\x{20}+) # 1. initial space and indentation
+                (.+) # 2. desc title
+                (\x{20}+) # 3. space
+                (\:\:) # 4 . separator
+                ((\x{20}?)(.*)) # 5 6. space 7. text
+                \z
+               /xs) {
+        $element{block} = 'dl';
+        $element{type} = 'dd';
+        $element{string} = $7;
+        $element{attribute} = $2;
+        $element{attribute_type} = 'dt';
+        $element{removed} = $1 . $2 . $3 . $4 . $6;
+        $element{indentation} = length($1);
+        return %element;
+    }
     if (!$opts{nolist}) {
-        if ($l =~ m/^(\x{20}+\-\x{20}+)(.*)/s) {
+        if ($l =~ m/^((\x{20}+)\-\x{20}+)(.*)/s) {
             $element{type} = "li";
             $element{removed} = $1;
-            $element{string} = $2;
+            $element{string} = $3;
             $element{block} = "ul";
+            $element{indentation} = length($2);
             return %element;
         }
         if ($l =~ m/^((\x{20}+)  # leading space and type $1
@@ -491,11 +517,11 @@ sub _parse_string {
                     (.*) # the string itself $4
                    /sx) {
             my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
-            my $indent = length($whitespace);
             $element{type} = "li";
             $element{removed} = $remove;
             $element{string} = $text;
             my $list_type = $self->_identify_list_type($prefix);
+            $element{indentation} = length($whitespace);
             $element{block} = $list_type;
             return %element;
         }
@@ -549,6 +575,8 @@ sub _identify_list_type {
 
 sub _list_element_can_be_first {
     my ($self, $el) = @_;
+    # every dd can be the first
+    return 1 if $el->type eq 'dd';
     return unless $el->type eq 'li';
     my $type = $el->block;
     my $prefix = $el->removed;
@@ -654,24 +682,100 @@ sub _create_block {
                                      removed => $removed);
 }
 
-sub _create_closing_block {
+sub _opening_blocks {
     my ($self, $el) = @_;
-    return $self->_create_block(close => $el->block,
-                                $el->indentation);
+    my @out;
+    if ($el->attribute && $el->attribute_type) {
+        @out = ($self->_create_block(open => $el->attribute_type, $el->indentation),
+                Text::Amuse::Element->new(type => 'dt', string => $el->attribute),
+                $self->_create_block(close => $el->attribute_type, $el->indentation));
+    }
+    push @out, $self->_create_block(open => $el->type, $el->indentation);
+    return @out;
 }
 
-sub _create_block_pair {
-    my ($self, $type, $indent) = @_;
-    my $open = $self->_create_block(open => $type, $indent);
-    my $close = $self->_create_closing_block($open);
-    return ($open, $close);
+sub _closing_blocks {
+    my ($self, $el) = @_;
+    my @out = ($self->_create_block(close => $el->type, $el->indentation));
+    return @out;
+}
+sub _opening_blocks_new_level {
+    my ($self, $el) = @_;
+    my @out = ($self->_create_block(open => $el->block, $el->indentation),
+               $self->_opening_blocks($el));
+    return @out;
+}
+sub _closing_blocks_new_level {
+    my ($self, $el) = @_;
+    my @out = ($self->_create_block(close => $el->block, $el->indentation),
+               $self->_closing_blocks($el));
+    return @out;
 }
 
-sub _create_blocks_for_new_level {
-    my ($self, $el) = @_;
-    my ($open, $close) = $self->_create_block_pair($el->block, $el->indentation);
-    my ($openli, $closeli) = $self->_create_block_pair(li => $el->indentation);
-    return ($open, $openli, $closeli, $close);
+sub _indentation_kinda_minor {
+    my $result = _indentation_compare(@_);
+    if ($result == IMINOR) {
+        return 1;
+    }
+    return 0;
 }
+
+sub _indentation_kinda_major {
+    my $result = _indentation_compare(@_);
+    if ($result == IMAJOR) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _indentation_kinda_equal {
+    my $result = _indentation_compare(@_);
+    if ($result == IEQUAL) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _indentation_compare {
+    my ($first, $second) = @_;
+    my $one_indent = $first->indentation;
+    my $two_indent = $second->indentation;
+    return _compare_tolerant($one_indent, $two_indent);
+}
+
+sub _compare_tolerant {
+    my ($one_indent, $two_indent) = @_;
+    # tolerance is zero if one of them is 0
+    my $tolerance = 0;
+    if ($one_indent && $two_indent) {
+        $tolerance = 1;
+    }
+    my $diff = $one_indent - $two_indent;
+    if ($diff - $tolerance > 0) {
+        return IMAJOR;
+    }
+    elsif ($diff + $tolerance < 0) {
+        return IMINOR;
+    }
+    else {
+        return IEQUAL;
+    }
+}
+
+sub _element_is_same_kind_as_in_list {
+    my ($el, $list) = @_;
+    my $find = $el->block;
+    my $found = 0;
+    for (my $i = $#$list; $i >= 0; $i--) {
+        my $block = $list->[$i]->block;
+        next if ($block eq 'li' or $block eq 'dd');
+        if ($block eq $find) {
+            $found = 1;
+        }
+        last;
+    }
+    return $found;
+}
+
 
 1;
