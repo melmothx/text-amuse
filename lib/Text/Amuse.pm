@@ -419,7 +419,8 @@ sub hyphenation {
 
 The updated manual can be found at
 L<http://www.amusewiki.org/library/manual> and is also present between
-the test files (C<t/testfiles/manual.muse>).
+the test files (C<t/testfiles/manual.muse>), even if is just seldom
+updated.
 
 =head3 Inline markup
 
@@ -431,8 +432,6 @@ Emphasis and strong can also be written with tags, like <em>emphasis</em>,
 Added tag <sup> and <sub> for superscript and subscript.
 
 =head3 Block markup
-
-Description lists have been dropped. (Lists work as usual).
 
 The only tables supported are the native one (with ||| as separator).
 
