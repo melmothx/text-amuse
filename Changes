@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.41 2015-10-03
+
+ - Made all the beamer frames fragile
+ - Doc fixes
+
 0.40 2015-10-03
 
  - Added as_beamer method

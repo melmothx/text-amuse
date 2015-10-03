@@ -14,11 +14,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.40
+Version 0.41
 
 =cut
 
-our $VERSION = '0.40';
+our $VERSION = '0.41';
 
 
 =head1 SYNOPSIS

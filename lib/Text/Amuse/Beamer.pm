@@ -93,7 +93,7 @@ sub _render {
                 pop @out if @out;
                 next ELEMENT;
             }
-            push @out, "\n\\begin{frame}{$el->{title}}\n", $body,
+            push @out, "\n\\begin{frame}[fragile]{$el->{title}}\n", $body,
               "\\end{frame}\n\n";
         }
         else {
