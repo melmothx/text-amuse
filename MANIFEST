@@ -146,6 +146,9 @@ t/testfiles/recursiv.muse
 t/testfiles/right.exp.html
 t/testfiles/right.exp.ltx
 t/testfiles/right.muse
+t/testfiles/special-chars.exp.html
+t/testfiles/special-chars.exp.ltx
+t/testfiles/special-chars.muse
 t/testfiles/special.exp.html
 t/testfiles/special.exp.ltx
 t/testfiles/special.muse
