@@ -13,7 +13,7 @@ use Data::Dumper;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 92;
+plan tests => 94;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -55,6 +55,7 @@ is($document->as_latex, $exptex);
 
 
 foreach my $testfile (qw/comments
+                         special-chars
                          footnotes
                          verse
                          example-3
