@@ -432,9 +432,9 @@ sub escape_tex {
     $string =~ s/%/\\%/g;
     $string =~ s/&/\\&/g;
     $string =~ s/_/\\_/g ;
-    $string =~ s/{/\\{/g ;
-    $string =~ s/}/\\}/g ;
-    $string =~ s/\\textbackslash\\{\\}/\\textbackslash{}/g;
+    $string =~ s/\{/\\{/g ;
+    $string =~ s/\}/\\}/g ;
+    $string =~ s/\\textbackslash\\\{\\\}/\\textbackslash{}/g;
     $string =~ s/~/\\textasciitilde{}/g ;
     $string =~ s/\^/\\^{}/g ;
     $string =~ s/\|/\\textbar{}/g;
