@@ -1,5 +1,11 @@
 Revision history for perl module Text::Amuse
 
+0.43 2015-10-13
+
+ - Optionally use Text::Diff in t/output.t
+ - Test the full output of beamer
+ - Be more tolerant when detecting ignored sections in slides
+
 0.42 2015-10-10
 
  - Fixed warnings on newer perls for unescaped left brace in regex.
