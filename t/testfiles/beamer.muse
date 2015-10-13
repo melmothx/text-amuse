@@ -61,7 +61,7 @@ This thing should be ignored
 
 balblabla
 
-; noslide
+; no SlIdeS
 
 blab labla ignored chunck
 
