@@ -6,6 +6,11 @@ use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
 
+eval "use Text::Diff;";
+my $use_diff;
+if (!$@) {
+    $use_diff = 1;
+}
  # my $builder = Test::More->builder;
  # binmode $builder->output,         ":utf8";
  # binmode $builder->failure_output, ":utf8";
@@ -13,7 +18,7 @@ use Data::Dumper;
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 94;
+plan tests => 97;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -99,6 +104,7 @@ foreach my $testfile (qw/comments
                          lists-2
                          lists-3
                          desc-lists
+                         beamer
                         /) {
     test_testfile($testfile);
 }
@@ -115,12 +121,19 @@ sub test_testfile {
     }
     my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
     my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
-    my @exp = split /\n/, $latex;
-    my @got = split /\n/, $document->as_latex;
-    is_deeply (\@got, \@exp, "LaTex for $base OK") or diag Dumper(\@got, \@exp);
-    @exp = split /\n/, $html;
-    @got = split /\n/, $document->as_html;
-    is_deeply (\@got, \@exp, "HTML for $base OK") or diag Dumper(\@got, \@exp);
+    my $beamer_file = catfile(t => testfiles => "$base.exp.sl.tex");
+    my $got_latex = $document->as_latex;
+    ok ($got_latex eq $latex, "LaTex for $base OK")
+      or show_diff($got_latex, $latex);
+    my $got_html = $document->as_html;
+    ok ($got_html eq $html, "HTML for $base OK")
+      or show_diff($got_html, $html);
+    if (-f $beamer_file) {
+        my $beamer = read_file($beamer_file);
+        my $got_beamer = $document->as_beamer;
+        ok($got_beamer eq $beamer, "Beamer for $base OK")
+          or show_diff($got_beamer, $beamer);
+    }
 }
 
 sub write_to_file {
@@ -137,4 +150,14 @@ sub read_file {
     my $string = <$fh>;
     close $fh;
     return $string;
+}
+
+sub show_diff {
+    my ($got, $exp) = @_;
+    if ($use_diff) {
+        diag diff(\$exp, \$got, { STYLE => 'Unified' });
+    }
+    else {
+        diag "GOT:\n$got\n\nEXP:\n$exp\n\n";
+    }
 }

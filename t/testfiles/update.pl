@@ -3,6 +3,10 @@ use strict;
 use warnings;
 use lib '../../lib';
 use Text::Amuse;
+use Getopt::Long;
+
+my $beamer;
+GetOptions (beamer => 1) or die;
 
 foreach my $f (@ARGV) {
     next unless -f $f;
@@ -11,6 +15,7 @@ foreach my $f (@ARGV) {
         my $out = $1 . ".exp";
         write_file($out . ".html", $amuse->as_html);
         write_file($out . ".ltx", $amuse->as_latex);
+        write_file($out . ".sl.tex", $amuse->as_beamer) if $beamer;
     }
 }
 
