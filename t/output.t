@@ -119,15 +119,20 @@ sub test_testfile {
         write_to_file(catfile(tmpdir() => "$base.out.ltx"),
                       $document->as_latex);
     }
-    my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
-    my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
+
+    {
+        my $got_latex = $document->as_latex;
+        my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
+        ok ($got_latex eq $latex, "LaTex for $base OK")
+          or show_diff($got_latex, $latex);
+    }
+    {
+        my $got_html = $document->as_html;
+        my $html = read_file(catfile(t => testfiles => "$base.exp.html"));
+        ok ($got_html eq $html, "HTML for $base OK")
+          or show_diff($got_html, $html);
+    }
     my $beamer_file = catfile(t => testfiles => "$base.exp.sl.tex");
-    my $got_latex = $document->as_latex;
-    ok ($got_latex eq $latex, "LaTex for $base OK")
-      or show_diff($got_latex, $latex);
-    my $got_html = $document->as_html;
-    ok ($got_html eq $html, "HTML for $base OK")
-      or show_diff($got_html, $html);
     if (-f $beamer_file) {
         my $beamer = read_file($beamer_file);
         my $got_beamer = $document->as_beamer;
