@@ -2,6 +2,11 @@ Revision history for perl module Text::Amuse
 
 0.51 2015-12-04
 
+ - Fixed obvious bug with partial index == 0
+
+
+0.51 2015-12-04
+
  - Handle the raw_html_toc taking care of the partial option
 
 0.50 2015-12-04

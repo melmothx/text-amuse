@@ -15,13 +15,20 @@ my @files = map { catfile($dir, $_) }
   grep { /\.muse$/ } readdir $dh;
 closedir $dh;
 
-plan tests => scalar(@files) * 4;
+plan tests => scalar(@files) * 5;
 
 foreach my $file (@files) {
-    # diag "Testing $file";
+    # check html as well while we're at this....
+    {
+        my $doc = Text::Amuse->new(file => $file);
+        my @toc = $doc->raw_html_toc;
+        my @html = $doc->as_splat_html;
+        is (scalar(@toc), scalar(@html), "pieces and toc match");
+    }
+
     my $doc = Text::Amuse->new(file => $file);
     my $full = $doc->as_latex;
-    ok ($full);
+    ok ($full, "latex found");
     my @chunks = $doc->as_splat_latex;
     my @empty_chunks = grep { !$_ } @chunks;
     ok (!@empty_chunks, "No empty chunks found");

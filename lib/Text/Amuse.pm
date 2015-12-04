@@ -14,11 +14,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.51
+Version 0.52
 
 =cut
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 
 =head1 SYNOPSIS
@@ -79,7 +79,7 @@ sub new {
         die "partial needs an arrayref" unless ref($chunks) eq 'ARRAY';
         my %partials;
         foreach my $chunk (@$chunks) {
-            if ($chunk and $chunk =~ m/\A([0-9]|[1-9][0-9]+)\z/) {
+            if (defined $chunk and $chunk =~ m/\A([0-9]|[1-9][0-9]+)\z/) {
                 $partials{$1} = 1;
             }
             else {

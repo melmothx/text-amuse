@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 21;
+use Test::More tests => 23;
 use Text::Amuse;
 use File::Temp;
 use Data::Dumper;
@@ -92,23 +92,25 @@ close $fh;
 
 {
     my $doc = eval { Text::Amuse->new(file => $fh->filename,
-                                      partial => [qw/1 3 9 100/]) };
+                                      partial => [qw/0 1 3 9 100/]) };
     ok (!$@, "doc created") or diag $@;
     ok $doc;
-    is_deeply($doc->partials, { 1 => 1, 3 => 1, 9 => 1, 100 => 1 }, "Partials are good");
+    is_deeply($doc->partials, { 0 => 1, 1 => 1, 3 => 1, 9 => 1, 100 => 1 },
+              "Partials are good");
     foreach my $method (qw/as_splat_html as_splat_latex/) {
         my @chunks = $doc->$method;
-        is (scalar(@chunks), 3, "Found 3 chunks");
+        is (scalar(@chunks), 4, "Found 4 chunks");
         my @toc = $doc->raw_html_toc;
         is (scalar(@toc), scalar(@chunks), "Toc matches!");
-        like ($chunks[0], qr{\(1\).*\(1\)}s);
-        like ($chunks[1], qr{\(3\).*\(3\)}s);
-        like ($chunks[2], qr{\(9\).*\(9\)}s);
+        like ($chunks[0], qr{\(0\)}s);
+        like ($chunks[1], qr{\(1\).*\(1\)}s);
+        like ($chunks[2], qr{\(3\).*\(3\)}s);
+        like ($chunks[3], qr{\(9\).*\(9\)}s);
     }
     foreach my $method (qw/as_html as_latex/) {
         my $body = $doc->$method;
-        like $body, qr{\(1\).*\(1\).*\(3\).*\(3\).*\(9\).*\(9\)}s, "$method ok with keys";
-        unlike $body, qr{\([2456780]+\)}, "full $method without excluded kes ok";
+        like $body, qr{\(0\).*\(1\).*\(1\).*\(3\).*\(3\).*\(9\).*\(9\)}s, "$method ok with keys";
+        unlike $body, qr{\([245678]+\)}, "full $method without excluded kes ok";
     }
 }
 
