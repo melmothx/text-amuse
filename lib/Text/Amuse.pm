@@ -63,6 +63,8 @@ you need to pass strings.
 Optionally, accept a C<partial> option pointing to an arrayref of
 integers, meaning that only those chunks will be needed.
 
+The beamer output doesn't take C<partial> in account.
+
 =cut
 
 sub new {
@@ -71,6 +73,7 @@ sub new {
     my $self = {
                 file => $opts{file},
                 debug => $opts{debug},
+                partials => undef,
                };
     if (my $chunks = $opts{partial}) {
         die "partial needs an arrayref" unless ref($chunks) eq 'ARRAY';
@@ -148,14 +151,29 @@ sub _html_obj {
     return $self->{_html_doc};
 }
 
+sub _get_body {
+    my ($self, $doc, $split) = @_;
+    if (my $partials = $self->partials) {
+        my @chunks = @{ $doc->process(split => 1) };
+        my @out;
+        for (my $i = 0; $i < @chunks; $i++) {
+            push @out, $chunks[$i] if $partials->{$i};
+        }
+        return \@out;
+    }
+    else {
+        return $doc->process(split => $split);
+    }
+}
+
 sub _get_full_body {
     my ($self, $doc) = @_;
-    return $doc->process;
+    return $self->_get_body($doc => 0);
 }
 
 sub _get_splat_body {
     my ($self, $doc) = @_;
-    return $doc->process(split => 1);
+    return $self->_get_body($doc => 1);
 }
 
 

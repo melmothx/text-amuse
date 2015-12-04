@@ -6,6 +6,7 @@ use utf8;
 use Test::More;
 use Text::Amuse;
 use File::Temp;
+use Data::Dumper;
 
 my $muse = <<'MUSE';
 #title The title
@@ -88,7 +89,7 @@ close $fh;
                                       partial => [qw/1 3 9 100/]) };
     ok (!$@, "doc created") or diag $@;
     ok $doc;
-    next;
+    is_deeply($doc->partials, { 1 => 1, 3 => 1, 9 => 1, 100 => 1 }, "Partials are good");
     foreach my $method (qw/as_splat_html as_splat_latex/) {
         my @chunks = $doc->$method;
         is (scalar(@chunks), 3, "Found 3 chunks");
@@ -98,8 +99,8 @@ close $fh;
     }
     foreach my $method (qw/as_html as_latex/) {
         my $body = $doc->$method;
-        like $body, qr{\(1\).*\(1\).*\(3\).*\(3\).*\(9\).*\(9\)}s;
-        unlike $body, qr{\([2456780]+\)};
+        like $body, qr{\(1\).*\(1\).*\(3\).*\(3\).*\(9\).*\(9\)}s, "$method ok with keys";
+        unlike $body, qr{\([2456780]+\)}, "full $method without excluded kes ok";
     }
 }
 
