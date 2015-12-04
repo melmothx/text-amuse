@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 23;
+use Test::More tests => 26;
 use Text::Amuse;
 use File::Temp;
 use Data::Dumper;
@@ -112,5 +112,8 @@ close $fh;
         like $body, qr{\(0\).*\(1\).*\(1\).*\(3\).*\(3\).*\(9\).*\(9\)}s, "$method ok with keys";
         unlike $body, qr{\([245678]+\)}, "full $method without excluded kes ok";
     }
+    like $doc->toc_as_html, qr{toc1.*toc3.*toc9}s, "toc as 1,3,9 anchors";
+    unlike $doc->toc_as_html, qr{toc0}, "toc is missing the 0 anchor";
+    unlike $doc->toc_as_html, qr{toc[245678]}, "toc is missing the other anchors";
 }
 
