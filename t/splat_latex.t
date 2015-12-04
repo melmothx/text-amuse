@@ -18,7 +18,7 @@ closedir $dh;
 plan tests => scalar(@files) * 4;
 
 foreach my $file (@files) {
-    diag "Testing $file";
+    # diag "Testing $file";
     my $doc = Text::Amuse->new(file => $file);
     my $full = $doc->as_latex;
     ok ($full);

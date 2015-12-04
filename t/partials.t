@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More;
+use Test::More tests => 19;
 use Text::Amuse;
 use File::Temp;
 use Data::Dumper;
@@ -86,6 +86,12 @@ close $fh;
 
 {
     my $doc = eval { Text::Amuse->new(file => $fh->filename,
+                                      partial => []) };
+    ok (!$doc->partials, "No partials found with empty list");
+}
+
+{
+    my $doc = eval { Text::Amuse->new(file => $fh->filename,
                                       partial => [qw/1 3 9 100/]) };
     ok (!$@, "doc created") or diag $@;
     ok $doc;
@@ -104,4 +110,3 @@ close $fh;
     }
 }
 
-done_testing;
