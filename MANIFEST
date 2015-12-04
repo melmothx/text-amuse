@@ -35,10 +35,12 @@ t/memory-size.t
 t/muse-to-object.t
 t/on-the-fly.t
 t/output.t
+t/partials.t
 t/pod-coverage.t
 t/pod.t
 t/regexp.t
 t/splat.t
+t/splat_latex.t
 t/tables.t
 t/testfiles/10_theses.exp.html
 t/testfiles/10_theses.exp.ltx

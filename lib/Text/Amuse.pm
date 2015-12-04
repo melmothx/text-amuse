@@ -60,13 +60,34 @@ C<file>, pointing to a muse file to process. Please note that you
 can't pass a string. Build a wrapper going through a temporary file if
 you need to pass strings.
 
+Optionally, accept a C<partial> option pointing to an arrayref of
+integers, meaning that only those chunks will be needed.
+
 =cut
 
 sub new {
     my $class = shift;
     my %opts = @_;
-    my $self = \%opts;
-    # for now
+    my $self = {
+                file => $opts{file},
+                debug => $opts{debug},
+               };
+    if (my $chunks = $opts{partial}) {
+        die "partial needs an arrayref" unless ref($chunks) eq 'ARRAY';
+        my %partials;
+        foreach my $chunk (@$chunks) {
+            if ($chunk and $chunk =~ m/\A([0-9]|[1-9][0-9]+)\z/) {
+                $partials{$1} = 1;
+            }
+            else {
+                die "Partials should be integers";
+            }
+        }
+        if (%partials) {
+            $self->{partials} = \%partials;
+        }
+    }
+
     $self->{_document_obj} =
       Text::Amuse::Document->new(file => $self->{file},
                                  debug => $self->{debug});
@@ -81,10 +102,25 @@ Accessor to the L<Text::Amuse::Document> object. [Internal]
 
 Accessor to the file passed in the constructor (read-only)
 
+=head3 partials
+
+Return an hashref where the keys are the chunk indexes and the values
+are true, undef otherwise.
+
 =cut
 
 sub document {
     return shift->{_document_obj};
+}
+
+sub partials {
+    my $self = shift;
+    if (my $partials = $self->{partials}) {
+        return { %$partials };
+    }
+    else {
+        return undef;
+    }
 }
 
 sub file {
@@ -112,11 +148,21 @@ sub _html_obj {
     return $self->{_html_doc};
 }
 
+sub _get_full_body {
+    my ($self, $doc) = @_;
+    return $doc->process;
+}
+
+sub _get_splat_body {
+    my ($self, $doc) = @_;
+    return $doc->process(split => 1);
+}
+
 
 sub as_html {
     my $self = shift;
     unless (defined $self->{_html_output_strings}) {
-        $self->{_html_output_strings} = $self->_html_obj->process;
+        $self->{_html_output_strings} = $self->_get_full_body($self->_html_obj);
     }
     return unless defined wantarray;
     return join("", @{ $self->{_html_output_strings} });
@@ -164,7 +210,7 @@ the end of each page.
 
 sub as_splat_html {
     my $self = shift;
-    return @{ $self->_html_obj->process(split => 1) };
+    return @{ $self->_get_splat_body($self->_html_obj) };
 }
 
 
@@ -213,7 +259,7 @@ the splitting of the as_latex output.
 sub as_latex {
     my $self = shift;
     unless (defined $self->{_latex_output_strings}) {
-        $self->{_latex_output_strings} = $self->_latex_obj->process;
+        $self->{_latex_output_strings} = $self->_get_full_body($self->_latex_obj);
     }
     return unless defined wantarray;
     return join("", @{ $self->{_latex_output_strings} });
@@ -221,7 +267,7 @@ sub as_latex {
 
 sub as_splat_latex {
     my $self = shift;
-    return @{ $self->_latex_obj->process(split => 1) };
+    return @{ $self->_get_splat_body($self->_latex_obj) };
 }
 
 =head3 as_beamer
