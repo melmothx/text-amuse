@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.53 UNRELEASED
+
+ - Handle the HTML toc with partials
+
 0.52 2015-12-04
 
  - Fixed obvious bug with partial index == 0
