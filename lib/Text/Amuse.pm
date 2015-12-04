@@ -14,11 +14,11 @@ Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse m
 
 =head1 VERSION
 
-Version 0.50
+Version 0.51
 
 =cut
 
-our $VERSION = '0.50';
+our $VERSION = '0.51';
 
 
 =head1 SYNOPSIS
@@ -240,11 +240,31 @@ Return an internal representation of the ToC
 
 sub raw_html_toc {
     my $self = shift;
-    $self->as_html;
-    return $self->_html_obj->table_of_contents;
+    my $html = $self->_html_obj;
+    my @pieces = @{ $html->process(split => 1) };
+    my @toc = $html->table_of_contents;
+    my $missing = scalar(@pieces) - scalar(@toc);
+    if ($missing) {
+        if ($missing == 1) {
+            unshift @toc, {
+                           index => 0,
+                           level => 2,
+                           string => "start body",
+                          };
+        }
+        else {
+            die "This shouldn't happen: missing pieces: $missing!";
+        }
+    }
+    if (my $partials = $self->partials) {
+        my @out;
+        for (my $i = 0; $i < @toc; $i++) {
+            push @out, $toc[$i] if $partials->{$i};
+        }
+        return @out;
+    }
+    return @toc;
 }
-
-
 
 =head2 LaTeX output
 

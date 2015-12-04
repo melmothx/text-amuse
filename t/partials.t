@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 19;
+use Test::More tests => 21;
 use Text::Amuse;
 use File::Temp;
 use Data::Dumper;
@@ -99,6 +99,8 @@ close $fh;
     foreach my $method (qw/as_splat_html as_splat_latex/) {
         my @chunks = $doc->$method;
         is (scalar(@chunks), 3, "Found 3 chunks");
+        my @toc = $doc->raw_html_toc;
+        is (scalar(@toc), scalar(@chunks), "Toc matches!");
         like ($chunks[0], qr{\(1\).*\(1\)}s);
         like ($chunks[1], qr{\(3\).*\(3\)}s);
         like ($chunks[2], qr{\(9\).*\(9\)}s);

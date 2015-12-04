@@ -5,7 +5,7 @@ use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
 
-plan tests => 11;
+plan tests => 13;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'headings.muse'));
@@ -84,5 +84,23 @@ ok(!$document->toc_as_html);
 ok($document->as_latex);
 ok(!$document->wants_toc);
 is($document->toc_as_html, "");
+my @toc = $document->raw_html_toc;
+is_deeply(\@toc, [
+                  {
+                   'string' => 'start body',
+                   'level' => 2,
+                   'index' => 0
+                  },
+                 ], "no toc, but raw toc has 1 entry with index 0");
 
+
+$document =
+  Text::Amuse->new(file => catfile(t => testfiles => 'beamer.muse'));
+@toc = $document->raw_html_toc;
+is_deeply($toc[0],
+          {
+           'string' => 'start body',
+           'level' => 2,
+           'index' => 0
+          }, "content before headers have index 0");
 

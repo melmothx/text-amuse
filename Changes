@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.51 2015-12-04
+
+ - Handle the raw_html_toc taking care of the partial option
+
 0.50 2015-12-04
 
  - Implemented method as_splat_latex
