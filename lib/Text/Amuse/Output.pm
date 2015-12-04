@@ -97,6 +97,24 @@ sub fmt {
     return shift->{fmt};
 }
 
+=head3 is_html
+
+True if the format is html
+
+=head3 is_latex
+
+True if the format is latex
+
+=cut
+
+sub is_latex {
+    return shift->fmt eq 'ltx';
+}
+
+sub is_html {
+    return shift->fmt eq 'html';
+}
+
 =head3 process
 
 This method returns a array ref with the processed chunks. To get
@@ -125,9 +143,7 @@ E.g.
 sub process {
     my ($self, %opts) = @_;
     my (@pieces, @splat, $splithtml);
-    if ($opts{split} and $self->fmt eq 'html') {
-        $splithtml = 1;
-    }
+    my $split = $opts{split};
     my $imagere = $self->image_re;
     $self->reset_toc_stack;
     # loop over the parsed elements
@@ -169,12 +185,13 @@ sub process {
         elsif ($el->type =~ m/h[1-6]/) {
 
             # if we want a split html, we cut here and flush the footnotes
-            if ($el->type =~ m/h[1-4]/ and $splithtml and @pieces) {
+            if ($el->type =~ m/h[1-4]/ and $split and @pieces) {
                 
-                foreach my $fn ($self->flush_footnotes) {
-                    push @pieces, $self->manage_html_footnote($fn);
+                if ($self->is_html) {
+                    foreach my $fn ($self->flush_footnotes) {
+                        push @pieces, $self->manage_html_footnote($fn);
+                    }
                 }
-
                 push @splat, join("", @pieces);
                 @pieces = ();
                 # all done
@@ -202,13 +219,13 @@ sub process {
             die "Unrecognized element: " . $el->type;
         }
     }
-    if ($self->fmt eq 'html') {
+    if ($self->is_html) {
         foreach my $fn ($self->flush_footnotes) {
             push @pieces, $self->manage_html_footnote($fn);
         }
     }
 
-    if ($splithtml) {
+    if ($split) {
         # catch the last
         push @splat, join("", @pieces);
         # and return
@@ -336,15 +353,16 @@ sub manage_regular {
             $l = $self->muse_inline_syntax_to_tags($l);
 
             # here we have different routines
-            if ($self->fmt eq 'ltx') {
+            if ($self->is_latex) {
                 $l = $self->escape_tex($l);
                 $l = $self->_ltx_replace_ldots($l);
                 $l = $self->muse_inline_syntax_to_ltx($l);
                 $l = $self->_ltx_replace_slash($l);
             }
-            elsif ($self->fmt eq 'html') {
+            elsif ($self->is_html) {
                 $l = $self->escape_html($l);
             }
+            else { die "Not reached" }
         }
         if ($recurse) {
             $l = $self->inline_footnotes($l);
@@ -376,18 +394,19 @@ sub inline_footnotes {
             # here we have a bit of recursion, but it should be safe
             if (defined $footnote) {
                 $footnote = $self->manage_regular($footnote);
-                if ($self->fmt eq "ltx") {
+                if ($self->is_latex) {
                     $footnote =~ s/\n/ /gs;
                     $footnote =~ s/ +$//s;
                     push @output, '\footnote{' . $footnote . '}';
                 }
-                elsif ($self->fmt eq "html") {
+                elsif ($self->is_html) {
                     # in html, just remember the number
                     $self->add_footnote($fn_num);
                     push @output,
                       qq{$space<a href="#fn${fn_num}" class="footnote" } .
                         qq{id="fn_back${fn_num}">[$fn_num]</a>};
                 }
+                else { die "Not reached" }
             }
             else {
                 # warn "Missing footnote [$fn_num] in $string";
@@ -410,12 +429,13 @@ format, to avoid command injection.
 
 sub safe {
     my ($self, $string) = @_;
-    if ($self->fmt eq 'ltx') {
+    if ($self->is_latex) {
         return $self->escape_tex($string);
     }
-    elsif ($self->fmt eq 'html') {
+    elsif ($self->is_html) {
         return $self->escape_all_html($string);
     }
+    else { die "Not reached" }
 }
 
 =head3 escape_tex($string)
@@ -608,7 +628,7 @@ sub manage_header {
         die "wtf, no index for toc?" unless $index;
 
         # inject the id into the html toc
-        if ($self->fmt eq 'html') {
+        if ($self->is_html) {
             $leading = "<h" . $level .
               qq{ id="toc$index">};
         }
@@ -706,7 +726,7 @@ The HTML formatted table of contents.
 
 sub html_toc {
     my $self = shift;
-    return "" unless $self->fmt eq 'html';
+    return "" unless $self->is_html;
     my @toc = $self->table_of_contents;
     return "" unless @toc;
     # do the dirty job
@@ -737,16 +757,17 @@ sub html_toc {
 sub manage_verse {
     my ($self, $el) = @_;
     my ($lead, $eol, $stanzasep);
-    if ($self->fmt eq 'html') {
+    if ($self->is_html) {
         $lead = "&nbsp;";
         $eol = "<br />\n";
         $stanzasep = "\n<br /><br />\n";
     }
-    elsif ($self->fmt eq 'ltx') {
+    elsif ($self->is_latex) {
         $lead = "~";
         $eol = "\\forcelinebreak\n";
         $stanzasep = "\n\n";
     }
+    else { die "Not reached" }
     my @stanza;
     my @out;
     my (@chunks) = split(/\n/, $el->string);
@@ -794,15 +815,13 @@ sub manage_comment {
 sub manage_table {
     my ($self, $el) = @_;
     my $thash = $self->_split_table_in_hash($el->string);
-    if ($self->fmt eq 'html') {
+    if ($self->is_html) {
         return $self->manage_table_html($thash);
     }
-    elsif ($self->fmt eq 'ltx') {
+    elsif ($self->is_latex) {
         return $self->manage_table_ltx($thash);
     }
-    else {
-        die "wtf?"
-    }
+    else { die "Not reached" }
 }
 
 =head3 manage_table_html
@@ -974,12 +993,13 @@ Put an horizontal rule
 sub manage_hr {
     my ($self, $el) = @_;
     die "Wtf?" if $el->string =~ m/\w/s; # don't eat chars by mistake
-    if ($self->fmt eq 'html') {
+    if ($self->is_html) {
         return "\n<hr />\n";
     }
-    elsif ($self->fmt eq 'ltx') {
+    elsif ($self->is_latex) {
         return "\n\\hairline\n\n";
     }
+    else { die "Not reached" }
 }
 
 =head3 manage_newpage
@@ -991,15 +1011,16 @@ If it's LaTeX, insert a newpage
 sub manage_newpage {
     my ($self, $el) = @_;
     die "Wtf? " . $el->string if $el->string =~ m/\w/s; # don't eat chars by mistake
-    if ($self->fmt eq 'html') {
+    if ($self->is_html) {
         my $out = $self->blkstring(start => 'center') .
           $self->manage_paragraph($el) .
             $self->blkstring(stop => 'center');
         return $out;
     }
-    elsif ($self->fmt eq 'ltx') {
+    elsif ($self->is_latex) {
         return "\n\\clearpage\n\n";
     }
+    else { die "Not reached" }
 }
 
 
@@ -1056,15 +1077,16 @@ sub format_links {
         return $image->output;
     }
     # links
-    if ($self->fmt eq 'html') {
+    if ($self->is_html) {
         $link = $self->_url_safe_escape($link);
         return qq{<a href="$link">$desc</a>};
     }
-    elsif ($self->fmt eq 'ltx') {
+    elsif ($self->is_latex) {
         return qq/\\href{/ .
           $self->_url_safe_escape($link) .
             qq/}{$desc}/;
     }
+    else { die "Not reached" }
 }
 
 =head3 format_single_link
@@ -1078,13 +1100,14 @@ sub format_single_link {
         $self->document->attachments($image->filename);
         return $image->output;
     }
-    if ($self->fmt eq 'html') {
+    if ($self->is_html) {
         $link = $self->_url_safe_escape($link);
         return qq{<a href="$link">$link</a>};
     }
-    elsif ($self->fmt eq 'ltx') {
+    elsif ($self->is_latex) {
         return "\\url{" . $self->_url_safe_escape($link) . "}";
     }
+    else { die "Not reached" }
 }
 
 =head3 _url_safe_escape

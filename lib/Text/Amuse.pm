@@ -203,6 +203,13 @@ sub _latex_obj {
     return $self->{_ltx_doc};
 }
 
+=head3 as_splat_latex
+
+Return a list of strings, each of them is a latex chunk resulting from
+the splitting of the as_latex output.
+
+=cut
+
 sub as_latex {
     my $self = shift;
     unless (defined $self->{_latex_output_strings}) {
@@ -210,6 +217,11 @@ sub as_latex {
     }
     return unless defined wantarray;
     return join("", @{ $self->{_latex_output_strings} });
+}
+
+sub as_splat_latex {
+    my $self = shift;
+    return @{ $self->_latex_obj->process(split => 1) };
 }
 
 =head3 as_beamer
