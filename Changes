@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.54 2015-12-05
+
+ - Added methods wants_preamble wants_postamble
+
 0.53 2015-12-05
 
  - Handle the HTML toc with partials
