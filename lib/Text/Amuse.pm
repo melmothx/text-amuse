@@ -214,7 +214,6 @@ Return the HTML formatted ToC, as a string.
 
 sub toc_as_html {
     my $self = shift;
-    $self->as_html; # be sure that it's processed
     my @toc = $self->raw_html_toc;
     return "" unless @toc;
     # do the dirty job
