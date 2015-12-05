@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 26;
+use Test::More tests => 38;
 use Text::Amuse;
 use File::Temp;
 use Data::Dumper;
@@ -115,5 +115,35 @@ close $fh;
     like $doc->toc_as_html, qr{toc1.*toc3.*toc9}s, "toc as 1,3,9 anchors";
     unlike $doc->toc_as_html, qr{toc0}, "toc is missing the 0 anchor";
     unlike $doc->toc_as_html, qr{toc[245678]}, "toc is missing the other anchors";
+    ok !$doc->wants_preamble, "Preamble not wanted";
+    ok !$doc->wants_postamble, "Postamble not wanted";
 }
 
+{
+    my $doc = Text::Amuse->new(file => $fh->filename);
+    ok $doc->wants_preamble, "Preamble wanted";
+    ok $doc->wants_postamble, "Postamble wanted";
+}
+
+{
+    my $doc = Text::Amuse->new(file => $fh->filename, partial => [qw/0 9/]);
+    ok !$doc->wants_preamble, "Preamble not wanted";
+    ok !$doc->wants_postamble, "Postamble not wanted";
+}
+
+{
+    my $doc = Text::Amuse->new(file => $fh->filename, partial => [qw/pre 0 9/]);
+    ok $doc->wants_preamble, "Preamble wanted";
+    ok !$doc->wants_postamble, "Postamble not wanted";
+}
+
+{
+    my $doc = Text::Amuse->new(file => $fh->filename, partial => [qw/post 0 9/]);
+    ok !$doc->wants_preamble, "Preamble not wanted";
+    ok $doc->wants_postamble, "Postamble wanted";
+}
+{
+    my $doc = Text::Amuse->new(file => $fh->filename, partial => [qw/pre post 3/]);
+    ok $doc->wants_preamble, "Preamble wanted";
+    ok $doc->wants_postamble, "Postamble wanted";
+}

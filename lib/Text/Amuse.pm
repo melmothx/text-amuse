@@ -79,11 +79,15 @@ sub new {
         die "partial needs an arrayref" unless ref($chunks) eq 'ARRAY';
         my %partials;
         foreach my $chunk (@$chunks) {
-            if (defined $chunk and $chunk =~ m/\A([0-9]|[1-9][0-9]+)\z/) {
-                $partials{$1} = 1;
-            }
-            else {
-                die "Partials should be integers";
+            if (defined $chunk) {
+                if ($chunk =~ m/\A
+                                (pre | post | [0-9] | [1-9][0-9]+ )
+                                \z/x) {
+                    $partials{$1} = 1;
+                }
+                else {
+                    die q{Partials should be integers or strings "pre", "post"};
+                }
             }
         }
         if (%partials) {
@@ -348,7 +352,46 @@ sub as_beamer {
 
 Return true if a toc is needed because we found some headings inside.
 
+=head3 wants_preamble
+
+Normally returns true. If partial output, only if the C<pre> string was passed.
+
+Preamble is the title page, or the title/author/date chunk.
+
+=head3 wants_postamble
+
+Normally returns true. If partial output, only if the C<post> string was passed.
+
+Postamble is the metadata of the text.
+
 =cut
+
+sub wants_preamble {
+    my $self = shift;
+    if (my $partials = $self->partials) {
+        if ($partials->{pre}) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+sub wants_postamble {
+    my $self = shift;
+    if (my $partials = $self->partials) {
+        if ($partials->{post}) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 
 sub wants_toc {
     my $self = shift;
