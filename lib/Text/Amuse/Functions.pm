@@ -21,7 +21,7 @@ our @EXPORT_OK = qw/muse_format_line
 
 =head1 NAME
 
-Text::Amuse::Functions
+Text::Amuse::Functions - Exportable functions for L<Text::Amuse>
 
 =head1 SYNOPSIS
 

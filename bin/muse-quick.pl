@@ -49,6 +49,9 @@ muse-quick.pl -- format your muse document using Text::Amuse
 
 =head1 SYNOPSIS
 
+This script is B<DEPRECATED> and not maintained any more. Please look
+to L<Text::Amuse::Compile> for a full-featured version.
+
   muse-quick.pl [-xtx] file.muse
 
 This program uses Text::Amuse to produce usable output in HTML, EPUB,

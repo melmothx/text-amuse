@@ -5,7 +5,7 @@ use utf8;
 
 =head1 NAME
 
-Text::Amuse::String
+Text::Amuse::String - Process one-line muse strings.
 
 =head1 SYNOPSIS
 

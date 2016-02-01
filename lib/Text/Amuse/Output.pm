@@ -6,7 +6,7 @@ use Text::Amuse::Output::Image;
 
 =head1 NAME
 
-Text::Amuse::Output
+Text::Amuse::Output - Internal module for L<Text::Amuse> output
 
 =head1 SYNOPSIS
 

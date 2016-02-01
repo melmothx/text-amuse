@@ -14,7 +14,7 @@ use constant {
 
 =head1 NAME
 
-Text::Amuse::Document
+Text::Amuse::Document - core parser for L<Text::Amuse> (internal)
 
 =head1 SYNOPSIS
 

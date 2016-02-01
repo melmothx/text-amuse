@@ -10,15 +10,15 @@ use Text::Amuse::Beamer;
 
 =head1 NAME
 
-Text::Amuse - Perl module to generate HTML and LaTeX documents from Emacs Muse markup.
+Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 0.54
+Version 0.55
 
 =cut
 
-our $VERSION = '0.54';
+our $VERSION = '0.55';
 
 
 =head1 SYNOPSIS
@@ -47,8 +47,9 @@ Typical usage which should illustrate all the public methods
     # files attached
     my @images = $doc->attachments;
     
-    # at this point you can inject the values in a template, which is left
-    # to the user. See the bundled muse-quick.pl for a real-life usage.
+    # at this point you can inject the values in a template, which is
+    # left to the user. If you want an executable, please install
+    # Text::Amuse::Compile.
     
 
 =head1 CONSTRUCTOR
@@ -633,6 +634,12 @@ Repository available at Github: L<https://github.com/melmothx/text-amuse>
 
 The original documentation for the Emacs Muse markup can be found at:
 L<http://mwolson.org/static/doc/muse/Markup-Rules.html>
+
+L<Text::Amuse::Compile> ships an executable to compile muse files.
+
+Amusewiki, L<http://amusewiki.org>, a wiki/publishing engine which
+uses this module under the hood (and for which this module was written
+and is maintained).
 
 =head1 LICENSE
 

@@ -6,7 +6,7 @@ use utf8;
 
 =head1 NAME
 
-Text::Amuse::Beamer
+Text::Amuse::Beamer - Beamer output for Text::Amuse
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,11 @@
 Revision history for perl module Text::Amuse
 
+0.55 2016-02-01
+
+ - Deprecated (and not installed anymore) the executable muse-quick.pl
+ - Added debian directory (not included in the CPAN tarball)
+ - Documentation fixes
+
 0.54 2015-12-05
 
  - Added methods wants_preamble wants_postamble
