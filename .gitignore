@@ -22,3 +22,5 @@ examples/*
 !examples/manual.muse
 !examples/logo.png
 t/beamer/*
+debian/files
+debian/libtext-amuse-perl*

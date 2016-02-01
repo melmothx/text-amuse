@@ -1,0 +1,16 @@
+Source: libtext-amuse-perl
+Section: perl
+Priority: optional
+Maintainer: packager <melmothx@gmail.com>
+Build-Depends: debhelper (>= 9)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.6
+Homepage: https://metacpan.org/release/Text-Amuse
+
+Package: libtext-amuse-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: Generate HTML and LaTeX documents from Emacs Muse markup
+ This module provides the core parser for the Emacs Muse syntax (with
+ some limitations). No executables are provided. For a command line
+ program, look into Text::Amuse::Compile (libtext-amuse-compile-perl).
