@@ -2,9 +2,10 @@ use 5.010001;
 use strict;
 use warnings;
 use Test::More;
+use Text::Amuse::Element;
 use Text::Amuse::Document;
 
-plan tests => 252;
+plan tests => 257;
 
 sub test_line {
     my $string = shift;
@@ -219,3 +220,64 @@ test_line(" table | table", {
                        });
 
 
+{
+    my $opening = Text::Amuse::Element->new(
+                                            type => 'example',
+                                           );
+    my $closing = Text::Amuse::Element->new(
+                                            type => 'stopblock',
+                                            block => 'example',
+                                           );
+    ok($closing->is_stop_element($opening));
+}
+
+{
+    my $opening = Text::Amuse::Element->new(
+                                            type => 'example',
+                                           );
+    my $closing = Text::Amuse::Element->new(
+                                            type => 'stopblock',
+                                            block => 'example',
+                                            style => '{{{}}}',
+                                           );
+    ok(!$closing->is_stop_element($opening));
+}
+
+{
+    my $opening = Text::Amuse::Element->new(
+                                            type => 'example',
+                                            style => '{{{}}}',
+                                           );
+    my $closing = Text::Amuse::Element->new(
+                                            type => 'stopblock',
+                                            block => 'example',
+                                            style => '{{{}}}',
+                                           );
+    ok($closing->is_stop_element($opening));
+}
+
+
+{
+    my $opening = Text::Amuse::Element->new(
+                                            type => 'example',
+                                           );
+    my $closing = Text::Amuse::Element->new(
+                                            type => 'stopblock',
+                                            block => 'examplex',
+                                            style => '{{{}}}',
+                                           );
+    ok(!$closing->is_stop_element($opening));
+}
+
+{
+    my $opening = Text::Amuse::Element->new(
+                                            type => 'example',
+                                            style => '{{{}}}',
+                                           );
+    my $closing = Text::Amuse::Element->new(
+                                            type => 'startblock',
+                                            block => 'example',
+                                            style => '{{{}}}',
+                                           );
+    ok(!$closing->is_stop_element($opening));
+}

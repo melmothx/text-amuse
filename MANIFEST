@@ -196,3 +196,4 @@ t/text-amuse.t
 t/tocs-with-fn.t
 t/tocs.t
 t/unroll.t
+t/verbatim.t

@@ -29,6 +29,7 @@ sub new {
                 attribute => '', # optional attribute for desclists
                 indentation => 0,
                 attribute_type => '',
+                style => 'X',
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -133,6 +134,19 @@ sub removed {
     return $self->{removed};
 }
 
+=head3 style
+
+The block style. Default to C<X>, read only. Used for aliases of tags,
+when closing it requires a matching style.
+
+=cut
+
+sub style {
+    my $self = shift;
+    die "Read only attribute!" if @_;
+    return $self->{style};
+}
+
 =head3 indentation
 
 The indentation level, as a numerical value
@@ -182,18 +196,22 @@ sub is_start_block {
     }
 }
 
-=head3 is_stop_block($blockname)
+=head3 is_stop_element($element)
 
-Return true if the element is a "stopblock" of the required block name
+Return true if the element is a matching stopblock for the element
+passed as argument.
 
 =cut
 
-sub is_stop_block {
-    my $self = shift;
-    my $block = shift || "";
-    if ($self->type eq 'stopblock' and $self->block eq $block) {
+sub is_stop_element {
+    my ($self, $element) = @_;
+    if ($element and
+        $self->type eq 'stopblock' and
+        $self->block eq $element->type and
+        $self->style eq $element->style) {
         return 1;
-    } else {
+    }
+    else {
         return 0;
     }
 }

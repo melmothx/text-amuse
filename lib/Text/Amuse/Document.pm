@@ -432,6 +432,20 @@ sub _parse_string {
         $element{block} = $2;
         return %element;
     }
+    if ($l =~ m/^(\{\{\{)\s*$/s) {
+        $element{type} = "startblock";
+        $element{removed} = $l;
+        $element{block} = 'example';
+        $element{style} = '{{{}}}';
+        return %element;
+    }
+    if ($l =~ m/^(\}\}\})\s*$/s) {
+        $element{type} = "stopblock";
+        $element{removed} = $l;
+        $element{block} = 'example';
+        $element{style} = '{{{}}}';
+        return %element;
+    }
     if ($l =~ m!^(</($blockre)>\s*)$!s) {
         $element{type} = "stopblock";
         $element{removed} = $1;
@@ -625,11 +639,13 @@ sub _construct_element {
 
     # catch the examples. and the verse
     # <example> is greedy, and will stop only at another </example> or
-    # at the end of input.
+    # at the end of input. Same is true for verse
 
     foreach my $block (qw/example verse/) {
         if ($current && $current->type eq $block) {
-            if ($element->is_stop_block($block)) {
+            if ($element->is_stop_element($current)) {
+                # print Dumper($element) . " is closing\n";
+
                 $self->_current_el(undef);
                 return Text::Amuse::Element->new(type => 'null',
                                                  removed => $element->rawline,
@@ -637,12 +653,14 @@ sub _construct_element {
             }
             else {
                 # maybe check if we want to stop at headings if verse?
+                # print Dumper($element) . " is appending\n";;
                 $current->append($element);
                 return;
             }
         }
         elsif ($element->is_start_block($block)) {
             $current = Text::Amuse::Element->new(type => $block,
+                                                 style => $element->style,
                                                  removed => $element->rawline,
                                                  rawline => $element->rawline);
             $self->_current_el($current);
