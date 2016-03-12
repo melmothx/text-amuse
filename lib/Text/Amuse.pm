@@ -14,11 +14,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 0.55
+Version 0.60
 
 =cut
 
-our $VERSION = '0.55';
+our $VERSION = '0.60';
 
 
 =head1 SYNOPSIS
@@ -597,6 +597,15 @@ Added tag <sup> and <sub> for superscript and subscript.
 =head3 Block markup
 
 The only tables supported are the native one (with ||| as separator).
+
+Since version 0.60, the code blocks, beside the C<example> tag, can
+also be written as:
+
+  {{{
+   if ($perl) {...}
+  }}}
+
+Borrowed from the Creole markup.
 
 =head3 Others
 

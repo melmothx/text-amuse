@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.60 2016-03-12
+
+ - Added {{{  }}} markup for code blocks.
+
 0.55 2016-02-01
 
  - Deprecated (and not installed anymore) the executable muse-quick.pl
