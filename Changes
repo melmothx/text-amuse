@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.61 2016-05-09
+
+ - Removed minimum perl version, which shouldn't be needed
+ - Replaced "start body" in the ToC with the title (if present)
+
 0.60 2016-03-12
 
  - Added {{{  }}} markup for code blocks.
