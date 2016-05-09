@@ -1,6 +1,5 @@
 package Text::Amuse::Document;
 
-use 5.010001;
 use strict;
 use warnings;
 use Text::Amuse::Element;

@@ -1,6 +1,5 @@
 package Text::Amuse;
 
-use 5.010001;
 use strict;
 use warnings;
 # use Data::Dumper;

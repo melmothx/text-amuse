@@ -1,4 +1,3 @@
-use 5.010001;
 use strict;
 use warnings FATAL => 'all';
 use ExtUtils::MakeMaker;
@@ -10,7 +9,6 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Text/Amuse.pm',
     LICENSE          => 'Perl_5',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.010001,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -21,9 +19,6 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'File::Temp' => 0,
-
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
     },
     # EXE_FILES => [ 'bin/muse-quick.pl' ],
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

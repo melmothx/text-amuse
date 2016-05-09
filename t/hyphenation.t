@@ -1,6 +1,5 @@
 #!perl
 
-use 5.010001;
 use utf8;
 use strict;
 use warnings;
