@@ -1,4 +1,4 @@
-#title table
+#title *table*
 
      Triple bars ||| Separate footer fields
      Double bars  || Separate header fields

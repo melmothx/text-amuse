@@ -1,4 +1,4 @@
-#title My slides
+#title My *slides*
 #lang it
 #slides yes
 #test

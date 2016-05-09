@@ -277,7 +277,7 @@ sub raw_html_toc {
             unshift @toc, {
                            index => 0,
                            level => 2,
-                           string => "start body",
+                           string => $html->header->{title} || "start body",
                           };
         }
         else {

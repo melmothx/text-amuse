@@ -87,7 +87,7 @@ is($document->toc_as_html, "");
 my @toc = $document->raw_html_toc;
 is_deeply(\@toc, [
                   {
-                   'string' => 'start body',
+                   'string' => '<em>table</em>',
                    'level' => 2,
                    'index' => 0
                   },
@@ -99,7 +99,7 @@ $document =
 @toc = $document->raw_html_toc;
 is_deeply($toc[0],
           {
-           'string' => 'start body',
+           'string' => 'My <em>slides</em>',
            'level' => 2,
            'index' => 0
           }, "content before headers have index 0");
