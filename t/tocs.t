@@ -14,7 +14,7 @@ my $htmltoc =<<'EOF';
 <p class="tableofcontentline toclevel1"><span class="tocprefix">&nbsp;&nbsp;</span><a href="#toc1">Part</a></p>
 <p class="tableofcontentline toclevel2"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc2">Chapter</a></p>
 <p class="tableofcontentline toclevel3"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc3">Section</a></p>
-<p class="tableofcontentline toclevel4"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc4">Subsection</a></p>
+<p class="tableofcontentline toclevel4"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc4">Subsection <em>test</em></a></p>
 <p class="tableofcontentline toclevel1"><span class="tocprefix">&nbsp;&nbsp;</span><a href="#toc5">Part (2)</a></p>
 <p class="tableofcontentline toclevel2"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc6">Chapter (2)</a></p>
 <p class="tableofcontentline toclevel3"><span class="tocprefix">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><a href="#toc7">Section (2)</a></p>
@@ -48,7 +48,7 @@ my $exp = [
            {
             'level' => '4',
             'index' => 4,
-            'string' => 'Subsection'
+            'string' => 'Subsection <em>test</em>'
            },
            {
             'level' => '1',
