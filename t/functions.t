@@ -8,7 +8,7 @@ use Text::Amuse::Functions qw/muse_format_line
 use File::Temp;
 
 
-plan tests => 20;
+plan tests => 22;
 
 is(muse_format_line(html => q{<em>ciao</em>bella<script">}),
    "<em>ciao</em>bella&lt;script&quot;&gt;");
@@ -17,6 +17,9 @@ is(muse_format_line(ltx => "<em>ciao</em>bella</script>"),
 
 is(muse_format_line(html => "[1] hello [1] [2]"), "[1] hello [1] [2]");
 is(muse_format_line(ltx => "[1] hello [1] [2]"), "[1] hello [1] [2]");
+
+is(muse_format_line(html => "*(hello)* **«hello»**"), "<em>(hello)</em> <strong>«hello»</strong>");
+is(muse_format_line(ltx => "*(hello)* **«hello»**"), "\\emph{(hello)} \\textbf{«hello»}");
 
 is(muse_format_line(html => "* ***hello***"),
    "* <strong><em>hello</em></strong>");
