@@ -219,7 +219,7 @@ sub as_latex {
 
 \\begin{wrapfigure}{$wrap}{$width}
 \\centering
-\\includegraphics[width=$width]{$src}$desc
+\\includegraphics[keepaspectratio=true,height=0.75\\textheight,width=$width]{$src}$desc
 \\end{wrapfigure}
 EOF
     }
@@ -228,7 +228,7 @@ EOF
 
 \\begin{figure}[htbp!]
 \\centering
-\\includegraphics[width=$width]{$src}$desc
+\\includegraphics[keepaspectratio=true,height=0.75\\textheight,width=$width]{$src}$desc
 \\end{figure}
 EOF
 

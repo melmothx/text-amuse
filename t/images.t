@@ -22,7 +22,7 @@ $ltx =<<'EOF';
 
 \begin{wrapfigure}{r}{0.25\textwidth}
 \centering
-\includegraphics[width=0.25\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=0.75\textheight,width=0.25\textwidth]{test.png}
 \end{wrapfigure}
 EOF
 
@@ -54,7 +54,7 @@ $ltx =<<'EOF';
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=0.75\textheight,width=\textwidth]{test.png}
 \end{figure}
 EOF
 
@@ -89,7 +89,7 @@ $ltx =<<'EOF';
 
 \begin{wrapfigure}{l}{0.75\textwidth}
 \centering
-\includegraphics[width=0.75\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=0.75\textheight,width=0.75\textwidth]{test.png}
 \end{wrapfigure}
 EOF
 
@@ -124,7 +124,7 @@ $ltx =<<'EOF';
 
 \begin{figure}[htbp!]
 \centering
-\includegraphics[width=0.50\textwidth]{test.png}
+\includegraphics[keepaspectratio=true,height=0.75\textheight,width=0.50\textwidth]{test.png}
 \end{figure}
 \clearpage
 EOF
