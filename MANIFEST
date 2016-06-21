@@ -49,6 +49,9 @@ t/testfiles/beamer.exp.html
 t/testfiles/beamer.exp.ltx
 t/testfiles/beamer.exp.sl.tex
 t/testfiles/beamer.muse
+t/testfiles/br-in-footnotes.exp.html
+t/testfiles/br-in-footnotes.exp.ltx
+t/testfiles/br-in-footnotes.muse
 t/testfiles/breaklist.exp.html
 t/testfiles/breaklist.exp.ltx
 t/testfiles/breaklist.muse

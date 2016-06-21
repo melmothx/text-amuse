@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.62 2016-06-21
+
+ - Prevent overflowing of images enforcing the max height.
+ - Translate <br> to \par while in a footnote.
+
 0.61 2016-05-09
 
  - Removed minimum perl version, which shouldn't be needed
