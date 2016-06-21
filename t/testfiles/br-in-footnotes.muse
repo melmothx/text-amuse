@@ -1,0 +1,11 @@
+#title Test br in fn
+
+This is a line [1] with [2] some [3] footnotes [4]
+
+[1] [first]
+
+[2] 0
+
+[3] <br>[second]<br>[third]<br>0<br>Hello.
+
+[4] {second}<br>{third}<br>0<br>Hello.
