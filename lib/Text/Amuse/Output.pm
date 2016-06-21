@@ -397,6 +397,11 @@ sub inline_footnotes {
                 if ($self->is_latex) {
                     $footnote =~ s/\n/ /gs;
                     $footnote =~ s/ +$//s;
+                    # covert <br> to \par in latex. those \\ in the
+                    # footnotes are pretty much ugly. Also the syntax
+                    # doesn't permit to have multiple paragraphs
+                    # separated by a blank line in a footnote.
+                    $footnote =~ s/\\forcelinebreak /\\par /g;
                     push @output, '\footnote{' . $footnote . '}';
                 }
                 elsif ($self->is_html) {
