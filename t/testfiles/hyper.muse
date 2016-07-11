@@ -12,7 +12,7 @@ A simple internal link is created with \hypertarget, with two parameters of an a
 
         * * * * *
 
-Here we [[#label][go]] and [[#label2]] and [[#label3][dead link]]
+Here we [[#label][go]] and [[#label2]] and [[#label3][dead link]] [[#label4]]
 
 
 
