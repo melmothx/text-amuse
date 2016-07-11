@@ -1,3 +1,9 @@
+libtext-amuse-perl (0.70-1) unstable; urgency=medium
+
+  * New release for internal linking
+
+ -- Marco Pessotto <melmothx@gmail.com>  Mon, 11 Jul 2016 14:06:20 +0200
+
 libtext-amuse-perl (0.62-1) unstable; urgency=medium
 
   * New release

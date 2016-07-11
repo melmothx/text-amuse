@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.70 2016-07-11
+
+ - Implemented internal linking (GH#4)
+   https://www.gnu.org/software/emacs-muse/manual/muse.html#Horizontal-Rules-and-Anchors
+
 0.62 2016-06-21
 
  - Prevent overflowing of images enforcing the max height.

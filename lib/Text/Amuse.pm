@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 0.62
+Version 0.70
 
 =cut
 
-our $VERSION = '0.62';
+our $VERSION = '0.70';
 
 
 =head1 SYNOPSIS
@@ -607,9 +607,6 @@ also be written as:
 Borrowed from the Creole markup.
 
 =head3 Others
-
-Anchors are unsupported (mainly because of the confusing syntax and
-the PDF output).
 
 Embedded lisp code and syntax highlight is not supported.
 
