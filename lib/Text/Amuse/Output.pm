@@ -609,6 +609,30 @@ sub muse_inline_syntax_to_tags {
 sub manage_paragraph {
     my ($self, $el) = @_;
     my $body = $self->manage_regular($el);
+    # consider targets only if we find #here on a line by itself. This
+    # way we can easily check the existing texts across all archives
+    # and minimize clashes due to this markup change.
+    my $hyperre = $self->hyperref_re;
+    if ($self->is_latex) {
+        $body =~ s/\A
+                   (\\
+                       \#
+                       ($hyperre)
+                   )
+                   (?=\n) # look forward for the end of line
+                  /\\hyperdef{amuse}{$2}{}%/x;
+    }
+    elsif ($self->is_html) {
+        $body =~ s/\A
+                   (\#
+                       ($hyperre)
+                   )
+                   (?=\n) # look forward for the end of line
+                  /<a id="text-amuse-label-$2"><\/a>/x;
+    }
+    else {
+        die "Not reached";
+    }
     chomp $body;
     return $self->blkstring(start  => "p") .
       $body . $self->blkstring(stop => "p");
@@ -1050,6 +1074,17 @@ sub format_links {
         return $image->output;
     }
     # links
+    my $hyperre = $self->hyperref_re;
+    if ($link =~ m/\A\#($hyperre)\z/) {
+        my $linkname = $1;
+        if ($self->is_html) {
+            $link = "#text-amuse-label-$linkname";
+        }
+        elsif ($self->is_latex) {
+            return "\\hyperref{}{amuse}{$linkname}{$desc}";
+        }
+    }
+
     if ($self->is_html) {
         $link = $self->_url_safe_escape($link);
         return qq{<a href="$link">$desc</a>};
@@ -1072,6 +1107,18 @@ sub format_single_link {
     if (my $image = $self->find_image($link)) {
         $self->document->attachments($image->filename);
         return $image->output;
+    }
+    my $hyperre = $self->hyperref_re;
+    if ($link =~ m/\A\#($hyperre)\z/) {
+        my $linkname = $1;
+        # link is sane and safe
+        if ($self->is_html) {
+            $link = "#text-amuse-label-$linkname";
+            return qq{<a href="$link">$linkname</a>};
+        }
+        elsif ($self->is_latex) {
+            return "\\hyperref{}{amuse}{$linkname}{$linkname}";
+        }
     }
     if ($self->is_html) {
         $link = $self->_url_safe_escape($link);
@@ -1427,6 +1474,16 @@ sub image_re {
                                     ([0-9]+)? # width in percent
                                     ([ ]*([rlf]))?
                                 )?}x;
+}
+
+=head3 hyperref_re
+
+Regular expression to match hyperref internal links.
+
+=cut
+
+sub hyperref_re {
+    return qr{[A-Za-z][A-Za-z0-9]*};
 }
 
 =head3 find_image($link)

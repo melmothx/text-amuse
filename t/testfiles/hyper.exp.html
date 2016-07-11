@@ -1,26 +1,72 @@
+<h3 id="toc1">Begin</h3>
+
 
 <p>
+<a id="text-amuse-label-label"></a>
 Here the doc start
-<a id="#text-amuse-label-label"></a>here blablabla
+#label here blablabla
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page.
 </p>
+<h3 id="toc2">Middle</h3>
+
 
 <p>
-<a id="#text-amuse-label-label2"></a>Continue here
+<a id="text-amuse-label-label2"></a>
+#label2 Continue here
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page.
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page.
 A simple internal link is created with \hypertarget, with two parameters of an anchor name, and anchor text. \hyperlink has two arguments, the name of a hypertext object defined somewhere by \hypertarget, and the text which be used as the link on the page.
  #label3 not a label
 </p>
+<h3 id="toc3">Next</h3>
 
-<div class="center">
 
 <p>
-* * * * *
+<a id="text-amuse-label-label2"></a>
+This is invalid.
 </p>
 
-</div>
+<pre class="example">
+#label3
+This is verbatim
+</pre>
+
+<blockquote>
 
 <p>
-Here we <a href="#text-amuse-label-label">go</a> and <a href="#text-amuse-label-label2">#label2</a> and <a href="#text-amuse-label-label3">dead link</a> <a href="#text-amuse-label-label4">#label4</a>
+<a id="text-amuse-label-label5"></a>
+in quotation is not neutralized,
+</p>
+
+</blockquote>
+<div class="verse">
+#label6<br />
+in verse is neutralized
+</div>
+<div class="verse">
+#label7<br />
+&nbsp;in verse again
+</div>
+
+<ol>
+<li>
+<p>
+#label8 not a label
+</p>
+
+</li>
+<li>
+<p>
+<a id="text-amuse-label-lable9"></a>
+This is a label
+</p>
+
+</li>
+
+</ol>
+<h3 id="toc4">End</h3>
+
+
+<p>
+Here we <a href="#text-amuse-label-label">go</a> and <a href="#text-amuse-label-label2">label2</a> and <a href="#text-amuse-label-label3">dead link</a> <a href="#text-amuse-label-label4">label4</a>
 </p>
