@@ -23,6 +23,10 @@ A simple internal link is created with \textbackslash{}hypertarget, with two par
 This is invalid.
 
 
+\#1blabla
+Not a label, starts with a number
+
+
 \begin{alltt}
 \#label3
 This is verbatim
@@ -55,6 +59,14 @@ in verse is neutralized
 \end{verse}
 
 
+\hyperdef{amuse}{label9}{}%
+This is a label despite of the trailing whitespace.
+
+
+ \#label9
+This is not because of the leading whitespace.
+
+
 \begin{enumerate}[1.]
 \item\relax 
 \#label8 not a label
@@ -73,4 +85,7 @@ This is a label
 
 
 Here we \hyperref{}{amuse}{label}{go} and \hyperref{}{amuse}{label2}{label2} and \hyperref{}{amuse}{label3}{dead link} \hyperref{}{amuse}{label4}{label4}
+\href{\#1}{Preserved verbatim}
+\url{\#label2\%20unkown}
+\hyperref{}{amuse}{label}{\textbackslash{}tryme}
 

@@ -26,6 +26,11 @@ A simple internal link is created with \hypertarget, with two parameters of an a
 This is invalid.
 </p>
 
+<p>
+#1blabla
+Not a label, starts with a number
+</p>
+
 <pre class="example">
 #label3
 This is verbatim
@@ -48,6 +53,16 @@ in verse is neutralized
 &nbsp;in verse again
 </div>
 
+<p>
+<a id="text-amuse-label-label9"></a>
+This is a label despite of the trailing whitespace.
+</p>
+
+<p>
+ #label9
+This is not because of the leading whitespace.
+</p>
+
 <ol>
 <li>
 <p>
@@ -69,4 +84,7 @@ This is a label
 
 <p>
 Here we <a href="#text-amuse-label-label">go</a> and <a href="#text-amuse-label-label2">label2</a> and <a href="#text-amuse-label-label3">dead link</a> <a href="#text-amuse-label-label4">label4</a>
+<a href="#1">Preserved verbatim</a>
+<a href="#label2%20unkown">#label2%20unkown</a>
+<a href="#text-amuse-label-label">\tryme</a>
 </p>
