@@ -1087,7 +1087,7 @@ sub format_links {
 
     if ($self->is_html) {
         $link = $self->_url_safe_escape($link);
-        return qq{<a href="$link">$desc</a>};
+        return qq{<a class="text-amuse-link" href="$link">$desc</a>};
     }
     elsif ($self->is_latex) {
         return qq/\\href{/ .
@@ -1114,7 +1114,7 @@ sub format_single_link {
         # link is sane and safe
         if ($self->is_html) {
             $link = "#text-amuse-label-$linkname";
-            return qq{<a href="$link">$linkname</a>};
+            return qq{<a class="text-amuse-link" href="$link">$linkname</a>};
         }
         elsif ($self->is_latex) {
             return "\\hyperref{}{amuse}{$linkname}{$linkname}";
@@ -1122,7 +1122,7 @@ sub format_single_link {
     }
     if ($self->is_html) {
         $link = $self->_url_safe_escape($link);
-        return qq{<a href="$link">$link</a>};
+        return qq{<a class="text-amuse-link" href="$link">$link</a>};
     }
     elsif ($self->is_latex) {
         return "\\url{" . $self->_url_safe_escape($link) . "}";

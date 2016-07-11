@@ -28,7 +28,7 @@ is(muse_format_line(ltx => "* ***hello***"),
 
 
 is(muse_format_line(html => "[1] [[http://pippo.org][mylink]]"),
-   q{[1] <a href="http://pippo.org">mylink</a>});
+   q{[1] <a class="text-amuse-link" href="http://pippo.org">mylink</a>});
 is(muse_format_line(ltx => "[1] [[http://pippo.org][mylink]]"),
   q([1] \href{http://pippo.org}{mylink}));
 
