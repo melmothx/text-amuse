@@ -105,6 +105,9 @@ t/testfiles/headings.muse
 t/testfiles/high-num-list.exp.html
 t/testfiles/high-num-list.exp.ltx
 t/testfiles/high-num-list.muse
+t/testfiles/hyper.exp.html
+t/testfiles/hyper.exp.ltx
+t/testfiles/hyper.muse
 t/testfiles/image2.exp.html
 t/testfiles/image2.exp.ltx
 t/testfiles/image2.muse
