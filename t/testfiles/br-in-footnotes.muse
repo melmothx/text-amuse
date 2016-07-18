@@ -2,6 +2,10 @@
 
 This is a line [1] with [2] some [3] footnotes [4]
 
+* This is a title [5] with [6] some [7] footnotes [8]
+
+blabla
+
 [1] [first]
 
 [2] 0
@@ -9,3 +13,11 @@ This is a line [1] with [2] some [3] footnotes [4]
 [3] <br>[second]<br>[third]<br>0<br>Hello.
 
 [4] {second}<br>{third}<br>0<br>Hello.
+
+[5] [first]
+
+[6] 0
+
+[7] <br>[second]<br>[third]<br>0<br>Hello.
+
+[8] {second}<br>{third}<br>0<br>Hello.

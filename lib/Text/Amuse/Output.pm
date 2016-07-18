@@ -401,7 +401,9 @@ sub inline_footnotes {
                     # footnotes are pretty much ugly. Also the syntax
                     # doesn't permit to have multiple paragraphs
                     # separated by a blank line in a footnote.
-                    $footnote =~ s/\\forcelinebreak /\\par /g;
+                    # However, this is going to fail with footnotes in
+                    # the headings, so we have to call \endgraf instead
+                    $footnote =~ s/\\forcelinebreak /\\endgraf /g;
                     push @output, '\footnote{' . $footnote . '}';
                 }
                 elsif ($self->is_html) {
