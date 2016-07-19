@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.72 2016-07-19
+
+ - Fixed LaTeX compilation failure when a heading's footnote is
+   multipar.
+
 0.71 2016-07-11
 
  - Added class text-amuse-link to HTML links (GH#3)
