@@ -30,6 +30,7 @@ my %langs = (
              mk => 'macedonian',
              sv => 'swedish',
              pl => 'polish',
+             sq => 'albanian',
             );
 
 plan tests => (scalar(keys %langs) + 8) * 10;
