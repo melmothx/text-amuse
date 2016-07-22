@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.73 2016-07-22
+
+ - Added language mappings for all the languages polyglossia supports.
+
 0.72 2016-07-19
 
  - Fixed LaTeX compilation failure when a heading's footnote is
