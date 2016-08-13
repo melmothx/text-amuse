@@ -348,7 +348,8 @@ sub append {
     my ($self, $element) = @_;
     $self->{rawline} .= $element->rawline;
     my $type = $self->type;
-    if ($type eq 'example' or $type eq 'verse') {
+    # greedy elements
+    if ($type eq 'example' or $type eq 'verse' or $type eq 'footnote') {
         $self->{string} .= $element->rawline;
     }
     else {
@@ -364,6 +365,12 @@ sub append {
 sub can_append {
     my ($self, $element) = @_;
     if ($self->can_merge_next && $element->can_be_merged) {
+        return 1;
+    }
+    if ($self->type eq 'footnote' and
+        $element->type ne 'footnote' and
+        $element->type ne 'null' and
+        !$element->should_close_blocks) {
         return 1;
     }
     # same type
