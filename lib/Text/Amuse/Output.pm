@@ -395,7 +395,7 @@ sub inline_footnotes {
             if (defined $footnote) {
                 $footnote = $self->manage_regular($footnote);
                 if ($self->is_latex) {
-                    $footnote =~ s/\n/ /gs;
+                    $footnote =~ s/\s+/ /gs;
                     $footnote =~ s/ +$//s;
                     # covert <br> to \par in latex. those \\ in the
                     # footnotes are pretty much ugly. Also the syntax
