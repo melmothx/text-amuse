@@ -8,6 +8,7 @@ My[1] footnote[2]!
 [2] This is
  1. pretty
 > hello yeah
+<script> \latex
 
 This is another paragraph [3] [4]
 
