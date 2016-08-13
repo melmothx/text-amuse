@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 101;
+plan tests => 103;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -62,6 +62,7 @@ is($document->as_latex, $exptex);
 foreach my $testfile (qw/comments
                          special-chars
                          footnotes
+                         footnotes-2
                          verse
                          example-3
                          table

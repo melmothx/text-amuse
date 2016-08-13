@@ -1,0 +1,25 @@
+#title Footnotes 2
+
+My[1] footnote[2]!
+
+[1] This is
+ a. pretty
+
+[2] This is
+ 1. pretty
+> hello yeah
+
+This is another paragraph [3] [4]
+
+[3] This is
+ T. test
+
+[4] This is
+ test :: me it's clear it's a footnote
+
+ Test :: Me
+         Here we are in a list
+
+ 1. Should be ok
+
+ 
