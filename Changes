@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.74 2016-08-13
+
+ - Fixed parsing bug on multiline footnotes
+
 0.73 2016-07-22
 
  - Added language mappings for all the languages polyglossia supports.
