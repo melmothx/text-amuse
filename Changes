@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.75 2016-10-09
+
+ - Putting hyperlinks in headings is doomed to break latex, so do not
+   consider them as links in that context.
+
 0.74 2016-08-13
 
  - Fixed parsing bug on multiline footnotes
