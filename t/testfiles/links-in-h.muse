@@ -1,8 +1,9 @@
 #title This should not break
 
-* [[https://amusewiki.org][hello]]
+* [[https://amusewiki.org][*hello* <em>there</em>]]
 
-** [[https://amusewiki.org][hello]]
+** This was an error
+[[https://amusewiki.org][hello]]
 
 *** [[https://amusewiki.org][hello]]
 
