@@ -28,4 +28,6 @@ This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]
 
  - This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]
 
- [[https://amusewiki.org]] :: This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]
+ [[https://amusewiki.org]] :: This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]] [1]
+
+[1] This works ok [[https://amusewiki.org]] [[https://amusewiki.org][hello]]

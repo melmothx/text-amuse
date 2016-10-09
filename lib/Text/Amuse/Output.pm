@@ -324,7 +324,7 @@ Main routine to transform a string to the given format
 =cut
 
 sub manage_regular {
-    my ($self, $el) = @_;
+    my ($self, $el, %opts) = @_;
     my $string;
     my $recurse = 1;
     # we can accept even plain string;
@@ -343,7 +343,7 @@ sub manage_regular {
     my @out;
     while (@pieces) {
         my $l = shift @pieces;
-        if ($l =~ m/^$linkre$/s) {
+        if ($l =~ m/^$linkre$/s and !$opts{nolinks}) {
             push @out, $self->linkify($l);
             next;
         } else {
@@ -646,7 +646,7 @@ sub manage_paragraph {
 
 sub manage_header {
     my ($self, $el) = @_;
-    my $body = $self->manage_regular($el);
+    my $body = $self->manage_regular($el, nolinks => 1);
     # remove trailing spaces and \n
     chomp $body;
     my $leading = $self->blkstring(start => $el->type);
