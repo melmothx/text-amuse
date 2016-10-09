@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 103;
+plan tests => 105;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -108,6 +108,7 @@ foreach my $testfile (qw/comments
                          beamer
                          br-in-footnotes
                          hyper
+                         links-in-h
                         /) {
     test_testfile($testfile);
 }

@@ -29,6 +29,6 @@
 \.orig$
 \.rej$
 t/testfiles/build/.*$
-examples/.*(html|epub|log|pdf|tex)$
+examples/.*(html|epub|log|pdf|tex|el)$
 t/beamer/*
 

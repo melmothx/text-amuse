@@ -121,6 +121,9 @@ t/testfiles/inline.muse
 t/testfiles/links-2.exp.html
 t/testfiles/links-2.exp.ltx
 t/testfiles/links-2.muse
+t/testfiles/links-in-h.exp.html
+t/testfiles/links-in-h.exp.ltx
+t/testfiles/links-in-h.muse
 t/testfiles/links.exp.html
 t/testfiles/links.exp.ltx
 t/testfiles/links.muse
