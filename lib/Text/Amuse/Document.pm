@@ -107,8 +107,7 @@ sub get_lines {
     $self->_debug("Reading $file");
     open (my $fh, "<:encoding(utf-8)", $file) or die "Couldn't open $file! $!\n";
     my @lines;
-    while (<$fh>) {
-        my $l = $_;
+    while (my $l = <$fh>) {
         # EOL
         $l =~ s/\r\n/\n/gs;
         $l =~ s/\r/\n/gs;

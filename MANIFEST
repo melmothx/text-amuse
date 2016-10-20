@@ -18,6 +18,7 @@ t/broken.t
 t/caching.t
 t/changes.t
 t/context-parsing.t
+t/crash-on-loops.t
 t/description-lists.t
 t/elements.t
 t/false-lists.t

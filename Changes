@@ -1,5 +1,10 @@
 Revision history for perl module Text::Amuse
 
+0.76 2016-10-20
+
+ - Removed the use of $_ while reading files, which in some (corner)
+   cases can create problems.
+
 0.75 2016-10-09
 
  - Putting hyperlinks in headings is doomed to break latex, so do not

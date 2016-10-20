@@ -76,8 +76,7 @@ sub muse_fast_scan_header {
     my %directives;
     my $in_meta = 1;
     my $lastdirective;
-    while (<$fh>) {
-        my $line = $_;
+    while (my $line = <$fh>) {
         # warn "Parsing $line\n";
         if ($in_meta) {
             # reset the directives on blank lines
