@@ -323,6 +323,11 @@ Main routine to transform a string to the given format
 
 =cut
 
+sub _get_unique_counter {
+    my $self = shift;
+    ++$self->{_unique_counter};
+}
+
 sub manage_regular {
     my ($self, $el, %opts) = @_;
     my $string;
@@ -341,21 +346,26 @@ sub manage_regular {
 
     # remove the verbatim pieces
     my @verbatims;
-    my $rand = int(rand(1000000));
+    my $rand = sprintf('%u', rand(1000000000)) . 'b1fc670b2e799b90b2f65124021de691' . $self->_get_unique_counter;
+    # print "$string\n$rand\n\n";
     my $startm = "\x{f0001}${rand}\x{f0002}";
     my $stopm  = "\x{f0003}${rand}\x{f0004}";
     my $save_verb = sub {
         my $string = shift;
+        push @verbatims, $string;
         return $startm . $#verbatims . $stopm;
     };
+    my $restored = 0;
     my $restore_verb = sub {
         my $num = shift;
         my $string = $verbatims[$num];
+        $restored++;
+        # print "Called restore_verb for $num\n";
         die "Pulled too much when restoring verb" unless defined $string;
         return $self->safe($string);
     };
 
-    $string =~ s/<verbatim>(.+)<\/verbatim>/$save_verb->($1)/gsxe;
+    $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
 
     # split at [[ ]] to avoid the mess
     my @pieces = split /($linkre)/, $string;
@@ -386,11 +396,11 @@ sub manage_regular {
         if ($recurse) {
             $l = $self->inline_footnotes($l);
         }
+        # restore the verbatim pieces
+        $l =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb->($1)/gsxe;
         push @out, $l;
     }
-
-    # restore the verbatim pieces
-    $string =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb->($1)/gsxe;
+    die "Failed to restore chunks" if $restored != @verbatims;
     undef $save_verb;
     undef $restore_verb;
     return join("", @out);

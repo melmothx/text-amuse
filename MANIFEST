@@ -193,6 +193,9 @@ t/testfiles/unroll.exp.html
 t/testfiles/unroll.exp.ltx
 t/testfiles/unroll.muse
 t/testfiles/update.pl
+t/testfiles/verb.exp.html
+t/testfiles/verb.exp.ltx
+t/testfiles/verb.muse
 t/testfiles/verbatim.exp.html
 t/testfiles/verbatim.exp.ltx
 t/testfiles/verbatim.muse
