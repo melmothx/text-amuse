@@ -338,6 +338,25 @@ sub manage_regular {
     }
     return "" unless defined $string;
     my $linkre = $self->link_re;
+
+    # remove the verbatim pieces
+    my @verbatims;
+    my $rand = int(rand(1000000));
+    my $startm = "\x{f0001}${rand}\x{f0002}";
+    my $stopm  = "\x{f0003}${rand}\x{f0004}";
+    my $save_verb = sub {
+        my $string = shift;
+        return $startm . $#verbatims . $stopm;
+    };
+    my $restore_verb = sub {
+        my $num = shift;
+        my $string = $verbatims[$num];
+        die "Pulled too much when restoring verb" unless defined $string;
+        return $self->safe($string);
+    };
+
+    $string =~ s/<verbatim>(.+)<\/verbatim>/$save_verb->($1)/gsxe;
+
     # split at [[ ]] to avoid the mess
     my @pieces = split /($linkre)/, $string;
     my @out;
@@ -369,6 +388,11 @@ sub manage_regular {
         }
         push @out, $l;
     }
+
+    # restore the verbatim pieces
+    $string =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb->($1)/gsxe;
+    undef $save_verb;
+    undef $restore_verb;
     return join("", @out);
 }
 
