@@ -142,7 +142,7 @@ E.g.
 
 sub process {
     my ($self, %opts) = @_;
-    my (@pieces, @splat, $splithtml);
+    my (@pieces, @splat);
     my $split = $opts{split};
     my $imagere = $self->image_re;
     $self->reset_toc_stack;
