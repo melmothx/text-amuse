@@ -222,13 +222,13 @@ sub _parse_body {
         if ($el->type eq 'li' or $el->type eq 'dd') {
             if (@listpile) {
                 # indentation is major, open a new level
-                if (_indentation_kinda_major($el, $listpile[$#listpile])) {
+                if (_indentation_kinda_major($el, $listpile[-1])) {
                     push @out, $self->_opening_blocks_new_level($el);
                     push @listpile, $self->_closing_blocks_new_level($el);
                 }
                 else {
                     # close the lists until we get the the right level
-                    while(@listpile and _indentation_kinda_minor($el, $listpile[$#listpile])) {
+                    while(@listpile and _indentation_kinda_minor($el, $listpile[-1])) {
                         push @out, pop @listpile;
                     }
                     if (@listpile) { # continue if open
@@ -237,8 +237,8 @@ sub _parse_body {
                             push @listpile, $self->_closing_blocks($el);
                         }
                         else {
-                            my $top = $listpile[$#listpile];
-                            while (@listpile and _indentation_kinda_equal($top, $listpile[$#listpile])) {
+                            my $top = $listpile[-1];
+                            while (@listpile and _indentation_kinda_equal($top, $listpile[-1])) {
                                 # empty the pile until the indentation drops.
                                 push @out, pop @listpile;
                             }
@@ -268,7 +268,7 @@ sub _parse_body {
         }
         elsif ($el->type eq 'regular') {
             # the type is regular: It can only close or continue
-            while (@listpile and _indentation_kinda_minor($el, $listpile[$#listpile])) {
+            while (@listpile and _indentation_kinda_minor($el, $listpile[-1])) {
                 push @out, pop @listpile;
             }
             if (@listpile) {
