@@ -13,11 +13,11 @@ Text::Amuse - Generate HTML and LaTeX documents from Emacs Muse markup.
 
 =head1 VERSION
 
-Version 0.76
+Version 0.80
 
 =cut
 
-our $VERSION = '0.76';
+our $VERSION = '0.80';
 
 
 =head1 SYNOPSIS

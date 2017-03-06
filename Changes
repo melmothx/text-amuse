@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.80 2017-03-06
+
+ - Add support for <verbatim> tag (GH#8 and GH#7)
+
 0.76 2016-10-20
 
  - Removed the use of $_ while reading files, which in some (corner)
