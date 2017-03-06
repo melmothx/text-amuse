@@ -36,3 +36,49 @@ Multiline verbatim test<br>
 </verbatim>
 
 [2] Another regular <verbatim>*footnote*</verbatim>.
+
+> This
+> is a <verbatim>[3] \^/<>"</verbatim> poem
+> with just one [3] \^/<>" footnote
+
+
+<verse>
+This
+is a <verbatim>\^/<>" [4]</verbatim> poem
+with just one [4] footnote
+</verse>
+
+[3] fn 3
+
+[4] fn 4
+
+ - A list <verbatim>*hello*  \^/<>"</verbatim>
+
+<br>
+
+ <verbatim>*definition* \^/<>"</verbatim> :: <verbatim>*body* \^/<>"</verbatim>
+
+<br>
+
+ 1. A list <verbatim>*hello*</verbatim>
+
+     1. A list <verbatim>*hello*</verbatim>
+
+          I. A list <verbatim>*hello* \^/<>"</verbatim>
+
+               I. A list <verbatim>*hello*</verbatim>
+
+<br>
+
+** Example <verbatim>*hey* \^/<>"</verbatim>
+
+<verbatim>*definition* \^/<>"</verbatim> try out <verbatim>*body*</verbatim>
+
+<example>
+<verbatim>*definition* \^/<>"</verbatim>
+try out <verbatim>*body*</verbatim>
+</example>
+
+<verbatim>* will not be a part</verbatim>
+
+\^/<>"
