@@ -364,19 +364,33 @@ sub manage_regular {
         die "Pulled too much when restoring verb" unless defined $string;
         return $self->safe($string);
     };
+    my $restore_verb_full = sub {
+        my $num = shift;
+        my $string = $verbatims[$num];
+        $restored++;
+        # print "Called restore_verb for $num\n";
+        die "Pulled too much when restoring verb" unless defined $string;
+        return '<verbatim>' . $string . '</verbatim>';
+    };
+
 
     $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
 
     # split at [[ ]] to avoid the mess
     my @pieces = split /($linkre)/, $string;
     my @out;
+  PIECE:
     while (@pieces) {
         my $l = shift @pieces;
         if ($l =~ m/^$linkre$/s and !$opts{nolinks}) {
-            push @out, $self->linkify($l);
-            next;
+            # we want the removed piece back verbatim, because the
+            # chunks are going to be processed anew.
+            $l =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb_full->($1)/gsxe;
+            my $link = $self->linkify($l);
+            push @out, $link;
+            next PIECE;
         } else {
-            next if $l eq ""; # no text!
+            next PIECE if $l eq ""; # no text!
 
             # convert the muse markup to tags
             $l = $self->muse_inline_syntax_to_tags($l);
@@ -400,7 +414,8 @@ sub manage_regular {
         $l =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb->($1)/gsxe;
         push @out, $l;
     }
-    die "Failed to restore chunks" if $restored != @verbatims;
+    die "Failed to restore chunks for $restored <=>" . join(' - ', @verbatims)
+      if $restored != @verbatims;
     undef $save_verb;
     undef $restore_verb;
     return join("", @out);

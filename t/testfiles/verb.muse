@@ -82,3 +82,22 @@ try out <verbatim>*body*</verbatim>
 <verbatim>* will not be a part</verbatim>
 
 \^/<>"
+
+[[<script>alert("!")</script>][<verbatim><script>alert("in the body!")</script></verbatim>]]
+
+<verbatim>[[<script>alert("!")</script>][<script>alert("in the body!")</script>]]</verbatim>
+
+<code><verbatim>[[link]]</verbatim></code>
+
+<verbatim><code>[[link]]</code></verbatim>
+
+
+  <verbatim><code>[[link]]</code></verbatim> :: <verbatim><code>[[link]]</code></verbatim>
+
+  <code><verbatim>[[link]]</verbatim></code> :: <code><verbatim>[[link]]</verbatim></code>
+
+
+
+[[<verbatim><script>alert("!")</script></verbatim>][<verbatim><script></verbatim> alert("in the body!")<verbatim><code></script></code></verbatim>]]
+
+[[<em><script>alert("!")</script></em>][<verbatim><script></verbatim> alert("in the body!")<verbatim><code></script></code></verbatim>]] [[<em><script>alert("!")</script></em>][<verbatim>*hello*</verbatim> *hello* <verbatim><script></verbatim> alert("in the body!")<verbatim><code></script></code></verbatim>]]
