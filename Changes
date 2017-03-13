@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.81 2017-03-13
+
+ - Fix <verbatim> inside url formatting
+
 0.80 2017-03-06
 
  - Add support for <verbatim> tag (GH#8 and GH#7)
