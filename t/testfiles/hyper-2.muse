@@ -10,6 +10,7 @@ This is the note.
 
 #invalid3 because the text continue
 
+This is valid,
 #valid3
 Anchor is on a line by itself (valid3)
 
