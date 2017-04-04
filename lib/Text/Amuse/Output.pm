@@ -317,9 +317,24 @@ sub blkstring  {
     return $table->{$block}->{$start_stop}->{$self->fmt};
 }
 
-=head3 manage_regular($element_or_string)
+=head3 manage_regular($element_or_string, %options)
 
 Main routine to transform a string to the given format
+
+Options:
+
+=over 4
+
+=item nolinks
+
+If set to true, do not parse the links and consider them plain strings
+
+=item anchors
+
+If set to true, parse the anchors and return two elements, the first
+is the processed string, the second is the processed anchors string.
+
+=back
 
 =cut
 
@@ -341,7 +356,9 @@ sub manage_regular {
             $recurse = 0;
         }
     }
-    return "" unless defined $string;
+    unless (defined $string) {
+        $string = '';
+    }
     my $linkre = $self->link_re;
 
     # remove the verbatim pieces
@@ -375,6 +392,12 @@ sub manage_regular {
 
 
     $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
+
+    my $anchors = '';
+    if ($opts{anchors}) {
+        # remove anchors from the string
+        ($string, $anchors) = $self->handle_anchors($string);
+    }
 
     # split at [[ ]] to avoid the mess
     my @pieces = split /($linkre)/, $string;
@@ -418,7 +441,13 @@ sub manage_regular {
       if $restored != @verbatims;
     undef $save_verb;
     undef $restore_verb;
-    return join("", @out);
+    my $final = join("", @out);
+    if ($opts{anchors}) {
+        return $final, $anchors;
+    }
+    else {
+        return $final;
+    }
 }
 
 =head3 inline_footnotes($string)
@@ -655,37 +684,57 @@ sub muse_inline_syntax_to_tags {
 
 =head3 manage_paragraph
 
+=head3 handle_anchors($string)
+
+Return two elements, the first is the string without the anchor, the
+second is a string with the anchors output.
+
 =cut
 
-sub manage_paragraph {
-    my ($self, $el) = @_;
-    my $body = $self->manage_regular($el);
+sub handle_anchors {
+    my ($self, $line) = @_;
+    return ('', '') unless length($line);
     # consider targets only if we find #here on a line by itself. This
     # way we can easily check the existing texts across all archives
     # and minimize clashes due to this markup change.
     my $hyperre = $self->hyperref_re;
+    my @anchors;
+    my $handle;
     if ($self->is_latex) {
-        $body =~ s/\A
-                   (\\
-                       \#
-                       ($hyperre)
-                   )
-                   (?=\n) # look forward for the end of line
-                  /\\hyperdef{amuse}{$2}{}%/x;
+        $handle = sub {
+            my $anchor = shift;
+            push @anchors, "\\hyperdef{amuse}{$anchor}{}%";
+            return '';
+        };
     }
     elsif ($self->is_html) {
-        $body =~ s/\A
-                   (\#
-                       ($hyperre)
-                   )
-                   (?=\n) # look forward for the end of line
-                  /<a id="text-amuse-label-$2"><\/a>/x;
+        $handle = sub {
+            my $anchor = shift;
+            push @anchors, qq{<a id="text-amuse-label-$anchor" class="text-amuse-internal-anchor"><\/a>};
+            return '';
+        };
     }
-    else {
-        die "Not reached";
-    }
+    else { die "Not reached" }
+    die "wtf" unless $handle;
+    $line =~ s/^
+               \x{20}*
+               (\#
+                   ($hyperre)
+               )
+               \x{20}*
+               $
+               \n? # remove the eventual trailing newline
+              /$handle->($2)/gmxe;
+    my $anchors_string = @anchors ? join("\n", @anchors) . "\n" : '';
+    return ($line, $anchors_string);
+}
+
+sub manage_paragraph {
+    my ($self, $el) = @_;
+    my ($body, $anchors) = $self->manage_regular($el, anchors => 1);
     chomp $body;
     return $self->blkstring(start  => "p") .
+      $anchors .
       $body . $self->blkstring(stop => "p");
 }
 
@@ -695,10 +744,22 @@ sub manage_paragraph {
 
 sub manage_header {
     my ($self, $el) = @_;
-    my $body = $self->manage_regular($el, nolinks => 1);
+    my ($body, $anchors) = $self->manage_regular($el, nolinks => 1, anchors => 1);
     # remove trailing spaces and \n
     chomp $body;
     my $leading = $self->blkstring(start => $el->type);
+    my $trailing = $self->blkstring(stop => $el->type);
+    if ($anchors) {
+        if ($self->is_html) {
+            #insert the <a> before the text
+            $leading .= $anchors;
+        }
+        elsif ($self->is_latex) {
+            # latex doesn't like it inside \chapter{}
+            $trailing .= $anchors;
+        }
+        else { die "Not reached" }
+    }
     # add them to the ToC for html output;
     if ($el->type =~ m/h([1-4])/) {
         my $level = $1;
@@ -707,15 +768,13 @@ sub manage_header {
         $level++; # increment by one
         die "wtf, no index for toc?" unless $index;
 
-        # inject the id into the html toc
+        # inject the id into the html toc (and the anchor)
         if ($self->is_html) {
             $leading = "<h" . $level .
-              qq{ id="toc$index">};
+              qq{ id="toc$index">} . $anchors;
         }
     }
-    return $leading .
-      $body .
-        $self->blkstring(stop => $el->type) . "\n";
+    return $leading . $body . $trailing . "\n";
 }
 
 =head3 add_to_table_of_contents
@@ -804,45 +863,71 @@ sub table_of_contents {
 
 sub manage_verse {
     my ($self, $el) = @_;
-    my ($lead, $eol, $stanzasep);
+    my ($lead, $stanzasep);
     if ($self->is_html) {
         $lead = "&nbsp;";
-        $eol = "<br />\n";
         $stanzasep = "\n<br /><br />\n";
     }
     elsif ($self->is_latex) {
         $lead = "~";
-        $eol = "\\forcelinebreak\n";
         $stanzasep = "\n\n";
     }
     else { die "Not reached" }
-    my @stanza;
-    my @out;
+
     my (@chunks) = split(/\n/, $el->string);
+    my (@out, @stanza, @anchors);
     foreach my $l (@chunks) {
         if ($l =~ m/^( *)(.+?)$/s) {
             my $leading = $lead x length($1);
-            my $text = $self->manage_regular($2);
-            push @stanza, $leading . $text;
+            my ($text, $anchors) = $self->manage_regular($2, anchors => 1);
+            if ($anchors) {
+                push @anchors, $anchors;
+            }
+            if (length($text)) {
+                push @stanza, $leading . $text;
+            }
         }
         elsif ($l =~ m/^\s*$/s) {
-            if (@stanza) {
-                push @out, join($eol, @stanza);
-                @stanza = ();
-            }
+            push @out, $self->_format_stanza(\@stanza, \@anchors);
+            die "wtf" if @stanza || @anchors;
         }
         else {
             die "wtf?";
         }
     }
-    # flush the stanzas
-    if (@stanza) {
-        push @out, join($eol, @stanza);
-    }
+    # flush the stanzas and the anchors
+    push @out, $self->_format_stanza(\@stanza, \@anchors) if @stanza || @anchors;
+    die "wtf" if @stanza || @anchors;
+
     # process
     return $self->blkstring(start => $el->type) .
       join($stanzasep, @out) . $self->blkstring(stop => $el->type);
 }
+
+sub _format_stanza {
+    my ($self, $stanza, $anchors) = @_;
+
+    my $eol;
+    if ($self->is_html) {
+        $eol = "<br />\n";
+    }
+    elsif ($self->is_latex) {
+        $eol = "\\forcelinebreak\n";
+    }
+    else { die "Not reached" };
+
+    my ($anchor_string, $stanza_string) = ('', '');
+    if (@$anchors) {
+        $anchor_string = join("\n", @$anchors);
+        @$anchors = ();
+    }
+    if (@$stanza) {
+        $stanza_string = join($eol, @$stanza);
+        @$stanza = ();
+    }
+    return $anchor_string . $stanza_string;
+}
+
 
 =head3 manage_comment
 
