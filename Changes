@@ -1,9 +1,10 @@
 Revision history for perl module Text::Amuse
 
-0.90 UNRELEASED
+0.82 2017-04-03
 
  - Support named anchors in sections and verses (and relaxed the
-   matching rule so it can be anywhere).
+   matching rule so it can be anywhere, but always on a line by
+   itself).
 
 0.81 2017-03-13
 
