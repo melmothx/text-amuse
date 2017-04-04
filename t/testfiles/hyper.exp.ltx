@@ -20,7 +20,7 @@ A simple internal link is created with \textbackslash{}hypertarget, with two par
 
 
 \hyperdef{amuse}{label2}{}%
-This is invalid.
+This is valid.
 
 
 \#1blabla
@@ -47,15 +47,15 @@ in quotation is not neutralized,
 
 
 \begin{verse}
-\#label6\forcelinebreak
-in verse is neutralized
+\hyperdef{amuse}{label6}{}%
+in verse is not neutralized
 \end{verse}
 
 
 
 \begin{verse}
-\#label7\forcelinebreak
-~in verse again
+\hyperdef{amuse}{label7}{}%
+~in verse again, we have a label
 \end{verse}
 
 
@@ -63,8 +63,8 @@ in verse is neutralized
 This is a label despite of the trailing whitespace.
 
 
- \#label9
-This is not because of the leading whitespace.
+\hyperdef{amuse}{label9}{}%
+This is a label despite of the leading whitespace.
 
 
 \begin{enumerate}[1.]

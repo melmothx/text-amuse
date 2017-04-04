@@ -19,7 +19,7 @@ A simple internal link is created with \hypertarget, with two parameters of an a
 ** Next
 
 #label2
-This is invalid.
+This is valid.
 
 #1blabla
 Not a label, starts with a number
@@ -33,18 +33,18 @@ This is verbatim
   in quotation is not neutralized,
 
 > #label6
-> in verse is neutralized
+> in verse is not neutralized
 
 <verse>
 #label7
- in verse again
+ in verse again, we have a label
 </verse>
 
 #label9 
 This is a label despite of the trailing whitespace.
 
  #label9
-This is not because of the leading whitespace.
+This is a label despite of the leading whitespace.
 
  1. #label8 not a label
 
