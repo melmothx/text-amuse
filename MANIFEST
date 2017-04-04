@@ -28,6 +28,7 @@ t/header-defined.t
 t/headers.t
 t/hyphenation.t
 t/images.t
+t/internal-linking.t
 t/languages.t
 t/lists.t
 t/manifest.t
@@ -109,6 +110,9 @@ t/testfiles/headings.muse
 t/testfiles/high-num-list.exp.html
 t/testfiles/high-num-list.exp.ltx
 t/testfiles/high-num-list.muse
+t/testfiles/hyper-2.exp.html
+t/testfiles/hyper-2.exp.ltx
+t/testfiles/hyper-2.muse
 t/testfiles/hyper.exp.html
 t/testfiles/hyper.exp.ltx
 t/testfiles/hyper.muse

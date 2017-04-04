@@ -6,7 +6,7 @@ use warnings;
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 117;
+use Test::More tests => 137;
 use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 
@@ -26,7 +26,7 @@ foreach my $i (2..14) {
     my $hlink = qq{<a class="text-amuse-link" href="#text-amuse-label-valid$i">valid$i</a>};
     like $html, qr{\Q$hlink\E}, "$link found";
 }
-foreach my $i (2..14) {
+foreach my $i (1..18) {
     my $str = '\hyperdef{amuse}{invalid' . $i . '}{}%';
     my $link = '\hyperref{}{amuse}{invalid' . $i . '}{invalid' . $i . '}';
     unlike $ltx, qr{\Q$str\E}, "$str not found (invalid)";

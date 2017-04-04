@@ -18,7 +18,7 @@ Anchor is on a line by itself (valid3)
 
 *** Section 2 #invalid4
 
-*** #valid5
+***** #valid5
 Section 3 with valid5 anchor (but weird).
 
 *** #invalid5 <br> In title
