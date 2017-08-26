@@ -58,7 +58,6 @@ sub _list_index_map {
     my $self = shift;
     unless ($self->{_list_index_map}) {
         my %map = map { $_ . '.' => $_ } (0..1000); # never seen lists so long
-        $map{'-'} = 1;
         # this is a bit naif but will do. Generated with Roman module. We
         # support them to 89, otherwise you have to use i. i. i.
 
@@ -79,8 +78,8 @@ sub _list_index_map {
             my $lcount = 0;
             foreach my $letter (@$list) {
                 $lcount++;
-                $map{$letter . '.'} = $lcount;
-                $map{uc($letter) . '.'} = $lcount;
+                $map{$letter} = $lcount;
+                $map{uc($letter)} = $lcount;
             }
         }
         $self->{_list_index_map} = \%map;
@@ -600,6 +599,7 @@ sub _parse_string {
             my $list_type = $self->_identify_list_type($prefix);
             $element{indentation} = length($whitespace);
             $element{block} = $list_type;
+            $element{start_list_index} = $self->_get_start_list_index($prefix);
             return %element;
         }
     }
@@ -648,6 +648,19 @@ sub _identify_list_type {
         die "$list_type unrecognized, fix your code\n";
     }
     return $type;
+}
+
+sub _get_start_list_index {
+    my ($self, $prefix) = @_;
+    my $map = $self->_list_index_map;
+    if (exists $map->{$prefix}) {
+        return $map->{$prefix};
+    }
+    else {
+        warn "$prefix doesn't map exactly to a list index!\n";
+        print Dumper($map->{$prefix});
+        return 0;
+    }
 }
 
 sub _list_element_can_be_first {

@@ -30,6 +30,7 @@ sub new {
                 indentation => 0,
                 attribute_type => '',
                 style => 'X',
+                start_list_index => 0,
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -176,6 +177,24 @@ Accessor to attribute_type
 
 sub attribute_type {
     return shift->{attribute_type};
+}
+
+
+=head2 start_list_index
+
+Accessor rw to start_list_index (defaults to 0)
+
+=cut
+
+sub start_list_index {
+    my $self = shift;
+    if (@_) {
+        my $arg = shift;
+        if (defined $arg) {
+            $self->{start_list_index} = $arg;
+        }
+    }
+    return $self->{start_list_index};
 }
 
 =head2 HELPERS
