@@ -53,6 +53,41 @@ sub new {
     bless $self, $class;
 }
 
+sub _list_index_map {
+    # numerals
+    my $self = shift;
+    unless ($self->{_list_index_map}) {
+        my %map = map { $_ . '.' => $_ } (0..1000); # never seen lists so long
+        $map{'-'} = 1;
+        # this is a bit naif but will do. Generated with Roman module. We
+        # support them to 89, otherwise you have to use i. i. i.
+
+        my @romans = (qw/i ii iii iv v vi vii viii ix x xi xii xiii
+                         xiv xv xvi xvii xviii xix xx xxi xxii xxiii
+                         xxiv xxv xxvi xxvii xxviii xxix xxx xxxi
+                         xxxii xxxiii xxxiv xxxv xxxvi xxxvii xxxviii
+                         xxxix xl xli xlii xliii xliv xlv xlvi xlvii
+                         xlviii xlix l li lii liii liv lv lvi lvii
+                         lviii lix lx lxi lxii lxiii lxiv lxv lxvi
+                         lxvii lxviii lxix lxx lxxi lxxii lxxiii lxxiv
+                         lxxv lxxvi lxxvii lxxviii lxxix lxxx lxxxi
+                         lxxxii lxxxiii lxxxiv lxxxv lxxxvi lxxxvii
+                         lxxxviii lxxxix/);
+        my @alpha = ('a'..'z');
+        # we will need to take care of 'i', 'x', 'v', 'l', which can be both alpha or roman
+        foreach my $list (\@alpha, \@romans) {
+            my $lcount = 0;
+            foreach my $letter (@$list) {
+                $lcount++;
+                $map{$letter . '.'} = $lcount;
+                $map{uc($letter) . '.'} = $lcount;
+            }
+        }
+        $self->{_list_index_map} = \%map;
+    }
+    return $self->{_list_index_map};
+}
+
 
 sub _debug {
     my $self = shift;

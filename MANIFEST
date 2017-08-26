@@ -1,5 +1,6 @@
 bin/muse-quick.pl
 Changes
+examples/generate-roman-numbers.pl
 lib/Text/Amuse.pm
 lib/Text/Amuse/Beamer.pm
 lib/Text/Amuse/Document.pm
@@ -30,6 +31,7 @@ t/hyphenation.t
 t/images.t
 t/internal-linking.t
 t/languages.t
+t/list-continuations.t
 t/lists.t
 t/manifest.t
 t/memory-cycles.t
@@ -81,6 +83,7 @@ t/testfiles/crashed-1.muse
 t/testfiles/desc-lists.exp.html
 t/testfiles/desc-lists.exp.ltx
 t/testfiles/desc-lists.muse
+t/testfiles/enumerations.muse
 t/testfiles/example-2.exp.html
 t/testfiles/example-2.exp.ltx
 t/testfiles/example-2.muse
