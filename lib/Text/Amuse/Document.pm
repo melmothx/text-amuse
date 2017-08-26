@@ -660,7 +660,6 @@ sub _get_start_list_index {
     }
     else {
         warn "$prefix doesn't map exactly to a list index!\n";
-        print Dumper($map->{$prefix});
         return 0;
     }
 }
