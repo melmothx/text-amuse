@@ -570,6 +570,7 @@ sub _parse_string {
         $element{attribute_type} = 'dt';
         $element{removed} = $1 . $2 . $3 . $4 . $6;
         $element{indentation} = length($1);
+        $element{start_list_index} = 1;
         return %element;
     }
     if (!$opts{nolist}) {
@@ -579,6 +580,7 @@ sub _parse_string {
             $element{string} = $3;
             $element{block} = "ul";
             $element{indentation} = length($2);
+            $element{start_list_index} = 1;
             return %element;
         }
         if ($l =~ m/^((\x{20}+)  # leading space and type $1
@@ -668,23 +670,13 @@ sub _list_element_can_be_first {
     # every dd can be the first
     return 1 if $el->type eq 'dd';
     return unless $el->type eq 'li';
-    my $type = $el->block;
-    my $prefix = $el->removed;
-    if ($prefix =~ m/^\s{1,6}  # leading space
-                     (  # the type               $1
-                         - | ((1|a|A|i|I)\.)
-                     )
-                     \s+  # space
-                     $/sx) {
-        my $id = $1;
-        if    ($type eq 'ul'  and $id eq '-' ) { return 1; }
-        elsif ($type eq 'oln' and $id eq '1.') { return 1; }
-        elsif ($type eq 'ola' and $id eq 'a.') { return 1; }
-        elsif ($type eq 'olA' and $id eq 'A.') { return 1; }
-        elsif ($type eq 'oli' and $id eq 'i.') { return 1; }
-        elsif ($type eq 'olI' and $id eq 'I.') { return 1; }
+    # first element, can't be too indented
+    if ($el->indentation > 6) {
+        return 0;
     }
-    return;
+    else {
+        return $el->start_list_index;
+    }
 }
 
 sub _current_el {
@@ -797,6 +789,9 @@ sub _opening_blocks_new_level {
     my ($self, $el) = @_;
     my @out = ($self->_create_block(open => $el->block, $el->indentation),
                $self->_opening_blocks($el));
+    if (my $list_index = $el->start_list_index) {
+        $out[0]->start_list_index($list_index);
+    }
     return @out;
 }
 sub _closing_blocks_new_level {

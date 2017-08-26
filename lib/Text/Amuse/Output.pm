@@ -153,7 +153,7 @@ sub process {
         }
         if ($el->type eq 'startblock') {
             die "startblock with string passed!: " . $el->string if $el->string;
-            push @pieces, $self->blkstring(start => $el->block);
+            push @pieces, $self->blkstring(start => $el->block, start_list_index => $el->start_list_index);
         }
         elsif ($el->type eq 'stopblock') {
             die "stopblock with string passed!:" . $el->string if $el->string;
