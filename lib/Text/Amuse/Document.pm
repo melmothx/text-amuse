@@ -9,7 +9,7 @@ use constant {
     IMINOR => -1,
 };
 
-# use Data::Dumper;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -46,6 +46,10 @@ sub new {
         die "Wrong argument! $args{file} doesn't exist!\n"
     }
     $self->{debug} = 1 if $args{debug};
+    $self->{_raw_footnotes} = {};
+    $self->{_current_footnote_indent} = 0;
+    $self->{_current_footnote_number} = undef;
+    $self->{_current_footnote_stack} = [];
     bless $self, $class;
 }
 
@@ -288,22 +292,29 @@ sub _parse_body {
     }
 
     # now we use parsed as output
-    my %footnotes;
+    $self->_flush_current_footnote;
     while (@out) {
         my $el = shift @out;
         if ($el->type eq 'footnote') {
-            if ($el->removed =~ m/\A\[([0-9]+)\]\s+\z/) {
-                warn "Overwriting footnote number $1" if exists $footnotes{$1};
-                $footnotes{$1} = $el;
+            $self->_register_footnote($el);
+        }
+        elsif (my $fn_indent = $self->_current_footnote_indent) {
+            if ($el->type eq 'null') {
+                push @parsed, $el;
             }
-            else { die "Something is wrong here! <" . $el->removed . ">"
-                     . $el->string . "!" }
+            elsif ($el->indentation and $el->indentation == $fn_indent) {
+                push @{$self->_current_footnote_stack}, Text::Amuse::Element->new($self->_parse_string("<br>\n")), $el;
+            }
+            else {
+                $self->_flush_current_footnote;
+                push @parsed, $el;
+            }
         }
         else {
             push @parsed, $el;
         }
     }
-    $self->_raw_footnotes(\%footnotes);
+    $self->_flush_current_footnote;
 
     # unroll the quote/center/right blocks
     while (@parsed) {
@@ -395,11 +406,30 @@ sub get_footnote {
 
 sub _raw_footnotes {
     my $self = shift;
-    if (@_) {
-        $self->{_raw_footnotes} = shift;
-    }
     return $self->{_raw_footnotes};
 }
+
+sub _current_footnote_stack {
+    return shift->{_current_footnote_stack};
+}
+
+sub _current_footnote_number {
+    my $self = shift;
+    if (@_) {
+        $self->{_current_footnote_number} = shift;
+    }
+    return $self->{_current_footnote_number};
+}
+
+sub _current_footnote_indent {
+    my $self = shift;
+    if (@_) {
+        $self->{_current_footnote_indent} = shift;
+    }
+    return $self->{_current_footnote_indent};
+}
+
+
 
 sub _parse_string {
     my ($self, $l, %opts) = @_;
@@ -793,5 +823,36 @@ sub _element_is_same_kind_as_in_list {
     return $found;
 }
 
+sub _register_footnote {
+    my ($self, $el) = @_;
+    my $fn_num = $el->footnote_index;
+    if (defined $fn_num) {
+        if ($self->_raw_footnotes->{$fn_num}) {
+            warn "Overwriting footnote number $fn_num!\n";
+        }
+        $self->_flush_current_footnote;
+        $self->_current_footnote_indent($el->indentation);
+        $self->_current_footnote_number($fn_num);
+        $self->_raw_footnotes->{$fn_num} = $el;
+    }
+    else {
+        die "Something is wrong here! <" . $el->removed . ">"
+          . $el->string . "!";
+    }
+}
+
+sub _flush_current_footnote {
+    my $self = shift;
+    if (@{$self->_current_footnote_stack}) {
+        my $footnote = $self->get_footnote($self->_current_footnote_number);
+        die "Missing current footnote to append " . Dumper($self->_current_footnote_stack) unless $footnote;
+        while (@{$self->_current_footnote_stack}) {
+            my $append = shift @{$self->_current_footnote_stack};
+            $footnote->append($append);
+        }
+    }
+    $self->_current_footnote_indent(0);
+    $self->_current_footnote_number(undef)
+}
 
 1;

@@ -340,7 +340,7 @@ sub add_to_string {
 
 =head3 append($element)
 
-Append the element passed as argument to this one, setting th raw_line
+Append the element passed as argument to this one, setting the raw_line
 
 =cut
 
@@ -393,5 +393,16 @@ sub become_regular {
     $self->type('regular');
     $self->block('');
 }
+
+sub footnote_index {
+    my $self = shift;
+    if ($self->type eq 'footnote') {
+        if ($self->removed =~ m/\A\[([0-9]+)\]\s+\z/) {
+            return $1;
+        }
+    }
+    return undef;
+}
+
 
 1;
