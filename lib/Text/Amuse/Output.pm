@@ -1465,7 +1465,9 @@ sub _build_blk_table {
                                                 html => sub {
                                                     _html_ol_element(n => @_);
                                                 },
-                                                ltx => "\n\\begin{enumerate}[1.]\n",
+                                                ltx => sub {
+                                                    _ltx_enum_element(1 => @_);
+                                                },
                                                },
                                       stop => {
                                                html => "\n</ol>\n",
@@ -1479,7 +1481,7 @@ sub _build_blk_table {
                                                      _html_ol_element(n => @_);
                                                  },
                                                  ltx => sub {
-                                                     "\n\\begin{enumerate}[1.]\n",
+                                                     _ltx_enum_element(1 => @_);
                                                  },
                                                 },
                                        stop => {
@@ -1494,7 +1496,7 @@ sub _build_blk_table {
                                                      _html_ol_element(i => @_);
                                                  },
                                                  ltx => sub {
-                                                     "\n\\begin{enumerate}[i.]\n",
+                                                     _ltx_enum_element(i => @_);
                                                  },
                                                 },
                                        stop => {
@@ -1509,7 +1511,7 @@ sub _build_blk_table {
                                                      _html_ol_element(I => @_);
                                                  },
                                                  ltx => sub {
-                                                     "\n\\begin{enumerate}[I.]\n",
+                                                     _ltx_enum_element(I => @_);
                                                  },
                                                 },
                                        stop => {
@@ -1524,7 +1526,7 @@ sub _build_blk_table {
                                                      _html_ol_element(A => @_);
                                                  },
                                                  ltx => sub {
-                                                     "\n\\begin{enumerate}[A.]\n",
+                                                     _ltx_enum_element(A => @_);
                                                  },
                                                 },
                                        stop => {
@@ -1539,7 +1541,7 @@ sub _build_blk_table {
                                                      _html_ol_element(a => @_);
                                                  },
                                                  ltx => sub {
-                                                     "\n\\begin{enumerate}[a.]\n",
+                                                     _ltx_enum_element(a => @_);
                                                  },
                                                 },
                                        stop => {
@@ -1769,10 +1771,30 @@ sub _html_ol_element {
     }
     my $start = $attributes{start_list_index};
     my $start_string = '';
-    if ($start and $start > 1) {
+    if ($start and $start =~ m/\A[0-9]+\z/ and $start > 1) {
         $start_string = qq{ start="$start"};
     }
     return "\n<ol" . $ol_type . $start_string . ">\n";
+}
+
+sub _ltx_enum_element {
+    my ($type, %attributes) = @_;
+    my %map = (
+               1 => '1',
+               i => 'i',
+               I => 'I',
+               A => 'A',
+               a => 'a',
+              );
+    my $string = "\n\\begin{enumerate}[";
+    my $type_string = $map{$type} || '1';
+
+    my $start = $attributes{start_list_index};
+    my $start_string = '';
+    if ($start and $start =~ m/\A[0-9]+\z/ and $start > 1) {
+        $start_string = qq{, start=$start};
+    }
+    return $string . $type_string . '.' . $start_string . "]\n";
 }
 
 
