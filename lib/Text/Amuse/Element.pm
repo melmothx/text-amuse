@@ -394,6 +394,12 @@ sub become_regular {
     $self->block('');
 }
 
+=head3 footnote_index
+
+Return the number of the footnote if the element is a footnote, undef othewise
+
+=cut
+
 sub footnote_index {
     my $self = shift;
     if ($self->type eq 'footnote') {
