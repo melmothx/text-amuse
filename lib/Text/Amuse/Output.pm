@@ -1290,6 +1290,14 @@ Methods providing some fixed values
 =cut
 
 sub blk_table {
+    my $self = shift;
+    unless ($self->{_block_table_map}) {
+        $self->{_block_table_map} = $self->_build_blk_table;
+    }
+    return $self->{_block_table_map};
+}
+
+sub _build_blk_table {
     my $table = {
                                   p =>  { start => {
                                                     ltx => "\n",
