@@ -57,7 +57,7 @@ sub _list_index_map {
     # numerals
     my $self = shift;
     unless ($self->{_list_index_map}) {
-        my %map = map { $_ . '.' => $_ } (0..1000); # never seen lists so long
+        my %map = map { $_ => $_ } (0..1000); # never seen lists so long
         # this is a bit naif but will do. Generated with Roman module. We
         # support them to 89, otherwise you have to use i. i. i.
 
