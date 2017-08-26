@@ -1,0 +1,18 @@
+#title Multiline footnotes
+
+This is a paragraph [1] with a [2] footnote [11] Footnote
+
+[1] Footnote.
+
+    Here the footnote continues, because of the same indentation.
+
+
+[11] Footnote.
+
+     Here it continues as well.
+
+[2] Footnote, single.
+
+  This is just a quotation because indentation doesn't match.
+
+
