@@ -1462,7 +1462,9 @@ sub _build_blk_table {
 
                                ol => {
                                       start => {
-                                                html => "\n<ol>\n",
+                                                html => sub {
+                                                    _html_ol_element(n => @_);
+                                                },
                                                 ltx => "\n\\begin{enumerate}[1.]\n",
                                                },
                                       stop => {
@@ -1474,7 +1476,7 @@ sub _build_blk_table {
                                oln => {
                                        start => {
                                                  html => sub {
-                                                     "\n<ol>\n",
+                                                     _html_ol_element(n => @_);
                                                  },
                                                  ltx => sub {
                                                      "\n\\begin{enumerate}[1.]\n",
@@ -1489,7 +1491,7 @@ sub _build_blk_table {
                                oli => {
                                        start => {
                                                  html => sub {
-                                                     "\n<ol style=\"list-style-type:lower-roman\">\n"
+                                                     _html_ol_element(i => @_);
                                                  },
                                                  ltx => sub {
                                                      "\n\\begin{enumerate}[i.]\n",
@@ -1504,7 +1506,7 @@ sub _build_blk_table {
                                olI => {
                                        start => {
                                                  html => sub {
-                                                     "\n<ol style=\"list-style-type:upper-roman\">\n",
+                                                     _html_ol_element(I => @_);
                                                  },
                                                  ltx => sub {
                                                      "\n\\begin{enumerate}[I.]\n",
@@ -1519,7 +1521,7 @@ sub _build_blk_table {
                                olA => {
                                        start => {
                                                  html => sub {
-                                                     "\n<ol style=\"list-style-type:upper-alpha\">\n",
+                                                     _html_ol_element(A => @_);
                                                  },
                                                  ltx => sub {
                                                      "\n\\begin{enumerate}[A.]\n",
@@ -1534,7 +1536,7 @@ sub _build_blk_table {
                                ola => {
                                        start => {
                                                  html => sub {
-                                                     "\n<ol style=\"list-style-type:lower-alpha\">\n",
+                                                     _html_ol_element(a => @_);
                                                  },
                                                  ltx => sub {
                                                      "\n\\begin{enumerate}[a.]\n",
@@ -1750,5 +1752,28 @@ sub html_table_mapping {
             etr => "  </tr>",
            };
 }
+
+sub _html_ol_element {
+    my ($type, %attributes) = @_;
+    my %map = (
+               ol => '',
+               n => '',
+               i => 'lower-roman',
+               I => 'upper-roman',
+               A => 'upper-alpha',
+               a => 'lower-alpha',
+              );
+    my $ol_type = '';
+    if ($map{$type}) {
+        $ol_type = qq{ style="list-style-type:$map{$type}"};
+    }
+    my $start = $attributes{start_list_index};
+    my $start_string = '';
+    if ($start and $start > 1) {
+        $start_string = qq{ start="$start"};
+    }
+    return "\n<ol" . $ol_type . $start_string . ">\n";
+}
+
 
 1;
