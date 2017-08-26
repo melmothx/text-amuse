@@ -306,7 +306,7 @@ sub manage_html_footnote {
 =cut
 
 sub blkstring  {
-    my ($self, $start_stop, $block) = @_;
+    my ($self, $start_stop, $block, %attributes) = @_;
     die "Wrong usage! Missing params $start_stop, $block"
       unless ($start_stop && $block);
     die "Wrong usage!\n" unless ($start_stop eq 'stop' or
@@ -314,7 +314,13 @@ sub blkstring  {
     my $table = $self->blk_table;
     die "Table is missing an element $start_stop  $block "
       unless exists $table->{$block}->{$start_stop}->{$self->fmt};
-    return $table->{$block}->{$start_stop}->{$self->fmt};
+    my $string = $table->{$block}->{$start_stop}->{$self->fmt};
+    if (ref($string)) {
+        return $string->(%attributes);
+    }
+    else {
+        return $string;
+    }
 }
 
 =head3 manage_regular($element_or_string, %options)
@@ -1467,8 +1473,12 @@ sub _build_blk_table {
 
                                oln => {
                                        start => {
-                                                 html => "\n<ol>\n",
-                                                 ltx => "\n\\begin{enumerate}[1.]\n",
+                                                 html => sub {
+                                                     "\n<ol>\n",
+                                                 },
+                                                 ltx => sub {
+                                                     "\n\\begin{enumerate}[1.]\n",
+                                                 },
                                                 },
                                        stop => {
                                                 html => "\n</ol>\n",
@@ -1478,8 +1488,12 @@ sub _build_blk_table {
 
                                oli => {
                                        start => {
-                                                 html => "\n<ol style=\"list-style-type:lower-roman\">\n",
-                                                 ltx => "\n\\begin{enumerate}[i.]\n",
+                                                 html => sub {
+                                                     "\n<ol style=\"list-style-type:lower-roman\">\n"
+                                                 },
+                                                 ltx => sub {
+                                                     "\n\\begin{enumerate}[i.]\n",
+                                                 },
                                                 },
                                        stop => {
                                                 html => "\n</ol>\n",
@@ -1489,8 +1503,12 @@ sub _build_blk_table {
 
                                olI => {
                                        start => {
-                                                 html => "\n<ol style=\"list-style-type:upper-roman\">\n",
-                                                 ltx => "\n\\begin{enumerate}[I.]\n",
+                                                 html => sub {
+                                                     "\n<ol style=\"list-style-type:upper-roman\">\n",
+                                                 },
+                                                 ltx => sub {
+                                                     "\n\\begin{enumerate}[I.]\n",
+                                                 },
                                                 },
                                        stop => {
                                                 html => "\n</ol>\n",
@@ -1500,8 +1518,12 @@ sub _build_blk_table {
 
                                olA => {
                                        start => {
-                                                 html => "\n<ol style=\"list-style-type:upper-alpha\">\n",
-                                                 ltx => "\n\\begin{enumerate}[A.]\n",
+                                                 html => sub {
+                                                     "\n<ol style=\"list-style-type:upper-alpha\">\n",
+                                                 },
+                                                 ltx => sub {
+                                                     "\n\\begin{enumerate}[A.]\n",
+                                                 },
                                                 },
                                        stop => {
                                                 html => "\n</ol>\n",
@@ -1511,8 +1533,12 @@ sub _build_blk_table {
 
                                ola => {
                                        start => {
-                                                 html => "\n<ol style=\"list-style-type:lower-alpha\">\n",
-                                                 ltx => "\n\\begin{enumerate}[a.]\n",
+                                                 html => sub {
+                                                     "\n<ol style=\"list-style-type:lower-alpha\">\n",
+                                                 },
+                                                 ltx => sub {
+                                                     "\n\\begin{enumerate}[a.]\n",
+                                                 },
                                                 },
                                        stop => {
                                                 html => "\n</ol>\n",
