@@ -8,12 +8,53 @@
   
       8. Abc
   
+          i. Roman
+          ii. Roman
+
+
   c. First
   
+          i. Alpha
+          l. Alpha
+          m. Alpha
+
   d. Second
   
       f. Third
   
       g. Abc
+
+          i. Alpha
+          l. Alpha
+
+And what is this?
+
+
+  x. Roman.
+
+  xi. Roman.
+
+
+And this?
+
+  c. Alpha
+
+  d. Alpha.
+
+
+And this???
+
+  x. Alpha
+
+  y. Alpha
+
+  z. Alpha
+
+
+And this?
+
+  i. Alpha
+
+  l. Alpha
 
 
