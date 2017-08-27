@@ -790,6 +790,7 @@ sub _opening_blocks_new_level {
                $self->_opening_blocks($el));
     if (my $list_index = $el->start_list_index) {
         $out[0]->start_list_index($list_index);
+        $out[1]->start_list_index($list_index);
     }
     return @out;
 }
