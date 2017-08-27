@@ -336,7 +336,7 @@ sub _parse_body {
             if ($el->type eq 'null') {
                 push @parsed, $el;
             }
-            elsif ($el->indentation and $el->indentation == $fn_indent) {
+            elsif ($el->indentation and _kinda_equal($el->indentation, $fn_indent)) {
                 push @{$self->_current_footnote_stack}, Text::Amuse::Element->new($self->_parse_string("<br>\n")), $el;
             }
             else {
@@ -818,6 +818,14 @@ sub _indentation_kinda_major {
 
 sub _indentation_kinda_equal {
     my $result = _indentation_compare(@_);
+    if ($result == IEQUAL) {
+        return 1;
+    }
+    return 0;
+}
+
+sub _kinda_equal {
+    my $result = _compare_tolerant(@_);
     if ($result == IEQUAL) {
         return 1;
     }
