@@ -269,7 +269,8 @@ sub _parse_body {
                     # close the lists until we get the the right level
                     $self->_list_close_until_indentation($el);
                     if ($self->_list_pile_count) { # continue if open
-                        if (_element_is_same_kind_as_in_list($el, $self->_list_element_pile)) {
+                        if ($self->_list_element_is_same_kind_as_in_list($el) and
+                            $self->_list_element_is_a_progression($el)) {
                             $self->_list_continuation($el);
                         }
                         else {
@@ -849,8 +850,10 @@ sub _compare_tolerant {
     }
 }
 
-sub _element_is_same_kind_as_in_list {
-    my ($el, $list) = @_;
+
+sub _list_element_is_same_kind_as_in_list {
+    my ($self, $el) = @_;
+    my $list = $self->_list_element_pile;
     my $find = $el->block;
     my $found = 0;
     for (my $i = $#$list; $i >= 0; $i--) {
@@ -924,13 +927,22 @@ sub _reset_list_parsing_output {
 sub _list_open_new_list_level {
     my ($self, $el) = @_;
     push @{$self->_list_parsing_output}, $self->_opening_blocks_new_level($el);
-    push @{$self->_list_element_pile}, $self->_closing_blocks_new_level($el);
+    my @pile = $self->_closing_blocks_new_level($el);
+    if (my $list_index = $el->start_list_index) {
+        $_->start_list_index($list_index) for @pile;
+    }
+    push @{$self->_list_element_pile}, @pile;
 }
 
 sub _list_continuation {
     my ($self, $el) = @_;
+    my $current = $self->_list_pile_last_element->start_list_index + 1;
     push @{$self->_list_parsing_output}, pop @{$self->_list_element_pile}, $self->_opening_blocks($el);
-    push @{$self->_list_element_pile}, $self->_closing_blocks($el);
+    my @pile = $self->_closing_blocks($el);
+    if (my $list_index = $el->start_list_index) {
+        $_->start_list_index($current) for @pile;
+    }
+    push @{$self->_list_element_pile}, @pile;
 }
 
 sub _close_list_level {
@@ -957,5 +969,28 @@ sub _list_flush {
         $self->_close_list_level;
     }
 }
+
+sub _list_element_is_a_progression {
+    my ($self, $el) = @_;
+    # not defined, not needed.
+    my $last = $self->_list_pile_last_element->start_list_index;
+    my $current = $el->start_list_index;
+    # no index from one or another, we cant compare
+    if (!$last or !$current) {
+        return 1;
+    }
+    elsif ($last > 0 and $current > 1) {
+        if (($current - $last) == 1) {
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
+    else {
+        return 1;
+    }
+}
+
 
 1;

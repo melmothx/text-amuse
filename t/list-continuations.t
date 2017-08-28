@@ -31,3 +31,5 @@ my $el = Text::Amuse::Element->new($doc->_parse_string(" d. test\n"));
 is $el->start_list_index, 4;
 $el->start_list_index(10);
 is $el->start_list_index, 10;
+
+$doc->elements;
