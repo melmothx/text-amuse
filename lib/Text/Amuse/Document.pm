@@ -945,7 +945,7 @@ sub _append_element_to_list_parsing_output {
 
 sub _list_close_until_indentation {
     my ($self, $el) = @_;
-    while( $self->_list_pile_count and
+    while ($self->_list_pile_count and
            _indentation_kinda_minor($el, $self->_list_pile_last_element)) {
         $self->_close_list_level;
     }
