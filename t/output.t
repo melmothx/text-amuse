@@ -102,6 +102,7 @@ foreach my $testfile (qw/comments
                          example
                          open-letter
                          packing
+                         lists
                          lists-2
                          lists-3
                          desc-lists
