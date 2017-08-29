@@ -327,7 +327,9 @@ sub _parse_body {
             if ($el->type eq 'null') {
                 push @parsed, $el;
             }
-            elsif ($el->indentation and _kinda_equal($el->indentation, $fn_indent)) {
+            elsif ($el->can_be_regular and
+                   $el->indentation and
+                   _kinda_equal($el->indentation, $fn_indent)) {
                 push @{$self->_current_footnote_stack}, Text::Amuse::Element->new($self->_parse_string("<br>\n")), $el;
             }
             else {
