@@ -60,7 +60,7 @@ sub _list_index_map {
     # numerals
     my $self = shift;
     unless ($self->{_list_index_map}) {
-        my %map = map { $_ => $_ } (0..1000); # never seen lists so long
+        my %map = map { $_ => $_ } (1..200); # never seen lists so long
         # this is a bit naif but will do. Generated with Roman module. We
         # support them to 89, otherwise you have to use i. i. i.
 
@@ -588,14 +588,18 @@ sub _parse_string {
                     (.*) # the string itself $4
                    /sx) {
             my ($remove, $whitespace, $prefix, $text) = ($1, $2, $3, $4);
-            $element{type} = "li";
-            $element{removed} = $remove;
-            $element{string} = $text;
-            my $list_type = $self->_identify_list_type($prefix);
-            $element{indentation} = length($whitespace);
-            $element{block} = $list_type;
-            $element{start_list_index} = $self->_get_start_list_index($prefix);
-            return %element;
+
+            # validate roman numbers, so we don't end up with random strings
+            if (my $list_index = $self->_get_start_list_index($prefix)) {
+                $element{type} = "li";
+                $element{removed} = $remove;
+                $element{string} = $text;
+                my $list_type = $self->_identify_list_type($prefix);
+                $element{indentation} = length($whitespace);
+                $element{block} = $list_type;
+                $element{start_list_index} = $list_index;
+                return %element;
+            }
         }
     }
     if ($l =~ m/^(\x{20}{20,})([^ ].+)$/s) {
