@@ -18,9 +18,6 @@ Text-Amuse-*
 Text-Amuse-*.tar.gz
 *~
 t/testfiles/build/*
-examples/*
-!examples/manual.muse
-!examples/logo.png
 t/beamer/*
 debian/files
 debian/libtext-amuse-perl*
