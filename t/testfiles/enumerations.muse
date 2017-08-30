@@ -84,3 +84,43 @@ Hello there
 
            A. Last Prova
 
+
+*** Regular
+
+ 1. one
+ 2. two
+ 3. three
+ 1. four
+ 1. five
+ 1. six
+
+    - bullet
+
+ 1. seven
+ 1. eight
+
+    a. alpha a
+    a. alpha b
+    c. alpha c
+    d. alpha d
+
+       A. Alpha A
+       A. Alpha A
+
+          i. roman
+          i. roman
+
+       A. Alpha C
+
+          I. Roman
+          II. Roman
+          IV. Roman IV
+
+       Description :: List
+       Description :: List
+
+    e. alpha e
+    g. alpha g
+    h. alpha h
+
+ 1. nine.
