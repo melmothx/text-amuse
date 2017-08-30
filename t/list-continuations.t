@@ -6,7 +6,7 @@ use File::Spec::Functions qw/catfile/;
 use Text::Amuse::Document;
 use Text::Amuse::Element;
 use Data::Dumper;
-use Test::More tests => 18;
+use Test::More tests => 19;
 
 my $doc = Text::Amuse::Document->new(file => catfile(qw/t testfiles enumerations.muse/));
 
@@ -31,5 +31,5 @@ my $el = Text::Amuse::Element->new($doc->_parse_string(" d. test\n"));
 is $el->start_list_index, 4;
 $el->start_list_index(10);
 is $el->start_list_index, 10;
+ok(scalar($doc->elements));
 
-$doc->elements;
