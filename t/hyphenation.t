@@ -3,7 +3,7 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 30;
 use Text::Amuse;
 use File::Temp qw/tempfile/;
 
@@ -40,6 +40,7 @@ my @tests = (
              [ "a-a-", "" ],
              [ "-a-a", "" ],
              [ "pà-teà-ć", "pà-teà-ć" ],
+             [ "1234 ка-пи-та-лиз мот-Ав-тор", "ка-пи-та-лиз мот-Ав-тор"],
             );
 
 foreach my $test (@tests) {
@@ -52,8 +53,9 @@ sub test_hyphens {
     my ($given, $expected) = @_;
     my $file = create_muse($given);
     my $muse = Text::Amuse->new(file => $file);
-    is $muse->hyphenation, $expected, "Got $expected";
-    is $muse->hyphenation, $expected, "Got $expected";
+    for (1..2) {
+        is $muse->hyphenation, $expected, "Got $expected";
+    }
 }
 
 sub create_muse {
