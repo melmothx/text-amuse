@@ -129,7 +129,7 @@ data.
   }
 
 If the format is C<html>, the option C<split> may be passed. Instead
-of a arrayref of chuncks, an arrayref with html pages will be
+of a arrayref of chunks, an arrayref with html pages will be
 returned. Each page usually starts with an heading, and it's without
 <head> <body>. Footnotes are flushed and inserted at the end of each
 pages.
@@ -621,7 +621,7 @@ sub remove_permitted_html {
     my ($self, $string) = @_;
     foreach my $tag (keys %{ $self->tag_hash }) {
         # only matched pairs, so we avoid a lot of problems
-        # we also use private unicode codepoints to mark start and end
+        # we also use private Unicode codepoints to mark start and end
         my $marker = $self->tag_hash->{$tag};
         my $startm = "\x{f0001}${marker}\x{f0002}";
         my $stopm  = "\x{f0003}${marker}\x{f0004}";
@@ -774,7 +774,7 @@ sub manage_header {
         $level++; # increment by one
         die "wtf, no index for toc?" unless $index;
 
-        # inject the id into the html toc (and the anchor)
+        # inject the id into the html ToC (and the anchor)
         if ($self->is_html) {
             $leading = "<h" . $level .
               qq{ id="toc$index">} . $anchors;
@@ -820,7 +820,7 @@ sub reset_toc_stack {
 
 =head3 table_of_contents
 
-Emit the formatted toc (if any). Please note that this method works
+Emit the formatted ToC (if any). Please note that this method works
 even for the LaTeX format, even if does not produce usable output.
 
 This because we can test if we need to emit a table of contents
@@ -855,7 +855,7 @@ sub table_of_contents {
     my $self = shift;
     my $internal_toc = $self->{_toc_entries};
     my @toc;
-    return @toc unless $internal_toc; # no toc gets undef
+    return @toc unless $internal_toc; # no ToC gets undef
     # do a deep copy and return;
     foreach my $entry (@$internal_toc) {
         push @toc, { %$entry };

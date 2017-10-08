@@ -316,7 +316,7 @@ sub _latex_obj {
 
 =head3 as_splat_latex
 
-Return a list of strings, each of them is a latex chunk resulting from
+Return a list of strings, each of them is a LaTeX chunk resulting from
 the splitting of the as_latex output.
 
 =cut
@@ -350,7 +350,7 @@ sub as_beamer {
 
 =head3 wants_toc
 
-Return true if a toc is needed because we found some headings inside.
+Return true if a ToC is needed because we found some headings inside.
 
 =head3 wants_preamble
 
@@ -636,7 +636,7 @@ Borrowed from the Creole markup.
 
 Embedded lisp code and syntax highlight is not supported.
 
-Exoteric stuff like citing from other resources is not supported.
+Esoteric stuff like citing from other resources is not supported.
 
 The scope of this module is not to replicate all the features of the
 original implementation, but to use the markup for a wiki (as opposed
@@ -659,7 +659,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Text::Amuse
 
-Repository available at Github: L<https://github.com/melmothx/text-amuse>
+Repository available at GitHub: L<https://github.com/melmothx/text-amuse>
 
 =head1 SEE ALSO
 
