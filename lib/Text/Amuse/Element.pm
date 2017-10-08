@@ -22,7 +22,7 @@ sub new {
     my ($class, %args) = @_;
     my $self = {
                 rawline => '',
-                block => '',      # the block it says to belog
+                block => '',      # the block it says to belong
                 type => 'null', # the type
                 string => '',      # the string
                 removed => '', # the portion of the string removed

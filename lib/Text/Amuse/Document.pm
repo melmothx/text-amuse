@@ -266,7 +266,7 @@ sub _parse_body {
                     $self->_list_open_new_list_level($el);
                 }
                 else {
-                    # close the lists until we get the the right level
+                    # close the lists until we get the right level
                     $self->_list_close_until_indentation($el);
                     if ($self->_list_pile_count) { # continue if open
                         if ($self->_list_element_is_same_kind_as_in_list($el) and
