@@ -584,15 +584,12 @@ sub hyphenation {
         my %header = $self->document->raw_header;
         my $hyphenation = $header{hyphenation} || '';
         my @patterns = split(/\s+/, $hyphenation);
-        my @validated;
-        foreach my $pattern (@patterns) {
-            if ($pattern =~ m/\A(
-                                  [[:alpha:]]+
-                                  (-[[:alpha:]]+)*
-                              )\z/x) {
-                push @validated, $1;
-            }
-        }
+        my @validated = grep {
+            m/\A(
+            [[:alpha:]]+
+            (-[[:alpha:]]+)*
+            )\z/x
+        } @patterns;
         my $valid = '';
         if (@validated) {
             $valid = join(' ', @validated);
