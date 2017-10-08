@@ -799,35 +799,19 @@ sub _closing_blocks_new_level {
 }
 
 sub _indentation_kinda_minor {
-    my $result = _indentation_compare(@_);
-    if ($result == IMINOR) {
-        return 1;
-    }
-    return 0;
+    return _indentation_compare(@_) == IMINOR;
 }
 
 sub _indentation_kinda_major {
-    my $result = _indentation_compare(@_);
-    if ($result == IMAJOR) {
-        return 1;
-    }
-    return 0;
+    return _indentation_compare(@_) == IMAJOR;
 }
 
 sub _indentation_kinda_equal {
-    my $result = _indentation_compare(@_);
-    if ($result == IEQUAL) {
-        return 1;
-    }
-    return 0;
+    return _indentation_compare(@_) == IEQUAL;
 }
 
 sub _kinda_equal {
-    my $result = _compare_tolerant(@_);
-    if ($result == IEQUAL) {
-        return 1;
-    }
-    return 0;
+    return _compare_tolerant(@_) == IEQUAL;
 }
 
 sub _indentation_compare {
