@@ -583,18 +583,13 @@ sub hyphenation {
     unless (defined $self->{_doc_hyphenation}) {
         my %header = $self->document->raw_header;
         my $hyphenation = $header{hyphenation} || '';
-        my @patterns = split(/\s+/, $hyphenation);
         my @validated = grep {
             m/\A(
             [[:alpha:]]+
             (-[[:alpha:]]+)*
             )\z/x
-        } @patterns;
-        my $valid = '';
-        if (@validated) {
-            $valid = join(' ', @validated);
-        }
-        $self->{_doc_hyphenation} = $valid;
+        } split(/\s+/, $hyphenation);
+        $self->{_doc_hyphenation} = @validated ? join(' ', @validated) : '';
     }
     return $self->{_doc_hyphenation};
 }

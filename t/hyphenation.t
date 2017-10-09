@@ -3,7 +3,7 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 30;
+use Test::More tests => 36;
 use Text::Amuse;
 use File::Temp qw/tempfile/;
 
@@ -14,6 +14,12 @@ binmode $builder->todo_output,    ":utf8";
 
 
 my @tests = (
+             [ undef,
+               '' ],
+             [ '',
+               '' ],
+             [ 0,
+               '' ],
              [
               "le-git-thing bla-bla-bla",
               "le-git-thing bla-bla-bla",
@@ -60,20 +66,25 @@ sub test_hyphens {
 
 sub create_muse {
     my ($string) = @_;
-    die unless $string;
     my ($fh, $filename) = tempfile(
                                    'hyphXXXXXXXX',
                                    SUFFIX => '.muse',
                                    TMPDIR => 1,
                                    UNLINK => 1,
                                   );
-    my $muse = <<"MUSE";
+    my $muse;
+    if (defined ($string)) {
+        $muse = <<"MUSE";
 #title test
 #hyphenation $string
 
 This is just a test
 
 MUSE
+    }
+    else {
+        $muse = "#title test\n\ntest\n";
+    }
     write_file($filename,$muse);
     return $filename;
 }
