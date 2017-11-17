@@ -5,7 +5,6 @@ This is a paragraph [1] with a regular and a secondary [*] footnote.
 
 [*] Fist secondary
 
-
           * * * * *
 
 A new page, then again [2] and a secondary. [*]
@@ -19,3 +18,37 @@ A new page, then again [2] and a secondary. [*]
 [*] Third secondary, from the footnote itself.
 
 [*] Last one from the footnote itself.
+
+* Part with secondary [*]
+
+[*] From part
+
+** Chapter with secondary [*] [3]
+
+[*] From chapter
+
+[3] Regular
+
+*** Section with secondary [*] [4]
+
+[*] From section
+
+[4] Regular footnote from section
+
+**** Subsection with secondary [*] [5]
+
+[5] Regular
+
+[*] From subsection
+
+***** Sub sub section with secondary [*] [6]
+
+[*] From secondary
+
+[6] From subsection <verbatim>[*]</verbatim> Neutralized
+
+<verbatim>[*]</verbatim> Neutralized
+
+Neutralized as well <verbatim>[*]</verbatim>.
+
+
