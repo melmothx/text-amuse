@@ -1,0 +1,21 @@
+#title Secondary footnotes
+#lang en
+
+This is a paragraph [1] with a regular and a secondary [*] footnote.
+
+[*] Fist secondary
+
+
+          * * * * *
+
+A new page, then again [2] and a secondary. [*]
+
+[*] Second secondary, from the body
+
+[1] First footnote: [2] will no be a footnote
+
+[2] Second footnote [2] with a secondary footnote itself [*] and another [*]
+
+[*] Third secondary, from the footnote itself.
+
+[*] Last one from the footnote itself.
