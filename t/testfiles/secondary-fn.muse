@@ -51,4 +51,29 @@ A new page, then again [2] and a secondary. [*]
 
 Neutralized as well <verbatim>[*]</verbatim>.
 
+{{{
+verbatim block [*]
 
+[*] Nothing happens
+}}}
+
+
+<example>
+verbatim block [*]
+
+[*] Nothing happens
+</example>
+
+<verse>
+verbatim block [*]
+
+[*] Parsed
+
+</verse>
+
+> verbatim block [*]
+> another [*]
+
+[*] Parsed 1
+
+[*] Parsed 2

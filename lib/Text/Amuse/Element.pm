@@ -31,6 +31,7 @@ sub new {
                 attribute_type => '',
                 style => 'X',
                 start_list_index => 0,
+                element_number => 0,
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -426,8 +427,38 @@ sub footnote_index {
             return $1;
         }
     }
+    elsif ($self->type eq 'secondary_footnote') {
+        return 'b' . $self->element_number;
+    }
     return undef;
 }
 
+sub footnote_symbol {
+    my $self = shift;
+    if ($self->type eq 'footnote') {
+        return $self->footnote_index;
+    }
+    elsif ($self->type eq 'secondary_footnote') {
+        return '*';
+    }
+    else {
+        die "Called against a non footnote element";
+    }
+}
+
+=head3 element_number
+
+Internal numbering of the element.
+
+=cut
+
+sub element_number {
+    return shift->{element_number};
+}
+
+sub _set_element_number {
+    my ($self, $num) = @_;
+    $self->{element_number} = $num;
+}
 
 1;

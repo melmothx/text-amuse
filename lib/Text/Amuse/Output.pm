@@ -353,12 +353,14 @@ sub manage_regular {
     my ($self, $el, %opts) = @_;
     my $string;
     my $recurse = 1;
+    my $el_object;
     # we can accept even plain string;
     if (ref($el) eq "") {
         $string = $el;
     } else {
+        $el_object = $el;
         $string = $el->string;
-        if ($el->type eq 'footnote') {
+        if ($el->type eq 'footnote' or $el->type eq 'secondary_footnotes') {
             $recurse = 0;
         }
     }
@@ -399,14 +401,25 @@ sub manage_regular {
 
     $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
 
+    my @secondary_footnotes;
+    if ($el_object and $el_object->type ne 'secondary_footnotes') {
+        my $secondary_footnotes_wanted = 0;
+        while ($string =~ m/\[\*\]/g) {
+            $secondary_footnotes_wanted++;
+        }
+        if ($secondary_footnotes_wanted) {
+            @secondary_footnotes = $self->document->get_secondary_footnotes($el_object, $secondary_footnotes_wanted);
+        }
+    }
     my $anchors = '';
     if ($opts{anchors}) {
         # remove anchors from the string
         ($string, $anchors) = $self->handle_anchors($string);
     }
 
+    my $sec_fn_re = qr{ *\[\*\]};
     # split at [[ ]] to avoid the mess
-    my @pieces = split /($linkre)/, $string;
+    my @pieces = split /($linkre|$sec_fn_re)/, $string;
     my @out;
   PIECE:
     while (@pieces) {
@@ -418,7 +431,13 @@ sub manage_regular {
             my $link = $self->linkify($l);
             push @out, $link;
             next PIECE;
-        } else {
+        }
+        elsif ($l =~ m/\A$sec_fn_re\z/s and @secondary_footnotes) {
+            my $fn_el = shift @secondary_footnotes;
+            push @out, $self->_format_footnote($fn_el);
+            next PIECE;
+        }
+        else {
             next PIECE if $l eq ""; # no text!
 
             # convert the muse markup to tags
@@ -467,6 +486,7 @@ sub inline_footnotes {
     my ($self, $string) = @_;
     my @output;
     my $footnotere = $self->footnote_re;
+    # print "Parsing $string\n";
     return $string unless $string =~ m/($footnotere)/;
     my @pieces = split /( *$footnotere)/, $string;
     while (@pieces) {
@@ -474,30 +494,14 @@ sub inline_footnotes {
         if ($piece =~ m/^( *)\[([0-9]+)\]$/s) {
             my $space = $1 || "";
             my $fn_num = $2;
+            # print "Getting footnote $fn_num\n";
             my $footnote = $self->document->get_footnote($fn_num);
             # here we have a bit of recursion, but it should be safe
             if (defined $footnote) {
-                $footnote = $self->manage_regular($footnote);
                 if ($self->is_latex) {
-                    $footnote =~ s/\s+/ /gs;
-                    $footnote =~ s/ +$//s;
-                    # covert <br> to \par in latex. those \\ in the
-                    # footnotes are pretty much ugly. Also the syntax
-                    # doesn't permit to have multiple paragraphs
-                    # separated by a blank line in a footnote.
-                    # However, this is going to fail with footnotes in
-                    # the headings, so we have to call \endgraf instead
-                    $footnote =~ s/\\forcelinebreak /\\endgraf /g;
-                    push @output, '\footnote{' . $footnote . '}';
+                    $space = '';
                 }
-                elsif ($self->is_html) {
-                    # in html, just remember the number
-                    $self->add_footnote($fn_num);
-                    push @output,
-                      qq{$space<a href="#fn${fn_num}" class="footnote" } .
-                        qq{id="fn_back${fn_num}">[$fn_num]</a>};
-                }
-                else { die "Not reached" }
+                push @output, $space . $self->_format_footnote($footnote);
             }
             else {
                 # warn "Missing footnote [$fn_num] in $string";
@@ -509,6 +513,38 @@ sub inline_footnotes {
         }
     }
     return join("", @output);
+}
+
+sub _format_footnote {
+    my ($self, $element) = @_;
+    my $footnote = $self->manage_regular($element);
+    if ($self->is_latex) {
+        $footnote =~ s/\s+/ /gs;
+        $footnote =~ s/ +$//s;
+        # covert <br> to \par in latex. those \\ in the footnotes are
+        # pretty much ugly. Also the syntax doesn't permit to have
+        # multiple paragraphs separated by a blank line in a footnote.
+        # However, this is going to fail with footnotes in the
+        # headings, so we have to call \endgraf instead
+        $footnote =~ s/\\forcelinebreak /\\endgraf /g;
+        if ($element->type eq 'secondary_footnote') {
+            return '\footnoteB{' . $footnote . '}';
+        }
+        else {
+            return '\footnote{' . $footnote . '}';
+        }
+    } elsif ($self->is_html) {
+        # in html, just remember the number
+        my $fn_num = $element->footnote_index;
+        $self->add_footnote($fn_num);
+        my $fn_symbol = $element->footnote_symbol;
+        return
+          qq(<a href="#fn${fn_num}" class="footnote" ) .
+          qq(id="fn_back${fn_num}">[$fn_symbol]</a>);
+    }
+    else {
+        die "Not reached"
+    }
 }
 
 =head3 safe($string)

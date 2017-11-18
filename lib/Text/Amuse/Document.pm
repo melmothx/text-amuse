@@ -318,9 +318,12 @@ sub _parse_body {
     # now we use parsed as output
     $self->_flush_current_footnote;
     my @out;
+    my $elnum = 0;
     while (@{$self->_list_parsing_output}) {
         my $el = shift @{$self->_list_parsing_output};
-        if ($el->type eq 'footnote') {
+        $elnum++;
+        $el->_set_element_number($elnum);
+        if ($el->type eq 'footnote' or $el->type eq 'secondary_footnote') {
             $self->_register_footnote($el);
         }
         elsif (my $fn_indent = $self->_current_footnote_indent) {
@@ -418,7 +421,7 @@ sub get_footnote {
     my ($self, $arg) = @_;
     return undef unless $arg;
     # ignore the brackets, if they are passed
-    if ($arg =~ m/([0-9]+)/) {
+    if ($arg =~ m/(b?[0-9]+)/) {
         $arg = $1;
     }
     else {
@@ -430,6 +433,32 @@ sub get_footnote {
     else { return undef }
 }
 
+=head3 get_secondary_footnotes($element, $number)
+
+Return the secondary footnotes attached to the element. This for now
+is a bit expensive. While parsing the body, we attached to each
+element a progressive index. So when asking for a couple of secondary
+footnotes (the second argument) we search for a secondary footnote
+element with an index greater then the current element passed as first
+element (sorted).
+
+=cut
+
+sub get_secondary_footnotes {
+    my ($self, $element, $wanted) = @_;
+    my $count = 0;
+    my @footnotes = sort { $a->element_number <=> $b->element_number }
+      grep { $_->type eq 'secondary_footnote' and $_->element_number > $element->element_number }
+      values %{$self->_raw_footnotes};
+    my @out;
+    while ($wanted > 0) {
+        if (@footnotes) {
+            push @out, shift @footnotes;
+        }
+        $wanted--;
+    }
+    return @out;
+}
 
 sub _raw_footnotes {
     my $self = shift;
@@ -538,6 +567,12 @@ sub _parse_string {
     }
     if ($l =~ m/^((\[[0-9]+\])\x{20}+)(.+)$/s) {
         $element{type} = "footnote";
+        $element{string} = $3;
+        $element{removed} = $1;
+        return %element;
+    }
+    if ($l =~ m/^((\[\*\])\x{20}+)(.+)$/s) {
+        $element{type} = "secondary_footnote";
         $element{string} = $3;
         $element{removed} = $1;
         return %element;
