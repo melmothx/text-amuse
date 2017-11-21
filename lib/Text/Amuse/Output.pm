@@ -397,7 +397,7 @@ sub manage_regular {
     };
 
 
-    $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
+    $string =~ s/<verbatim>(.*?)<\/verbatim>/$save_verb->($1)/gsxe;
 
     my $anchors = '';
     if ($opts{anchors}) {
