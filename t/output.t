@@ -133,7 +133,7 @@ sub test_testfile {
     {
         my $got_latex = $document->as_latex;
         my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
-        ok ($got_latex eq $latex, "LaTex for $base OK")
+        ok ($got_latex eq $latex, "LaTeX for $base OK")
           or show_diff($got_latex, $latex);
     }
     {
