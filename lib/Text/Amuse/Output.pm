@@ -397,8 +397,7 @@ sub manage_regular {
     };
 
 
-    $string =~ s/<verbatim>(.*?)<\/verbatim>/$save_verb->($1)/gsxe;
-
+    $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
     my $anchors = '';
     if ($opts{anchors}) {
         # remove anchors from the string
@@ -659,6 +658,12 @@ sub muse_inline_syntax_to_tags {
     my ($self, $string) = @_;
     # first, add a space around, so we don't need to check for ^ and $
     $string = " " . $string . " ";
+
+    # remove the empty tags before proceeding
+    foreach my $tag (qw/strong em code strike del sup sub verbatim/) {
+        $string =~ s!<\Q$tag\E></\Q$tag\E>!!g;
+    }
+
     # the *, something not a space, the match (no * inside), something
     # not a space, the *
     my $something = qr{\*(?=\S)([^\*]+?)(?<=\S)\*};
