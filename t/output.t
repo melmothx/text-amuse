@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 117;
+plan tests => 119;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -114,6 +114,7 @@ foreach my $testfile (qw/comments
                          links-in-h
                          footnotes-multiline
                          enumerations
+                         empty-tags
                          verb
                         /) {
     test_testfile($testfile);
@@ -133,7 +134,7 @@ sub test_testfile {
     {
         my $got_latex = $document->as_latex;
         my $latex = read_file(catfile(t => testfiles => "$base.exp.ltx"));
-        ok ($got_latex eq $latex, "LaTex for $base OK")
+        ok ($got_latex eq $latex, "LaTeX for $base OK")
           or show_diff($got_latex, $latex);
     }
     {
