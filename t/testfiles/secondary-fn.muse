@@ -1,79 +1,84 @@
 #title Secondary footnotes
 #lang en
 
-This is a paragraph [1] with a regular and a secondary [*] footnote.
+This is a paragraph [1] with a regular and a secondary {1} footnote.
 
-[*] Fist secondary
+{1} Fist secondary
 
           * * * * *
 
-A new page, then again [2] and a secondary. [*]
+A new page, then again [2] and a secondary. {2}
 
-[*] Second secondary, from the body
+{2} Second secondary, from the body
 
 [1] First footnote: [2] will no be a footnote
 
-[2] Second footnote [2] with a secondary footnote itself [*] and another [*]
+[2] Second footnote [2] with a secondary footnote itself {3} and another {4}
 
-[*] Third secondary, from the footnote itself.
+{3} Third secondary, from the footnote itself.
 
-[*] Last one from the footnote itself.
+{4} Last one from the footnote itself.
 
-* Part with secondary [*]
+* Part with secondary {5}
 
-[*] From part
+{5} From part
 
-** Chapter with secondary [*] [3]
+** Chapter with secondary {6} [3]
 
-[*] From chapter
+{6} From chapter
 
 [3] Regular
 
-*** Section with secondary [*] [4]
+*** Section with secondary {7} [4]
 
-[*] From section
+{7} From section
 
 [4] Regular footnote from section
 
-**** Subsection with secondary [*] [5]
+**** Subsection with secondary {8} [5]
 
 [5] Regular
 
-[*] From subsection
+{8} From subsection
 
-***** Sub sub section with secondary [*] [6]
+***** Sub sub section with secondary {9} [6]
 
-[*] From secondary
+{9} From secondary
 
-[6] From subsection <verbatim>[*]</verbatim> Neutralized
+[6] From subsection <verbatim>{1}</verbatim> Neutralized
 
-<verbatim>[*]</verbatim> Neutralized
+<verbatim>{10}</verbatim> Neutralized
 
-Neutralized as well <verbatim>[*]</verbatim>.
+Neutralized as well <verbatim>{10}</verbatim>.
 
 {{{
-verbatim block [*]
+verbatim block {10}
 
-[*] Nothing happens
+{10} Nothing happens
 }}}
 
 
 <example>
-verbatim block [*]
+verbatim block {11}
 
-[*] Nothing happens
+{11} Nothing happens
 </example>
 
 <verse>
-verbatim block [*]
+verbatim block {12}
 
-[*] Parsed
+{12} Parsed
 
 </verse>
 
-> verbatim block [*]
-> another [*]
+> verbatim block {13}
+> another {14}
 
-[*] Parsed 1
+{14} Parsed 1
 
-[*] Parsed 2
+{15} Parsed 2
+
+{212}
+
+Nothing {233} happens here.
+
