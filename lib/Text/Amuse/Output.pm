@@ -754,10 +754,35 @@ sub manage_paragraph {
 
 sub manage_header {
     my ($self, $el) = @_;
+    my $body_with_no_footnotes = $el->string;
+    my $has_fn;
+    my $catch_fn = sub {
+        if ($self->document->get_footnote($_[0])) {
+            $has_fn++;
+            return ''
+        } else {
+            return $1;
+        }
+    };
+    $body_with_no_footnotes =~ s/(
+                                     \{ [0-9]+ \}
+                                 |
+                                     \[ [0-9]+ \]
+                                 )
+                                /$catch_fn->($1)/gxe;
+    undef $catch_fn;
+    my ($body_for_toc);
+    if ($has_fn) {
+        ($body_for_toc) = $self->manage_regular($body_with_no_footnotes, nolinks => 1, anchors => 1);
+    }
     my ($body, $anchors) = $self->manage_regular($el, nolinks => 1, anchors => 1);
-    # remove trailing spaces and \n
     chomp $body;
-    my $leading = $self->blkstring(start => $el->type);
+    if (defined $body_for_toc) {
+        $body_for_toc =~ s/\s+/ /g;
+        $body_for_toc =~ s/\s+\z//;
+    }
+    my $leading = $self->blkstring(start => $el->type,
+                                   toc_entry => ($has_fn ? $body_for_toc : undef));
     my $trailing = $self->blkstring(stop => $el->type);
     if ($anchors) {
         if ($self->is_html) {
@@ -774,7 +799,7 @@ sub manage_header {
     if ($el->type =~ m/h([1-4])/) {
         my $level = $1;
         my $tocline = $body;
-        my $index = $self->add_to_table_of_contents($level => $body);
+        my $index = $self->add_to_table_of_contents($level => (defined($body_for_toc) ? $body_for_toc : $body));
         $level++; # increment by one
         die "wtf, no index for toc?" unless $index;
 
@@ -1320,7 +1345,9 @@ sub _build_blk_table {
                                         },
                                   h1 => {
                                          start => {
-                                                   ltx => "\\part{",
+                                                   ltx => sub {
+                                                       _latex_header(part => @_);
+                                                   },
                                                    html => "<h2>",
                                                   },
                                          stop => {
@@ -1330,7 +1357,9 @@ sub _build_blk_table {
                                         },
                                   h2 => {
                                          start => {
-                                                   ltx => "\\chapter{",
+                                                   ltx => sub {
+                                                       _latex_header(chapter => @_);
+                                                   },
                                                    html => "<h3>",
                                                   },
                                          stop => {
@@ -1340,7 +1369,9 @@ sub _build_blk_table {
                                         },
                                   h3 => {
                                          start => {
-                                                   ltx => "\\section{",
+                                                   ltx => sub {
+                                                       _latex_header(section => @_);
+                                                   },
                                                    html => "<h4>",
                                                   },
                                          stop => {
@@ -1350,7 +1381,9 @@ sub _build_blk_table {
                                         },
                                   h4 => {
                                          start => {
-                                                   ltx => "\\subsection{",
+                                                   ltx => sub {
+                                                       _latex_header(subsection => @_);
+                                                   },
                                                    html => "<h5>",
                                                   },
                                          stop => {
@@ -1360,7 +1393,9 @@ sub _build_blk_table {
                                         },
                                   h5 => {
                                          start => {
-                                                   ltx => "\\subsubsection{",
+                                                   ltx => sub {
+                                                       _latex_header(subsubsection => @_);
+                                                   },
                                                    html => "<h6>",
                                                   },
                                          stop => {
@@ -1801,5 +1836,17 @@ sub _ltx_enum_element {
     return $string . $type_string . '.' . $start_string . "]\n";
 }
 
+sub _latex_header {
+    # All sectioning commands take the same general form, e.g.,
+    # \chapter[TOCTITLE]{TITLE}
+    my ($name, %attributes) = @_;
+    if (defined $attributes{toc_entry}) {
+        # we use the grouping here, to avoid chocking on [ ]
+        return "\\" . $name . '[{' . $attributes{toc_entry} . '}]{'
+    }
+    else {
+        return "\\" . $name . '{';
+    }
+}
 
 1;
