@@ -262,16 +262,12 @@ existence is checked against the document object.
 =cut
 
 sub add_footnote {
-    my ($self, $num) = @_;
-    return unless $num;
-    unless ($self->document->get_footnote($num)) {
-        warn "no footnote $num found!";
-        return;
-    }
+    my ($self, $fn) = @_;
+    return unless $fn;
     unless (defined $self->{_fn_list}) {
         $self->{_fn_list} = [];
     }
-    push @{$self->{_fn_list}}, $num;
+    push @{$self->{_fn_list}}, $fn;
 }
 
 =head3 flush_footnotes
@@ -293,11 +289,13 @@ sub flush_footnotes {
 =cut
 
 sub manage_html_footnote {
-    my ($self, $num) = @_;
-    return unless $num;
+    my ($self, $element) = @_;
+    return unless $element;
+    my $fn_num = $element->footnote_index;
+    my $fn_symbol = $element->footnote_symbol;
     my $chunk = qq{\n<p class="fnline"><a class="footnotebody"} . " "
-      . qq{href="#fn_back$num" id="fn$num">[$num]</a> } .
-        $self->manage_regular($self->document->get_footnote($num)) .
+      . qq{href="#fn_back${fn_num}" id="fn${fn_num}">$fn_symbol</a> } .
+        $self->manage_regular($element) .
           qq{</p>\n};
 }
 
@@ -352,7 +350,8 @@ sub _get_unique_counter {
 sub manage_regular {
     my ($self, $el, %opts) = @_;
     my $string;
-    my $recurse = 1;
+    my $insert_primary_footnote = 1;
+    my $insert_secondary_footnote = 1;
     my $el_object;
     # we can accept even plain string;
     if (ref($el) eq "") {
@@ -360,8 +359,12 @@ sub manage_regular {
     } else {
         $el_object = $el;
         $string = $el->string;
-        if ($el->type eq 'footnote' or $el->type eq 'secondary_footnotes') {
-            $recurse = 0;
+        if ($el->type eq 'footnote') {
+            $insert_primary_footnote = 0;
+        }
+        elsif ($el->type eq 'secondary_footnotes') {
+            $insert_primary_footnote = 0;
+            $insert_secondary_footnote = 0;
         }
     }
     unless (defined $string) {
@@ -401,25 +404,16 @@ sub manage_regular {
 
     $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
 
-    my @secondary_footnotes;
-    if ($el_object and $el_object->type ne 'secondary_footnotes') {
-        my $secondary_footnotes_wanted = 0;
-        while ($string =~ m/\[\*\]/g) {
-            $secondary_footnotes_wanted++;
-        }
-        if ($secondary_footnotes_wanted) {
-            @secondary_footnotes = $self->document->get_secondary_footnotes($el_object, $secondary_footnotes_wanted);
-        }
-    }
     my $anchors = '';
     if ($opts{anchors}) {
         # remove anchors from the string
         ($string, $anchors) = $self->handle_anchors($string);
     }
 
-    my $sec_fn_re = qr{ *\[\*\]};
+    my $sec_fn_re = qr/\s*\{[0-9]+\}/;
+    my $pri_fn_re = qr/\s*\[[0-9]+\]/;
     # split at [[ ]] to avoid the mess
-    my @pieces = split /($linkre|$sec_fn_re)/, $string;
+    my @pieces = split /($linkre|$pri_fn_re|$sec_fn_re)/, $string;
     my @out;
   PIECE:
     while (@pieces) {
@@ -432,9 +426,20 @@ sub manage_regular {
             push @out, $link;
             next PIECE;
         }
-        elsif ($l =~ m/\A$sec_fn_re\z/s and @secondary_footnotes) {
-            my $fn_el = shift @secondary_footnotes;
-            push @out, $self->_format_footnote($fn_el);
+        elsif ($insert_primary_footnote and $l =~ m/\A$pri_fn_re\z/s and
+               my $pri_fn = $self->document->get_footnote($l)) {
+            if ($self->is_html and $l =~ m/\A(\s+)/) {
+                push @out, $1;
+            }
+            push @out, $self->_format_footnote($pri_fn);
+            next PIECE;
+        }
+        elsif ($insert_secondary_footnote and $l =~ m/\A$sec_fn_re\z/s and
+               my $sec_fn = $self->document->get_footnote($l)) {
+            if ($self->is_html and $l =~ m/\A(\s+)/) {
+                push @out, $1;
+            }
+            push @out, $self->_format_footnote($sec_fn);
             next PIECE;
         }
         else {
@@ -455,9 +460,6 @@ sub manage_regular {
             }
             else { die "Not reached" }
         }
-        if ($recurse) {
-            $l = $self->inline_footnotes($l);
-        }
         # restore the verbatim pieces
         $l =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb->($1)/gsxe;
         push @out, $l;
@@ -473,46 +475,6 @@ sub manage_regular {
     else {
         return $final;
     }
-}
-
-=head3 inline_footnotes($string)
-
-Inline the footnotes in the given string, accordingly to the current
-format.
-
-=cut
-
-sub inline_footnotes {
-    my ($self, $string) = @_;
-    my @output;
-    my $footnotere = $self->footnote_re;
-    # print "Parsing $string\n";
-    return $string unless $string =~ m/($footnotere)/;
-    my @pieces = split /( *$footnotere)/, $string;
-    while (@pieces) {
-        my $piece = shift @pieces;
-        if ($piece =~ m/^( *)\[([0-9]+)\]$/s) {
-            my $space = $1 || "";
-            my $fn_num = $2;
-            # print "Getting footnote $fn_num\n";
-            my $footnote = $self->document->get_footnote($fn_num);
-            # here we have a bit of recursion, but it should be safe
-            if (defined $footnote) {
-                if ($self->is_latex) {
-                    $space = '';
-                }
-                push @output, $space . $self->_format_footnote($footnote);
-            }
-            else {
-                # warn "Missing footnote [$fn_num] in $string";
-                push @output, $piece;
-            }
-        }
-        else {
-            push @output, $piece;
-        }
-    }
-    return join("", @output);
 }
 
 sub _format_footnote {
@@ -535,12 +497,12 @@ sub _format_footnote {
         }
     } elsif ($self->is_html) {
         # in html, just remember the number
+        $self->add_footnote($element);
         my $fn_num = $element->footnote_index;
-        $self->add_footnote($fn_num);
         my $fn_symbol = $element->footnote_symbol;
         return
           qq(<a href="#fn${fn_num}" class="footnote" ) .
-          qq(id="fn_back${fn_num}">[$fn_symbol]</a>);
+          qq(id="fn_back${fn_num}">$fn_symbol</a>);
     }
     else {
         die "Not reached"

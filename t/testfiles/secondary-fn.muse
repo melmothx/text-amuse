@@ -19,9 +19,11 @@ A new page, then again [2] and a secondary. {2}
 
 {4} Last one from the footnote itself.
 
-* Part with secondary {5}
+* Part with a primary [15] and a secondary {5}
 
 {5} From part
+
+[15] Regular footnote
 
 ** Chapter with secondary {6} [3]
 

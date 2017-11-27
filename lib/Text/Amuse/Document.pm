@@ -420,8 +420,7 @@ with a numerical argument or even with a string like [123]
 sub get_footnote {
     my ($self, $arg) = @_;
     return undef unless $arg;
-    # ignore the brackets, if they are passed
-    if ($arg =~ m/(b?[0-9]+)/) {
+    if ($arg =~ m/(\{[0-9]+\}|\[[0-9]+\])/) {
         $arg = $1;
     }
     else {
@@ -565,16 +564,22 @@ sub _parse_string {
         $element{type} = "comment";
         return %element;
     }
-    if ($l =~ m/^((\[[0-9]+\])\x{20}+)(.+)$/s) {
+    if ($l =~ m/^((\[([0-9]+)\])\x{20}+)(.+)$/s) {
         $element{type} = "footnote";
-        $element{string} = $3;
         $element{removed} = $1;
+        $element{footnote_symbol} = $2;
+        $element{footnote_number} = $3;
+        $element{footnote_index} = $3;
+        $element{string} = $4;
         return %element;
     }
-    if ($l =~ m/^((\[\*\])\x{20}+)(.+)$/s) {
+    if ($l =~ m/^((\{([0-9]+)\})\x{20}+)(.+)$/s) {
         $element{type} = "secondary_footnote";
-        $element{string} = $3;
         $element{removed} = $1;
+        $element{footnote_symbol} = $2;
+        $element{footnote_number} = $3;
+        $element{footnote_index} = 'b'. $3;
+        $element{string} = $4;
         return %element;
     }
     if ($l =~ m/^((\x{20}{6,})((\*\x{20}?){5})\s*)$/s) {
@@ -894,7 +899,7 @@ sub _list_element_is_same_kind_as_in_list {
 
 sub _register_footnote {
     my ($self, $el) = @_;
-    my $fn_num = $el->footnote_index;
+    my $fn_num = $el->footnote_symbol;
     if (defined $fn_num) {
         if ($self->_raw_footnotes->{$fn_num}) {
             warn "Overwriting footnote number $fn_num!\n";

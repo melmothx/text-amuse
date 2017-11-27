@@ -32,6 +32,9 @@ sub new {
                 style => 'X',
                 start_list_index => 0,
                 element_number => 0,
+                footnote_number => 0,
+                footnote_symbol => '',
+                footnote_index => '',
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -158,6 +161,38 @@ The indentation level, as a numerical value
 sub indentation {
     return shift->{indentation};
 }
+
+=head3 footnote_number
+
+The footnote number
+
+=cut
+
+sub footnote_number {
+    return shift->{footnote_number};
+}
+
+=head3 footnote_symbol
+
+The footnote symbol
+
+=cut
+
+sub footnote_symbol {
+    return shift->{footnote_symbol};
+}
+
+=head3 footnote_index
+
+The footnote index
+
+=cut
+
+sub footnote_index {
+    return shift->{footnote_index};
+}
+
+
 
 
 =head2 attribute
@@ -412,38 +447,6 @@ sub become_regular {
     my $self = shift;
     $self->type('regular');
     $self->block('');
-}
-
-=head3 footnote_index
-
-Return the number of the footnote if the element is a footnote, undef othewise
-
-=cut
-
-sub footnote_index {
-    my $self = shift;
-    if ($self->type eq 'footnote') {
-        if ($self->removed =~ m/\A\[([0-9]+)\]\s+\z/) {
-            return $1;
-        }
-    }
-    elsif ($self->type eq 'secondary_footnote') {
-        return 'b' . $self->element_number;
-    }
-    return undef;
-}
-
-sub footnote_symbol {
-    my $self = shift;
-    if ($self->type eq 'footnote') {
-        return $self->footnote_index;
-    }
-    elsif ($self->type eq 'secondary_footnote') {
-        return '*';
-    }
-    else {
-        die "Called against a non footnote element";
-    }
 }
 
 =head3 element_number
