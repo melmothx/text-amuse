@@ -84,6 +84,9 @@ t/testfiles/crashed-1.muse
 t/testfiles/desc-lists.exp.html
 t/testfiles/desc-lists.exp.ltx
 t/testfiles/desc-lists.muse
+t/testfiles/empty-tags.exp.html
+t/testfiles/empty-tags.exp.ltx
+t/testfiles/empty-tags.muse
 t/testfiles/enumerations.exp.html
 t/testfiles/enumerations.exp.ltx
 t/testfiles/enumerations.muse
