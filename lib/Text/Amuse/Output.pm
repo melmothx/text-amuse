@@ -191,6 +191,10 @@ sub process {
                     foreach my $fn ($self->flush_footnotes) {
                         push @pieces, $self->manage_html_footnote($fn);
                     }
+                    foreach my $fn ($self->flush_footnotes) {
+                        push @pieces, $self->manage_html_footnote($fn);
+                    }
+                    die "Footnotes still in the stack!" if scalar($self->flush_footnotes);
                 }
                 push @splat, join("", @pieces);
                 @pieces = ();
@@ -223,6 +227,10 @@ sub process {
         foreach my $fn ($self->flush_footnotes) {
             push @pieces, $self->manage_html_footnote($fn);
         }
+        foreach my $fn ($self->flush_footnotes) {
+            push @pieces, $self->manage_html_footnote($fn);
+        }
+        die "Footnotes still in the stack!" if scalar($self->flush_footnotes);
     }
 
     if ($split) {
@@ -479,8 +487,8 @@ sub manage_regular {
 
 sub _format_footnote {
     my ($self, $element) = @_;
-    my $footnote = $self->manage_regular($element);
     if ($self->is_latex) {
+        my $footnote = $self->manage_regular($element);
         $footnote =~ s/\s+/ /gs;
         $footnote =~ s/ +$//s;
         # covert <br> to \par in latex. those \\ in the footnotes are

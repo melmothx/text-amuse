@@ -432,33 +432,6 @@ sub get_footnote {
     else { return undef }
 }
 
-=head3 get_secondary_footnotes($element, $number)
-
-Return the secondary footnotes attached to the element. This for now
-is a bit expensive. While parsing the body, we attached to each
-element a progressive index. So when asking for a couple of secondary
-footnotes (the second argument) we search for a secondary footnote
-element with an index greater then the current element passed as first
-element (sorted).
-
-=cut
-
-sub get_secondary_footnotes {
-    my ($self, $element, $wanted) = @_;
-    my $count = 0;
-    my @footnotes = sort { $a->element_number <=> $b->element_number }
-      grep { $_->type eq 'secondary_footnote' and $_->element_number > $element->element_number }
-      values %{$self->_raw_footnotes};
-    my @out;
-    while ($wanted > 0) {
-        if (@footnotes) {
-            push @out, shift @footnotes;
-        }
-        $wanted--;
-    }
-    return @out;
-}
-
 sub _raw_footnotes {
     my $self = shift;
     return $self->{_raw_footnotes};
