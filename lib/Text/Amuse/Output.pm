@@ -190,9 +190,9 @@ sub process {
                 if ($self->is_html) {
                     foreach my $fn ($self->flush_footnotes) {
                         push @pieces, $self->manage_html_footnote($fn);
-                    }
-                    foreach my $fn ($self->flush_footnotes) {
-                        push @pieces, $self->manage_html_footnote($fn);
+                        foreach my $nested ($self->flush_footnotes) {
+                            push @pieces, $self->manage_html_footnote($nested);
+                        }
                     }
                     die "Footnotes still in the stack!" if scalar($self->flush_footnotes);
                 }
@@ -226,9 +226,9 @@ sub process {
     if ($self->is_html) {
         foreach my $fn ($self->flush_footnotes) {
             push @pieces, $self->manage_html_footnote($fn);
-        }
-        foreach my $fn ($self->flush_footnotes) {
-            push @pieces, $self->manage_html_footnote($fn);
+            foreach my $nested ($self->flush_footnotes) {
+                push @pieces, $self->manage_html_footnote($nested);
+            }
         }
         die "Footnotes still in the stack!" if scalar($self->flush_footnotes);
     }
