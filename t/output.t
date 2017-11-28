@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 119;
+plan tests => 121;
 
 my $document =
   Text::Amuse->new(file => catfile(t => testfiles => 'packing.muse'),
@@ -113,6 +113,7 @@ foreach my $testfile (qw/comments
                          hyper-2
                          links-in-h
                          footnotes-multiline
+                         secondary-fn
                          enumerations
                          empty-tags
                          verb

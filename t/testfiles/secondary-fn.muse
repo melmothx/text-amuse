@@ -7,6 +7,8 @@ This is a paragraph [1] with a regular and a secondary {1} footnote.
 
           * * * * *
 
+* [First Part]
+
 A new page, then again [2] and a secondary. {2}
 
 {2} Second secondary, from the body
@@ -19,44 +21,50 @@ A new page, then again [2] and a secondary. {2}
 
 {4} Last one from the footnote itself.
 
-* Part with a primary [15] and a secondary {5}
+* [Part with a primary [15] and a secondary {5}] [{}\_&^%#@$] [{}\_&^%#@$]
 
 {5} From part
 
 [15] Regular footnote
 
-** Chapter with secondary {6} [3]
+** [Chapter] with secondary {6} [3] [{}\_&^%#@$]
 
-{6} From chapter
+{6} From chapter [{}\_&^%#@$]
 
 [3] Regular
 
-*** Section with secondary {7} [4]
+* Another [part] {21} [22] [{}\_&^%#@$]
 
-{7} From section
+{21} From the part [{}\_&^%#@$]
+
+[22] Regular from the part
+
+*** [Section] with secondary {7} [4] [{}\_&^%#@$]
+
+{7} From section [{}\_&^%#@$]
 
 [4] Regular footnote from section
 
-**** Subsection with secondary {8} [5]
+**** Subsection with secondary {8} [5] [{}\_&^%#@$]
 
-[5] Regular
+[5] Regular [{}\_&^%#@$]
 
-{8} From subsection
+{8} From subsection [{}\_&^%#@$]
 
-***** Sub sub section with secondary {9} [6]
+***** Sub sub section with secondary {9} [6] [{}\_&^%#@$]
 
 {9} From secondary
 
-[6] From subsection <verbatim>{1}</verbatim> Neutralized
+[6] From subsection <verbatim>{1} [{}\_&^%#@$]</verbatim> Neutralized
 
 <verbatim>{10}</verbatim> Neutralized
 
-Neutralized as well <verbatim>{10}</verbatim>.
+Neutralized as well <verbatim>{10} [{}\_&^%#@$]</verbatim>.
 
 {{{
-verbatim block {10}
+verbatim block {10} [{}\_&^%#@$]
 
-{10} Nothing happens
+{10} Nothing happens [{}\_&^%#@$]
 }}}
 
 
@@ -67,9 +75,9 @@ verbatim block {11}
 </example>
 
 <verse>
-verbatim block {12}
+verbatim block {12} [{}\_&^%#@$]
 
-{12} Parsed
+{12} Parsed [{}\_&^%#@$]
 
 </verse>
 
@@ -83,4 +91,20 @@ verbatim block {12}
 {212}
 
 Nothing {233} happens here.
+
+
+** Chapter [55] {55}
+
+[55] Here we are 
+
+{55} Is it resetting?
+
+ - In a list {60} [50]
+
+{60} Fn in a list
+
+[50] Fn from list
+
+** Done [56] {56}
+
 
