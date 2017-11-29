@@ -84,9 +84,14 @@ verbatim block {12} [{}\_&^%#@$]
 > verbatim block {13}
 > another {14}
 
-{14} Parsed 1
+{14} Parsed 1.
 
-{15} Parsed 2
+     Same indent for secondary. This appears.
+
+
+{15} Parsed 2. This disappears.
+
+     Same indent for secondary.  Not referenced.
 
 {212}
 
@@ -103,7 +108,11 @@ Nothing {233} happens here.
 
 {60} Fn in a list
 
+     With the same indentation, it continues
+
 [50] Fn from list
+
+     Same indent, continues.
 
 ** Done [56] {56}
 

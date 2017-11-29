@@ -190,11 +190,12 @@ sub process {
                 if ($self->is_html) {
                     foreach my $fn ($self->flush_footnotes) {
                         push @pieces, $self->manage_html_footnote($fn);
-                        foreach my $nested ($self->flush_footnotes) {
-                            push @pieces, $self->manage_html_footnote($nested);
-                        }
                     }
-                    die "Footnotes still in the stack!" if scalar($self->flush_footnotes);
+                    foreach my $nested ($self->flush_secondary_footnotes) {
+                        push @pieces, $self->manage_html_footnote($nested);
+                    }
+                    die "Footnotes still in the stack!" if $self->flush_footnotes;
+                    die "Secondary footnotes still in the stack!" if $self->flush_secondary_footnotes;
                 }
                 push @splat, join("", @pieces);
                 @pieces = ();
@@ -226,11 +227,12 @@ sub process {
     if ($self->is_html) {
         foreach my $fn ($self->flush_footnotes) {
             push @pieces, $self->manage_html_footnote($fn);
-            foreach my $nested ($self->flush_footnotes) {
-                push @pieces, $self->manage_html_footnote($nested);
-            }
         }
-        die "Footnotes still in the stack!" if scalar($self->flush_footnotes);
+        foreach my $nested ($self->flush_secondary_footnotes) {
+            push @pieces, $self->manage_html_footnote($nested);
+        }
+        die "Footnotes still in the stack!" if $self->flush_footnotes;
+        die "Secondary footnotes still in the stack!" if $self->flush_secondary_footnotes;
     }
 
     if ($split) {
@@ -262,25 +264,50 @@ sub header {
 
 =head2 INTERNAL METHODS
 
-=head3 add_footnote($num)
+=head3 add_footnote($element)
 
-Add the footnote to the internal list of found footnotes. Its
-existence is checked against the document object.
+Add the footnote to the internal list of found footnotes.
 
 =cut
 
 sub add_footnote {
     my ($self, $fn) = @_;
     return unless $fn;
+    if ($fn->type eq 'footnote') {
+        $self->_add_primary_footnote($fn);
+    }
+    elsif ($fn->type eq 'secondary_footnote') {
+        $self->_add_secondary_footnote($fn);
+    }
+    else {
+        die "Wrong element type passed: " . $fn->type . " " . $fn->string;
+    }
+}
+
+sub _add_primary_footnote {
+    my ($self, $fn) = @_;
     unless (defined $self->{_fn_list}) {
         $self->{_fn_list} = [];
     }
     push @{$self->{_fn_list}}, $fn;
 }
 
+sub _add_secondary_footnote {
+    my ($self, $fn) = @_;
+    unless (defined $self->{_sec_fn_list}) {
+        $self->{_sec_fn_list} = [];
+    }
+    push @{$self->{_sec_fn_list}}, $fn;
+}
+
 =head3 flush_footnotes
 
-Return the list of footnotes found as a list of digits.
+Return the list of primary footnotes found as a list of elements.
+
+=head3 flush_secondary_footnotes
+
+Return the list of secondary footnotes found as a list of elements.
+
 
 =cut
 
@@ -292,6 +319,13 @@ sub flush_footnotes {
     return @{delete $self->{_fn_list}};
 }
 
+sub flush_secondary_footnotes {
+    my $self = shift;
+    # as above
+    return unless (defined $self->{_sec_fn_list});
+    return @{delete $self->{_sec_fn_list}};
+}
+
 =head3 manage_html_footnote
 
 =cut
@@ -301,7 +335,17 @@ sub manage_html_footnote {
     return unless $element;
     my $fn_num = $element->footnote_index;
     my $fn_symbol = $element->footnote_symbol;
-    my $chunk = qq{\n<p class="fnline"><a class="footnotebody"} . " "
+    my $class;
+    if ($element->type eq 'footnote') {
+        $class = 'fnline';
+    }
+    elsif ($element->type eq 'secondary_footnote') {
+        $class = 'secondary-fnline';
+    }
+    else {
+        die "wrong type " . $element->type . '  ' . $element->string;
+    }
+    my $chunk = qq{\n<p class="$class"><a class="footnotebody"} . " "
       . qq{href="#fn_back${fn_num}" id="fn${fn_num}">$fn_symbol</a> } .
         $self->manage_regular($element) .
           qq{</p>\n};
