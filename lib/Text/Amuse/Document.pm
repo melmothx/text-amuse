@@ -575,7 +575,7 @@ sub _parse_string {
         $element{attribute} = $2;
         $element{attribute_type} = 'dt';
         $element{removed} = $1 . $2 . $3 . $4 . $6;
-        $element{indentation} = length($1);
+        $element{indentation} = length($1) + 2;
         $element{start_list_index} = 1;
         return %element;
     }
@@ -585,7 +585,7 @@ sub _parse_string {
             $element{removed} = $1;
             $element{string} = $3;
             $element{block} = "ul";
-            $element{indentation} = length($2);
+            $element{indentation} = length($2) + 2;
             $element{start_list_index} = 1;
             return %element;
         }
@@ -608,7 +608,7 @@ sub _parse_string {
                 $element{removed} = $remove;
                 $element{string} = $text;
                 my $list_type = $self->_identify_list_type($prefix);
-                $element{indentation} = length($whitespace);
+                $element{indentation} = length($whitespace) + 2;
                 $element{block} = $list_type;
                 $element{start_list_index} = $list_index;
                 return %element;
@@ -680,7 +680,7 @@ sub _list_element_can_be_first {
     return 1 if $el->type eq 'dd';
     return unless $el->type eq 'li';
     # first element, can't be too indented
-    if ($el->indentation > 6) {
+    if ($el->indentation > 8) {
         return 0;
     }
     else {

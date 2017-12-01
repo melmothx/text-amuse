@@ -82,6 +82,9 @@ t/testfiles/complete.muse
 t/testfiles/crashed-1.exp.html
 t/testfiles/crashed-1.exp.ltx
 t/testfiles/crashed-1.muse
+t/testfiles/desc-lists-2.exp.html
+t/testfiles/desc-lists-2.exp.ltx
+t/testfiles/desc-lists-2.muse
 t/testfiles/desc-lists.exp.html
 t/testfiles/desc-lists.exp.ltx
 t/testfiles/desc-lists.muse
