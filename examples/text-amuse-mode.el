@@ -11,6 +11,7 @@
      ("^\\*\\*\\*\\* .*$" . font-lock-type-face)
      ("^\\*\\*\\*\\*\\* .*$" . font-lock-type-face)
      ("\\[[0-9]+\\]" . font-lock-variable-name-face)
+     ("{[0-9]+}" . font-lock-variable-name-face)
      ("^ +- " . font-lock-keyword-face)
      ("\\*+\\(.*?\\w.*?\\)\\*+" . font-lock-variable-name-face)
      ("=\\(.*?\\w.*?\\)=" . font-lock-variable-name-face)
