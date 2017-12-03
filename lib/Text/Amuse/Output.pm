@@ -578,7 +578,17 @@ sub manage_regular {
     while (@processed) {
         my $piece = shift @processed;
         if ($piece->type eq 'open') {
-            push @tagpile, $piece->tag;
+            # look forward for a matching tag
+            if (grep { $_->type eq 'close' and $_->tag eq $piece->tag } @processed) {
+                push @tagpile, $piece->tag;
+            }
+            else {
+                warn "Found opening tag " . $piece->string
+                  . " in <$string> without a matching closing tag. "
+                  . "Leaving it as-is, but it's unlikely you want this. "
+                  . "To suppress this warning, wrap it around <verbatim>\n";
+                $piece->type('text');
+            }
         }
         elsif ($piece->type eq 'close') {
             # check if there is a matching opening
