@@ -419,8 +419,7 @@ sub inline_elements {
                                 (?<tag_name> strong | em |  code | strike | del | sup |  sub )
                                 \>
                             ) |
-                            (?<open_inline>  (?<!\w) (?<open_inline_name>(?:(?:\*\*\*|\*\*|\*|\=)) (?=\S))) |
-                            (?<close_inline> (?<=\S) (?<close_inline_name>(?:(?:\*\*\*|\*\*|\*|\=)) (?!\w))) |
+                            (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
                             (?<anchor> ^\x{20}*\#[A-Za-z][A-Za-z0-9]+\x{20}*$) |
                             (?<br> \x{20}*\< br *\/*\>)
                         )}gcxms) {
@@ -429,11 +428,13 @@ sub inline_elements {
         my $text = delete $captures{text};
         my $raw = delete $captures{raw};
         my $position = pos($string);
-        push @list, Text::Amuse::InlineElement->new(string => $text,
-                                                    type => 'text',
-                                                    last_position => $position - length($raw),
-                                                    fmt => $self->fmt,
-                                                   );
+        if (length($text)) {
+            push @list, Text::Amuse::InlineElement->new(string => $text,
+                                                        type => 'text',
+                                                        last_position => $position - length($raw),
+                                                        fmt => $self->fmt,
+                                                       );
+        }
         my %args = (
                     string => $raw,
                     last_position => $position,
@@ -444,9 +445,9 @@ sub inline_elements {
             $args{type} = $close ? 'close' : 'open';
             $args{tag} = delete $captures{tag_name} or die "Missing tag_name, this is a bug:  <$string>";
         }
-        elsif (delete $captures{open_inline}) {
-            $args{type} = 'open_inline';
-            $args{tag} = delete $captures{open_inline_name} or die "Missing open_inline_name in <$string>";
+        elsif (my $tag = delete $captures{inline}) {
+            $args{type} = 'inline';
+            $args{tag} = $tag;
         }
         elsif (delete $captures{close_inline}) {
             $args{type} = 'close_inline';
@@ -468,6 +469,46 @@ sub inline_elements {
                                                 fmt => $self->fmt,
                                                 last_position => $offset + length($last_chunk),
                                                );
+    my $last = $#list;
+  PARSEINLINE:
+    for (my $i = 0; $i < @list; $i++) {
+        if ($list[$i]->type eq 'inline') {
+            my $next = $i + 1;
+            my $previous = $i - 1;
+            # check back and forward, just to mark as open or close
+            if ($i == 0) {
+                # first element, can be open if next is not a space
+                if ($next <= $last and
+                    $list[$next]->string =~ m/\A\S/) {
+                    $list[$i]->type('open_inline');
+                    next PARSEINLINE;
+                }
+            }
+            elsif ($i == $last) {
+                # last element, can only close
+                if ($list[$previous]->string =~ m/\S\z/) {
+                    $list[$i]->type('close_inline');
+                    next PARSEINLINE;
+                }
+            }
+            else {
+                # we have both next and previous
+                my $prev_string = $list[$previous]->string;
+                my $next_string = $list[$next]->string;
+                if ($prev_string !~ m/\w\z/ and
+                    $next_string =~ m/\A\S/) {
+                    $list[$i]->type('open_inline');
+                    next PARSEINLINE;
+                }
+                elsif ($prev_string =~ m/\S\z/ and
+                       $next_string !~ m/\A\w/) {
+                    $list[$i]->type('close_inline');
+                    next PARSEINLINE;
+                }
+            }
+            $list[$i]->type('text');
+        }
+    }
     die "Chunks lost during processing <$string>" unless $string eq join('', map { $_->string } @list);
     return @list;
 }
