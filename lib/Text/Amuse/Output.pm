@@ -4,6 +4,7 @@ use warnings;
 use utf8;
 use Text::Amuse::Output::Image;
 use Text::Amuse::InlineElement;
+# use Data::Dumper;
 
 =head1 NAME
 
@@ -273,7 +274,7 @@ Add the footnote to the internal list of found footnotes.
 
 sub add_footnote {
     my ($self, $fn) = @_;
-    return unless $fn;
+    return unless defined($fn);
     if ($fn->type eq 'footnote') {
         $self->_add_primary_footnote($fn);
     }
@@ -421,7 +422,7 @@ sub inline_elements {
                             ) |
                             (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
                             (?<anchor> ^\x{20}*\#[A-Za-z][A-Za-z0-9]+\x{20}*$) |
-                            (?<br> \x{20}*\< br *\/*\>)
+                            (?<br> \< br *\/*\>)
                         )}gcxms) {
         # this is a mammuth, but hey
         my %captures = %+;
@@ -495,14 +496,15 @@ sub inline_elements {
                 # we have both next and previous
                 my $prev_string = $list[$previous]->string;
                 my $next_string = $list[$next]->string;
-                if ($prev_string !~ m/\w\z/ and
-                    $next_string =~ m/\A\S/) {
-                    $list[$i]->type('open_inline');
-                    next PARSEINLINE;
-                }
-                elsif ($prev_string =~ m/\S\z/ and
+                # we give preference to the closing. Logic here is weak.
+                if ($prev_string =~ m/\S\z/ and
                        $next_string !~ m/\A\w/) {
                     $list[$i]->type('close_inline');
+                    next PARSEINLINE;
+                }
+                elsif ($prev_string !~ m/\w\z/ and
+                    $next_string =~ m/\A\S/) {
+                    $list[$i]->type('open_inline');
                     next PARSEINLINE;
                 }
             }
@@ -542,27 +544,34 @@ sub manage_regular {
 
     my @pieces = $self->inline_elements($string);
     my @processed;
+  VERBATIMPIECE:
     while (@pieces) {
         my $piece = shift @pieces;
-        if (@processed and $processed[-1]->type eq 'verbatim' and $piece->type ne 'close_verb') {
-            $processed[-1]->append($piece);
+        if (@processed and $processed[-1]->type eq 'verbatim') {
+            if ($piece->type eq 'close_verb') {
+                # push an empty text just to mark the end of verbatim.
+                push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                                 type => 'text',
+                                                                 fmt => $self->fmt,
+                                                                 last_position => $piece->last_position);
+            }
+            else {
+                $processed[-1]->append($piece);
+            }
+            next VERBATIMPIECE;
         }
         elsif ($piece->type eq 'open_verb') {
             push @processed, Text::Amuse::InlineElement->new(string => '',
                                                              fmt => $self->fmt,
                                                              type => 'verbatim',
                                                              last_position => $piece->last_position);
+            next VERBATIMPIECE;
         }
         elsif ($piece->type eq 'close_verb') {
-            # push an empty text just to mark the end of verbatim.
-            push @processed, Text::Amuse::InlineElement->new(string => '',
-                                                             type => 'text',
-                                                             fmt => $self->fmt,
-                                                             last_position => $piece->last_position);
+            # this is lonely tag
+            $piece->type('text');
         }
-        else {
-            push @processed, $piece;
-        }
+        push @processed, $piece;
     }
     # now validate the tags: open and close
     my @tagpile;
@@ -570,38 +579,40 @@ sub manage_regular {
         my $piece = shift @processed;
         if ($piece->type eq 'open') {
             push @tagpile, $piece->tag;
-            push @pieces, $piece;
         }
         elsif ($piece->type eq 'close') {
             # check if there is a matching opening
             if (@tagpile and $tagpile[-1] eq $piece->tag) {
                 # all match, can go
-                push @pieces, $piece;
                 # and remove from the pile
                 pop @tagpile;
             }
             else {
-                # here either there is mismatch, or it's just a lonely
-                # element. This is absolutely an error, as lonely
-                # elements can be escaped with <verbatim> instead of
-                # this crap. So, warn and remove from output.
+                while (@tagpile and @tagpile[-1] ne $piece->tag) {
+                    # empty the pile untile we find the matching one,
+                    # if any, we're in error anyway, but we have some
+                    # slight chance to recover.
+                    pop @tagpile;
+                }
                 warn "Found closing element " . $piece->string
-                  . " in <$string> without a matching opening tag. Ignoring\n";
+                  . " in <$string> without a matching opening tag. "
+                  . "Leaving it as-is, but it's unlikely you want this. "
+                  . "To suppress this warning, wrap it around <verbatim>\n";
+                $piece->type('text');
             }
         }
-        else {
-            push @pieces, $piece;
-        }
+        push @pieces, $piece;
     }
 
-    if (@tagpile) {
-        warn "Found unclosed tags in string <$string>, closing them\n";
-        while (@tagpile) {
-            push @pieces, Text::Amuse::InlineElement->new(string => '',
-                                                          fmt => $self->fmt,
-                                                          tag => pop(@tagpile),
-                                                          type => 'close');
-        }
+    # print Dumper(\@pieces);
+
+    while (@tagpile) {
+        my $unclosed = pop @tagpile;
+        warn "Found unclosed tag $unclosed in string <$string>, closing it\n";
+        push @pieces, Text::Amuse::InlineElement->new(string => '',
+                                                      fmt => $self->fmt,
+                                                      tag => $unclosed,
+                                                      type => 'close');
     }
 
     # finally, we have to decide if = and * are markup element or
