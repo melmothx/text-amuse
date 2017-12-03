@@ -598,7 +598,7 @@ sub manage_regular {
                 pop @tagpile;
             }
             else {
-                while (@tagpile and @tagpile[-1] ne $piece->tag) {
+                while (@tagpile and $tagpile[-1] ne $piece->tag) {
                     # empty the pile untile we find the matching one,
                     # if any, we're in error anyway, but we have some
                     # slight chance to recover.
