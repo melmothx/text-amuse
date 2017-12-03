@@ -17,19 +17,21 @@ use File::Spec::Functions(qw/catfile/);
 
 my $doc = Text::Amuse::Document->new(file => catfile(t => testfiles => 'broken-tags.muse'));
 
-foreach my $fmt (qw/ltx html/) {
-    my $out = Text::Amuse::Output->new(document => $doc,
-                                       format => $fmt);
+my @strings = (
+               'Test <verbatim>*M \{#!_<"> e*</verbatim><br> =code=' . "\n" .
+               'Test <verbatim>**M \{#!_<"> e**</verbatim><br>',
+               '<em>This is a [1] long string with [[http://example.com][<strong><em>strong</em></strong>]] emph</em> and some material',
+               '**This *is* a [1] long string** with [[http://example.com][<strong><em>strong</em></strong>]] <em>emph</em> and {3} =some= material');
 
-    {
-        my @out = $out->inline_elements('<em>This is a [1] long string with [[http://example.com][<strong><em>strong</em></strong>]] emph</em> and some material');
-        ok scalar(@out);
-        diag Dumper(\@out);
-    }
-    {
-        my @out = $out->inline_elements('**This *is* a [1] long string** with [[http://example.com][<strong><em>strong</em></strong>]] <em>emph</em> and {3} =some= material');
-        ok scalar(@out);
-        diag Dumper(\@out);
+foreach my $str (@strings) {
+    foreach my $fmt (qw/ltx html/) {
+        my $out = Text::Amuse::Output->new(document => $doc,
+                                           format => $fmt);
+        {
+            my @out = $out->inline_elements($str);
+            ok scalar(@out);
+            die Dumper(\@out);
+        }
     }
 }
 

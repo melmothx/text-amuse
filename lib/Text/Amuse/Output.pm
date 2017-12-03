@@ -408,20 +408,22 @@ sub inline_elements {
                         (?<text>.*?) # something not greedy, even nothing
                         (?<raw>
                             # these are OR, so order matters.
+                            # link is the most greedy, as it could have inline markup in the second argument.
+                            (?<link>         \[\[[^\[].*?\]\])      |
                             (?<open_verb>    \<verbatim\>)     |
                             (?<close_verb>   \<\/verbatim\>)  |
-                            (?<link>         \[\[[^\[].*?\]\])      |
                             (?<pri_footnote> \s*\[[0-9]+\]) |
                             (?<sec_footnote> \s*\{[0-9]+\}) |
                             (?<tag> \<
                                 (?<close>\/?)
-                                (?<tag_name> strong | em |  code | strike | del | sup |  sub | verbatim )
-                                \>) |
-                            (?<open_stars>  (?<!\w) \*{1,3} (?=\S)) |
-                            (?<close_stars> (?<=\S) \*{1,3} (?!\w)) |
-                            (?<open_code>  (?<!\w) (?:\=) (?=\S)) |
-                            (?<close_code> (?<=\S) (?:\=) (?!\w)) |
-                            (?<br> \< br *\/*\>))}gcx) {
+                                (?<tag_name> strong | em |  code | strike | del | sup |  sub )
+                                \>
+                            ) |
+                            (?<open_inline>  (?<!\w) (?<open_inline_name>(?:(?:\*\*\*|\*\*|\*|\=)) (?=\S))) |
+                            (?<close_inline> (?<=\S) (?<close_inline_name>(?:(?:\*\*\*|\*\*|\*|\=)) (?!\w))) |
+                            (?<anchor> ^\x{20}*\#[A-Za-z][A-Za-z0-9]+\x{20}*$) |
+                            (?<br> \x{20}*\< br *\/*\>)
+                        )}gcxms) {
         # this is a mammuth, but hey
         my %captures = %+;
         my $text = delete $captures{text};
@@ -430,30 +432,43 @@ sub inline_elements {
         push @list, Text::Amuse::InlineElement->new(string => $text,
                                                     type => 'text',
                                                     last_position => $position - length($raw),
+                                                    fmt => $self->fmt,
                                                    );
+        my %args = (
+                    string => $raw,
+                    last_position => $position,
+                    fmt => $self->fmt,
+                   );
         if (delete $captures{tag}) {
             my $close = delete $captures{close};
-            push @list, Text::Amuse::InlineElement->new(string => $raw,
-                                                        type => ($close ? 'close' : 'open'),
-                                                        tag => delete $captures{tag_name},
-                                                        last_position => $position,
-                                                       );
+            $args{type} = $close ? 'close' : 'open';
+            $args{tag} = delete $captures{tag_name} or die "Missing tag_name, this is a bug:  <$string>";
+        }
+        elsif (delete $captures{open_inline}) {
+            $args{type} = 'open_inline';
+            $args{tag} = delete $captures{open_inline_name} or die "Missing open_inline_name in <$string>";
+        }
+        elsif (delete $captures{close_inline}) {
+            $args{type} = 'close_inline';
+            $args{tag} = delete $captures{close_inline_name} or die "Missing close_inline_name in <$string>";
         }
         else {
             my ($type, @rest) = keys %captures;
-            die "Too many keys in the capture hash: @rest" if @rest;
-            push @list, Text::Amuse::InlineElement->new(string => $raw,
-                                                        type => $type,
-                                                        last_position => $position);
+            die "Too many keys in <$string> the capture hash: @rest" if @rest;
+            delete $captures{$type};
+            $args{type} = $type;
         }
+        die "Unprocessed captures %captures in <$string>" if %captures;
+        push @list, Text::Amuse::InlineElement->new(%args);
     }
     my $offset = (@list ? $list[-1]->last_position : 0);
     my $last_chunk = substr $string, $offset;
     push @list, Text::Amuse::InlineElement->new(string => $last_chunk,
                                                 type => 'text',
+                                                fmt => $self->fmt,
                                                 last_position => $offset + length($last_chunk),
                                                );
-    die "Chunks lost during processing $string" unless $string eq join('', map { $_->string } @list);
+    die "Chunks lost during processing <$string>" unless $string eq join('', map { $_->string } @list);
     return @list;
 }
 
@@ -480,110 +495,159 @@ sub manage_regular {
     unless (defined $string) {
         $string = '';
     }
-    my $linkre = $self->link_re;
 
-    # remove the verbatim pieces
-    my @verbatims;
-    my $rand = sprintf('%u', rand(1000000000)) . 'b1fc670b2e799b90b2f65124021de691' . $self->_get_unique_counter;
-    # print "$string\n$rand\n\n";
-    my $startm = "\x{f0001}${rand}\x{f0002}";
-    my $stopm  = "\x{f0003}${rand}\x{f0004}";
-    my $save_verb = sub {
-        my $string = shift;
-        push @verbatims, $string;
-        return $startm . $#verbatims . $stopm;
-    };
-    my $restored = 0;
-    my $restore_verb = sub {
-        my $num = shift;
-        my $string = $verbatims[$num];
-        $restored++;
-        # print "Called restore_verb for $num\n";
-        die "Pulled too much when restoring verb" unless defined $string;
-        return $self->safe($string);
-    };
-    my $restore_verb_full = sub {
-        my $num = shift;
-        my $string = $verbatims[$num];
-        $restored++;
-        # print "Called restore_verb for $num\n";
-        die "Pulled too much when restoring verb" unless defined $string;
-        return '<verbatim>' . $string . '</verbatim>';
-    };
+    # we do the processing in more steps. It may be more expensive,
+    # but at least the code should be clearer.
 
-
-    $string =~ s/<verbatim>(.+?)<\/verbatim>/$save_verb->($1)/gsxe;
-
-    my $anchors = '';
-    if ($opts{anchors}) {
-        # remove anchors from the string
-        ($string, $anchors) = $self->handle_anchors($string);
-    }
-
-    my $sec_fn_re = qr/\s*\{[0-9]+\}/;
-    my $pri_fn_re = qr/\s*\[[0-9]+\]/;
-    # split at [[ ]] to avoid the mess
-    my @pieces = split /($linkre|$pri_fn_re|$sec_fn_re)/, $string;
-    my @out;
-  PIECE:
+    my @pieces = $self->inline_elements($string);
+    my @processed;
     while (@pieces) {
-        my $l = shift @pieces;
-        if ($l =~ m/^$linkre$/s and !$opts{nolinks}) {
-            # we want the removed piece back verbatim, because the
-            # chunks are going to be processed anew.
-            $l =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb_full->($1)/gsxe;
-            my $link = $self->linkify($l);
-            push @out, $link;
-            next PIECE;
+        my $piece = shift @pieces;
+        if (@processed and $processed[-1]->type eq 'verbatim' and $piece->type ne 'close_verb') {
+            $processed[-1]->append($piece);
         }
-        elsif ($insert_primary_footnote and $l =~ m/\A$pri_fn_re\z/s and
-               my $pri_fn = $self->document->get_footnote($l)) {
-            if ($self->is_html and $l =~ m/\A(\s+)/) {
-                push @out, $1;
-            }
-            push @out, $self->_format_footnote($pri_fn);
-            next PIECE;
+        elsif ($piece->type eq 'open_verb') {
+            push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                             fmt => $self->fmt,
+                                                             type => 'verbatim',
+                                                             last_position => $piece->last_position);
         }
-        elsif ($insert_secondary_footnote and $l =~ m/\A$sec_fn_re\z/s and
-               my $sec_fn = $self->document->get_footnote($l)) {
-            if ($self->is_html and $l =~ m/\A(\s+)/) {
-                push @out, $1;
-            }
-            push @out, $self->_format_footnote($sec_fn);
-            next PIECE;
+        elsif ($piece->type eq 'close_verb') {
+            # push an empty text just to mark the end of verbatim.
+            push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                             type => 'text',
+                                                             fmt => $self->fmt,
+                                                             last_position => $piece->last_position);
         }
         else {
-            next PIECE if $l eq ""; # no text!
-
-            # convert the muse markup to tags
-            $l = $self->muse_inline_syntax_to_tags($l);
-
-            # here we have different routines
-            if ($self->is_latex) {
-                $l = $self->escape_tex($l);
-                $l = $self->_ltx_replace_ldots($l);
-                $l = $self->muse_inline_syntax_to_ltx($l);
-                $l = $self->_ltx_replace_slash($l);
-            }
-            elsif ($self->is_html) {
-                $l = $self->escape_html($l);
-            }
-            else { die "Not reached" }
+            push @processed, $piece;
         }
-        # restore the verbatim pieces
-        $l =~ s/\Q$startm\E([0-9]+)\Q$stopm\E/$restore_verb->($1)/gsxe;
-        push @out, $l;
     }
-    die "Failed to restore chunks for $restored <=>" . join(' - ', @verbatims)
-      if $restored != @verbatims;
-    undef $save_verb;
-    undef $restore_verb;
-    my $final = join("", @out);
+    # now validate the tags: open and close
+    my @tagpile;
+    while (@processed) {
+        my $piece = shift @processed;
+        if ($piece->type eq 'open') {
+            push @tagpile, $piece->tag;
+            push @pieces, $piece;
+        }
+        elsif ($piece->type eq 'close') {
+            # check if there is a matching opening
+            if (@tagpile and $tagpile[-1] eq $piece->tag) {
+                # all match, can go
+                push @pieces, $piece;
+                # and remove from the pile
+                pop @tagpile;
+            }
+            else {
+                # here either there is mismatch, or it's just a lonely
+                # element. This is absolutely an error, as lonely
+                # elements can be escaped with <verbatim> instead of
+                # this crap. So, warn and remove from output.
+                warn "Found closing element " . $piece->string
+                  . " in <$string> without a matching opening tag. Ignoring\n";
+            }
+        }
+        else {
+            push @pieces, $piece;
+        }
+    }
+
+    if (@tagpile) {
+        warn "Found unclosed tags in string <$string>, closing them\n";
+        while (@tagpile) {
+            push @pieces, Text::Amuse::InlineElement->new(string => '',
+                                                          fmt => $self->fmt,
+                                                          tag => pop(@tagpile),
+                                                          type => 'close');
+        }
+    }
+
+    # finally, we have to decide if = and * are markup element or
+    # normal pieces and change the type accordingly.
+
+    while (@pieces) {
+        my $piece = shift @pieces;
+        if ($piece->type eq 'close_inline') {
+            if (@tagpile and $tagpile[-1] eq $piece->tag) {
+                # all match, can go
+                # and remove from the pile
+                pop @tagpile;
+                push @processed, $piece->unroll;
+            }
+            else {
+                # this is just a text material like this*
+                $piece->type('text');
+                push @processed, $piece;
+            }
+        }
+        elsif ($piece->type eq 'open_inline') {
+            # check if in the remaning chunks there is a matching closing
+            if (grep { $_->type eq 'close_inline' && $_->tag eq $piece->tag } @pieces) {
+                push @tagpile, $piece->tag;
+                push @processed, $piece->unroll;
+            }
+            else {
+                $piece->type('text');
+                push @processed, $piece;
+            }
+        }
+        else {
+            push @processed, $piece;
+        }
+    }
+
+    # now we're hopefully set.
+    my (@out, @anchors);
+  CHUNK:
+    while (@processed) {
+        my $piece = shift @processed;
+        if ($piece->type eq 'link') {
+            if ($opts{nolinks}) {
+                $piece->type('text');
+            }
+            else {
+                push @out, $self->linkify($piece->string);
+                next CHUNK;
+            }
+        }
+        elsif ($piece->type eq 'pri_footnote') {
+            if ($insert_primary_footnote and
+                my $pri_fn = $self->document->get_footnote($piece->string)) {
+                if ($self->is_html and $piece->string =~ m/\A(\s+)/) {
+                    push @out, $1;
+                }
+                push @out, $self->_format_footnote($pri_fn);
+                next CHUNK;
+            }
+            else {
+                $piece->type('text');
+            }
+        }
+        elsif ($piece->type eq 'sec_footnote') {
+            if ($insert_secondary_footnote and
+                my $sec_fn = $self->document->get_footnote($piece->string)) {
+                if ($self->is_html and $piece->string =~ m/\A(\s+)/) {
+                    push @out, $1;
+                }
+                push @out, $self->_format_footnote($sec_fn);
+                next CHUNK;
+            }
+            else {
+                $piece->type('text');
+            }
+        }
+        elsif ($piece->type eq 'anchor') {
+            push @anchors, $piece->stringify;
+            next CHUNK;
+        }
+        push @out, $piece->stringify;
+    }
     if ($opts{anchors}) {
-        return $final, $anchors;
+        return join('', @out), join('', @anchors);
     }
     else {
-        return $final;
+        return join('', @out);
     }
 }
 
@@ -628,226 +692,16 @@ format, to avoid command injection.
 
 sub safe {
     my ($self, $string) = @_;
-    if ($self->is_latex) {
-        return $self->escape_tex($string);
-    }
-    elsif ($self->is_html) {
-        return $self->escape_all_html($string);
-    }
-    else { die "Not reached" }
+    return Text::Amuse::InlineElement->new(fmt => $self->fmt,
+                                    string => $string,
+                                    type => 'verbatim')->stringify;
 }
 
-=head3 escape_tex($string)
-
-Escape the string for LaTeX output
-
-=cut
-
-sub escape_tex {
-    my ($self, $string) = @_;
-    $string =~ s/\\/\\textbackslash{}/g;
-    $string =~ s/#/\\#/g ;
-    $string =~ s/\$/\\\$/g;
-    $string =~ s/%/\\%/g;
-    $string =~ s/&/\\&/g;
-    $string =~ s/_/\\_/g ;
-    $string =~ s/\{/\\{/g ;
-    $string =~ s/\}/\\}/g ;
-    $string =~ s/\\textbackslash\\\{\\\}/\\textbackslash{}/g;
-    $string =~ s/~/\\textasciitilde{}/g ;
-    $string =~ s/\^/\\^{}/g ;
-    $string =~ s/\|/\\textbar{}/g;
-    return $string;
-}
-
-sub _ltx_replace_ldots {
-    my ($self, $string) = @_;
-    my $ldots = "\\dots{}";
-    $string =~ s/\.{3,4}/$ldots/g ;
-    $string =~ s/\x{2026}/$ldots/g;
-    return $string;
-}
-
-sub _ltx_replace_slash {
-    my ($self, $string) = @_;
-    $string =~ s!/!\\Slash{}!g;
-    return $string;
-}
-
-=head4 escape_all_html($string)
-
-Escape the string for HTML output
-
-=cut
-
-sub escape_all_html {
-    my ($self, $string) = @_;
-    $string =~ s/&/&amp;/g;
-    $string =~ s/</&lt;/g;
-    $string =~ s/>/&gt;/g;
-    $string =~ s/"/&quot;/g;
-    $string =~ s/'/&#x27;/g;
-    return $string;
-}
-
-=head3 muse_inline_syntax_to_ltx
-
-=cut
-
-sub muse_inline_syntax_to_ltx {
-    my ($self, $string) = @_;
-    $string =~ s!<strong>(.+?)</strong>!\\textbf{$1}!gs;
-    $string =~ s!<em>(.+?)</em>!\\emph{$1}!gs;
-    $string =~ s!<code>(.+?)</code>!\\texttt{$1}!gs;
-    # the same
-    $string =~ s!<strike>(.+?)</strike>!\\sout{$1}!gs;
-    $string =~ s!<del>(.+?)</del>!\\sout{$1}!gs;
-    $string =~ s!<sup>(.+?)</sup>!\\textsuperscript{$1}!gs;
-    $string =~ s!<sub>(.+?)</sub>!\\textsubscript{$1}!gs;
-    $string =~ s!^[\s]*<br ?/?>[\s]*$!\n\\bigskip\n!gs;
-    $string =~ s! *<br ?/?>!\\forcelinebreak !gs;
-    return $string;
-}
-
-=head3 escape_html
-
-=cut
-
-sub escape_html {
-    my ($self, $string) = @_;
-    $string = $self->remove_permitted_html($string);
-    $string = $self->escape_all_html($string);
-    $string = $self->restore_permitted_html($string);
-    return $string;
-}
-
-=head3 remove_permitted_html
-
-=cut
-
-sub remove_permitted_html {
-    my ($self, $string) = @_;
-    foreach my $tag (keys %{ $self->tag_hash }) {
-        # only matched pairs, so we avoid a lot of problems
-        # we also use private Unicode codepoints to mark start and end
-        my $marker = $self->tag_hash->{$tag};
-        my $startm = "\x{f0001}${marker}\x{f0002}";
-        my $stopm  = "\x{f0003}${marker}\x{f0004}";
-        $string =~ s!<$tag>
-                     (.*?)
-                     </$tag>
-                    !$startm$1$stopm!gsx;
-    };
-    my $brhash = $self->br_hash;
-    $string =~ s!<br */*>!\x{f0001}$brhash\x{f0002}!gs;
-    return $string;
-}
-
-=head3 restore_permitted_html
-
-=cut
-
-sub restore_permitted_html {
-    my ($self, $string) = @_;
-    foreach my $hash (keys %{ $self->reverse_tag_hash }) {
-        my $orig = $self->reverse_tag_hash->{$hash};
-        $string =~ s!\x{f0001}$hash\x{f0002}!<$orig>!gs;
-        $string =~ s!\x{f0003}$hash\x{f0004}!</$orig>!gs;
-    }
-    my $brhash = $self->br_hash;
-    $string =~ s!\x{f0001}$brhash\x{f0002}!<br />!gs;
-    return $string;
-}
-
-=head3 muse_inline_syntax_to_tags
-
-=cut
-
-sub muse_inline_syntax_to_tags {
-    my ($self, $string) = @_;
-    # first, add a space around, so we don't need to check for ^ and $
-    $string = " " . $string . " ";
-
-    # remove the empty tags before proceeding
-    foreach my $tag (qw/strong em code strike del sup sub verbatim/) {
-        $string =~ s!<\Q$tag\E></\Q$tag\E>!!g;
-    }
-
-    # the *, something not a space, the match (no * inside), something
-    # not a space, the *
-    my $something = qr{\*(?=\S)([^\*]+?)(?<=\S)\*};
-    # the same, but for =
-    my $somethingeq = qr{\=(?=\S)([^\=]+?)(?<=\S)\=};
-
-    # before and after the *, something not a word and not an *
-    $string =~ s{(?<=[^\*\w])\*\*
-                 $something
-                 \*\*(?=[^\*\w])}
-                {<strong><em>$1</em></strong>}gsx;
-    $string =~ s{(?<=[^\*\w])\*
-                 $something
-                 \*(?=[^\*\w])}
-                {<strong>$1</strong>}gsx;
-    $string =~ s{(?<=[^\*\w])
-                 $something
-                 (?=[^\*\w])}
-                {<em>$1</em>}gsx;
-    $string =~ s{(?<=[^\=\w])
-                 $somethingeq
-                 (?=[^\=\w])}
-                {<code>$1</code>}gsx;
-    # the full line without the 2 spaces added;
-    my $l = (length $string) - 2;
-    # return the string, starting from 1 and for the length of the string.
-    return substr($string, 1, $l);
-}
 
 =head3 manage_paragraph
 
-=head3 handle_anchors($string)
-
-Return two elements, the first is the string without the anchor, the
-second is a string with the anchors output.
-
 =cut
 
-sub handle_anchors {
-    my ($self, $line) = @_;
-    return ('', '') unless length($line);
-    # consider targets only if we find #here on a line by itself. This
-    # way we can easily check the existing texts across all archives
-    # and minimize clashes due to this markup change.
-    my $hyperre = $self->hyperref_re;
-    my @anchors;
-    my $handle;
-    if ($self->is_latex) {
-        $handle = sub {
-            my $anchor = shift;
-            push @anchors, "\\hyperdef{amuse}{$anchor}{}%";
-            return '';
-        };
-    }
-    elsif ($self->is_html) {
-        $handle = sub {
-            my $anchor = shift;
-            push @anchors, qq{<a id="text-amuse-label-$anchor" class="text-amuse-internal-anchor"><\/a>};
-            return '';
-        };
-    }
-    else { die "Not reached" }
-    die "wtf" unless $handle;
-    $line =~ s/^
-               \x{20}*
-               (\#
-                   ($hyperre)
-               )
-               \x{20}*
-               $
-               \n? # remove the eventual trailing newline
-              /$handle->($2)/gmxe;
-    my $anchors_string = @anchors ? join("\n", @anchors) . "\n" : '';
-    return ($line, $anchors_string);
-}
 
 sub manage_paragraph {
     my ($self, $el) = @_;
@@ -1355,8 +1209,7 @@ sub format_links {
         return $image->output;
     }
     # links
-    my $hyperre = $self->hyperref_re;
-    if ($link =~ m/\A\#($hyperre)\z/) {
+    if ($link =~ m/\A\#([A-Za-z][A-Za-z0-9]*)\z/) {
         my $linkname = $1;
         if ($self->is_html) {
             $link = "#text-amuse-label-$linkname";
@@ -1389,8 +1242,7 @@ sub format_single_link {
         $self->document->attachments($image->filename);
         return $image->output;
     }
-    my $hyperre = $self->hyperref_re;
-    if ($link =~ m/\A\#($hyperre)\z/) {
+    if ($link =~ m/\A\#([A-Za-z][A-Za-z0-9]+)\z/) {
         my $linkname = $1;
         # link is sane and safe
         if ($self->is_html) {
@@ -1743,13 +1595,6 @@ sub _build_blk_table {
     return $table;
 }
 
-=head3 link_re
-
-=cut
-
-sub link_re {
-    return qr{\[\[[^\[].*?\]\]};
-}
 
 =head3 image_re
 
@@ -1767,15 +1612,6 @@ sub image_re {
                                 )?}x;
 }
 
-=head3 hyperref_re
-
-Regular expression to match hyperref internal links.
-
-=cut
-
-sub hyperref_re {
-    return qr{[A-Za-z][A-Za-z0-9]*};
-}
 
 =head3 find_image($link)
 
@@ -1818,62 +1654,6 @@ sub url_re {
                              !x;
 }
 
-=head3 footnote_re
-
-=cut
-
-sub footnote_re {
-    return qr{\[[0-9]+\]};
-}
-
-=head3 br_hash
-
-=cut
-
-sub br_hash {
-    my $self = shift;
-    unless (defined $self->{_br_hash}) {
-        my $random = sprintf('%u', rand(10000));
-        $self->{_br_hash} = '49777d285f86e8b252431fdc1a78b92459704911' . $random;
-    }
-    return $self->{_br_hash};
-}
-
-=head3 tag_hash
-
-=cut
-
-sub tag_hash {
-    my $self = shift;
-    unless (defined $self->{_tag_hash}) {
-        my $random = sprintf('%u', rand(10000));
-        $self->{_tag_hash} =
-          {
-           'em' => '93470662f625a56cd4ab62d9d820a77e6468638e' . $random,
-           'sub' => '5d85613a56c124e3a3ff8ce6fc95d10cdcb5001e' . $random,
-           'del' => 'fea453f853c8645b085126e6517eab38dfaa022f' . $random,
-           'strike' => 'afe5fd4ff1a85caa390fd9f36005c6f785b58cb4' . $random,
-           'strong' => '0117691d0201f04aa02f586b774c190802d47d8c' . $random,
-           'sup' => '3844b17b367801f41a3ff27aab7d5ca297c2b984' . $random,
-           'code' => 'e6fb06210fafc02fd7479ddbed2d042cc3a5155e' . $random,
-          };
-    }
-    return { %{$self->{_tag_hash} } };
-}
-
-=head3 reverse_tag_hash
-
-=cut
-
-sub reverse_tag_hash {
-    my $self = shift;
-    unless (defined $self->{_reverse_tag_hash}) {
-        my %hash = %{ $self->tag_hash };
-        my %reverse = reverse %hash;
-        $self->{_reverse_tag_hash} = \%reverse;
-    }
-    return { %{$self->{_reverse_tag_hash}} };
-}
 
 =head3 html_table_mapping
 
