@@ -405,6 +405,13 @@ sub inline_elements {
     my ($self, $string) = @_;
     return unless $string;
     my @list;
+    if ($string =~ m{\A\s*\<br */*\>\s*\z}) {
+        return Text::Amuse::InlineElement->new(string => $string,
+                                               type => 'bigskip',
+                                               last_position => length($string),
+                                               fmt => $self->fmt,
+                                              );
+    }
     while ($string =~ m{\G # last match
                         (?<text>.*?) # something not greedy, even nothing
                         (?<raw>
@@ -422,7 +429,7 @@ sub inline_elements {
                             ) |
                             (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
                             (?<anchor> ^\x{20}*\#[A-Za-z][A-Za-z0-9]+\x{20}*$) |
-                            (?<br> \< br *\/*\>)
+                            (?<br> \s*\< br *\/*\>)
                         )}gcxms) {
         # this is a mammuth, but hey
         my %captures = %+;

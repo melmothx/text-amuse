@@ -76,35 +76,37 @@ sub fmt {
 
 sub stringify {
     my $self = shift;
-    if ($self->type eq 'text') {
+    my $type = $self->type;
+    my $string = $self->string;
+    if ($type eq 'text') {
         if ($self->is_latex) {
-            my $string = $self->escape_tex($self->string);
+            $string = $self->escape_tex($string);
             $string = $self->_ltx_replace_ldots($string);
             $string = $self->_ltx_replace_slash($string);
             return $string;
         }
         elsif ($self->is_html) {
-            return $self->escape_all_html($self->string);
+            return $self->escape_all_html($string);
         }
         else {
             die "Not reached";
         }
     }
-    if ($self->type eq 'verbatim') {
+    if ($type eq 'verbatim') {
         if ($self->is_latex) {
-            return $self->escape_tex($self->string);
+            return $self->escape_tex($string);
         }
         elsif ($self->is_html) {
-            return $self->escape_all_html($self->string);
+            return $self->escape_all_html($string);
         }
         else {
             die "Not reached";
         }
     }
-    elsif ($self->type eq 'anchor') {
-        my $anchor = $self->string;
+    elsif ($type eq 'anchor') {
+        my $anchor = $string;
         $anchor =~ s/[^A-Za-z0-9]//g;
-        die "Bad anchor " . $self->string unless length($anchor);
+        die "Bad anchor " . $string unless length($anchor);
         if ($self->is_latex) {
             return "\\hyperdef{amuse}{$anchor}{}\%\n";
         }
@@ -115,21 +117,33 @@ sub stringify {
             die "Not reached";
         }
     }
-    elsif ($self->type eq 'open' or $self->type eq 'close') {
-        my $out = $self->markup_table->{$self->tag}->{$self->type}->{$self->fmt};
-        die "Missing markup for $self->fmt $self->type $self->tag" unless $out;
+    elsif ($type eq 'open' or $type eq 'close') {
+        my $out = $self->markup_table->{$self->tag}->{$type}->{$self->fmt};
+        die "Missing markup for $self->fmt $type $self->tag" unless $out;
         return $out;
     }
-    elsif ($self->type eq 'br') {
+    elsif ($type eq 'br') {
+        my $leading = '';
+        if ($string =~ m/\A(\s+)/) {
+            $leading = $1;
+        }
         if ($self->is_latex) {
-            return '\\forcelinebreak ';
+            return "\\forcelinebreak ";
+        }
+        else {
+            return "$leading<br />";
+        }
+    }
+    elsif ($type eq 'bigskip') {
+        if ($self->is_latex) {
+            return "\n\\bigskip";
         }
         else {
             return '<br />';
         }
     }
     else {
-        die "Unrecognized type " . $self->type . " for " . $self->string;
+        die "Unrecognized type " . $type . " for " . $string;
     }
 }
 
