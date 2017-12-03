@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use Text::Amuse::Output::Image;
+use Text::Amuse::InlineElement;
 
 =head1 NAME
 
@@ -397,6 +398,63 @@ is the processed string, the second is the processed anchors string.
 sub _get_unique_counter {
     my $self = shift;
     ++$self->{_unique_counter};
+}
+
+sub inline_elements {
+    my ($self, $string) = @_;
+    return unless $string;
+    my @list;
+    while ($string =~ m{\G # last match
+                        (?<text>.*?) # something not greedy, even nothing
+                        (?<raw>
+                            # these are OR, so order matters.
+                            (?<open_verb>    \<verbatim\>)     |
+                            (?<close_verb>   \<\/verbatim\>)  |
+                            (?<link>         \[\[[^\[].*?\]\])      |
+                            (?<pri_footnote> \s*\[[0-9]+\]) |
+                            (?<sec_footnote> \s*\{[0-9]+\}) |
+                            (?<tag> \<
+                                (?<close>\/?)
+                                (?<tag_name> strong | em |  code | strike | del | sup |  sub | verbatim )
+                                \>) |
+                            (?<open_stars>  (?<!\w) \*{1,3} (?=\S)) |
+                            (?<close_stars> (?<=\S) \*{1,3} (?!\w)) |
+                            (?<open_code>  (?<!\w) (?:\=) (?=\S)) |
+                            (?<close_code> (?<=\S) (?:\=) (?!\w)) |
+                            (?<br> \< br *\/*\>))}gcx) {
+        # this is a mammuth, but hey
+        my %captures = %+;
+        my $text = delete $captures{text};
+        my $raw = delete $captures{raw};
+        my $position = pos($string);
+        push @list, Text::Amuse::InlineElement->new(string => $text,
+                                                    type => 'text',
+                                                    last_position => $position - length($raw),
+                                                   );
+        if (delete $captures{tag}) {
+            my $close = delete $captures{close};
+            push @list, Text::Amuse::InlineElement->new(string => $raw,
+                                                        type => ($close ? 'close' : 'open'),
+                                                        tag => delete $captures{tag_name},
+                                                        last_position => $position,
+                                                       );
+        }
+        else {
+            my ($type, @rest) = keys %captures;
+            die "Too many keys in the capture hash: @rest" if @rest;
+            push @list, Text::Amuse::InlineElement->new(string => $raw,
+                                                        type => $type,
+                                                        last_position => $position);
+        }
+    }
+    my $offset = (@list ? $list[-1]->last_position : 0);
+    my $last_chunk = substr $string, $offset;
+    push @list, Text::Amuse::InlineElement->new(string => $last_chunk,
+                                                type => 'text',
+                                                last_position => $offset + length($last_chunk),
+                                               );
+    die "Chunks lost during processing $string" unless $string eq join('', map { $_->string } @list);
+    return @list;
 }
 
 sub manage_regular {

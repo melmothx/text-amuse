@@ -12,9 +12,9 @@ Text::Amuse::Element - Helper for Text::Amuse
 Everything here is pretty much internal only, underdocumented and
 subject to change.
 
-=head3 new($string)
+=head3 new(%args)
 
-Constructor. Accepts a string to be parsed
+Constructor
 
 =cut
 
