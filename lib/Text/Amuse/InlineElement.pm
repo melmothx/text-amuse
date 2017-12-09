@@ -146,7 +146,7 @@ sub stringify {
             return "\\hyperdef{amuse}{$anchor}{}\%\n";
         }
         elsif ($self->is_html) {
-            return qq{<a id="text-amuse-label-$anchor" class="text-amuse-internal-anchor"><\/a>}
+            return qq{<a id="text-amuse-label-$anchor" class="text-amuse-internal-anchor"><\/a>\n}
         }
         else {
             die "Not reached";
