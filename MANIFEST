@@ -7,6 +7,7 @@ lib/Text/Amuse/Beamer.pm
 lib/Text/Amuse/Document.pm
 lib/Text/Amuse/Element.pm
 lib/Text/Amuse/Functions.pm
+lib/Text/Amuse/InlineElement.pm
 lib/Text/Amuse/Output.pm
 lib/Text/Amuse/Output/Image.pm
 lib/Text/Amuse/String.pm
@@ -30,6 +31,7 @@ t/header-defined.t
 t/headers.t
 t/hyphenation.t
 t/images.t
+t/inline-elements.t
 t/internal-linking.t
 t/languages.t
 t/list-continuations.t
@@ -144,6 +146,8 @@ t/testfiles/image2.muse
 t/testfiles/images.exp.html
 t/testfiles/images.exp.ltx
 t/testfiles/images.muse
+t/testfiles/inline.exp.html
+t/testfiles/inline.exp.ltx
 t/testfiles/inline.muse
 t/testfiles/links-2.exp.html
 t/testfiles/links-2.exp.ltx
