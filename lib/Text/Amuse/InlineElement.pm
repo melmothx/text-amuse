@@ -25,14 +25,15 @@ sub new {
                 string => '',
                 last_position => 0,
                 tag => '',
-                tag_name => '',
                 fmt => '',
                };
     foreach my $k (keys %$self) {
         if (defined $args{$k}) {
             $self->{$k} = $args{$k};
         }
+        delete $args{$k};
     }
+    die "Extra arguments passed %args" if %args;
     die "Missing type for <$self->{string}>" unless $self->{type};
     unless ($self->{fmt} eq 'ltx' or $self->{fmt} eq 'html') {
         die "Missing format $self->{fmt} for <$self->{string}>"
@@ -64,10 +65,6 @@ sub append {
 
 sub tag {
     shift->{tag};
-}
-
-sub tag_name {
-    shift->{tag_name};
 }
 
 sub fmt {
