@@ -79,6 +79,7 @@ foreach my $testfile (qw/comments
                          links-in-h
                          footnotes-multiline
                          secondary-fn
+                         fn-ordering
                          enumerations
                          empty-tags
                          verb

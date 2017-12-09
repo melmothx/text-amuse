@@ -112,6 +112,9 @@ t/testfiles/false-lists.exp.html
 t/testfiles/false-lists.exp.ltx
 t/testfiles/false-lists.muse
 t/testfiles/float.png
+t/testfiles/fn-ordering.exp.html
+t/testfiles/fn-ordering.exp.ltx
+t/testfiles/fn-ordering.muse
 t/testfiles/footnotes-2.exp.html
 t/testfiles/footnotes-2.exp.ltx
 t/testfiles/footnotes-2.muse
