@@ -403,7 +403,7 @@ sub _get_unique_counter {
 
 sub inline_elements {
     my ($self, $string) = @_;
-    return unless $string;
+    return unless length($string);
     my @list;
     if ($string =~ m{\A\s*\<br */*\>\s*\z}) {
         return Text::Amuse::InlineElement->new(string => $string,
