@@ -123,14 +123,14 @@ sub stringify {
         return $out;
     }
     elsif ($type eq 'br') {
-        my $leading = '';
-        if ($string =~ m/\A(\s+)/) {
-            $leading = $1;
-        }
         if ($self->is_latex) {
             return "\\forcelinebreak ";
         }
         else {
+            my $leading = '';
+            if ($string =~ m/\A(\s+)/) {
+                $leading = $1;
+            }
             return "$leading<br />";
         }
     }
@@ -139,7 +139,11 @@ sub stringify {
             return "\n\\bigskip";
         }
         else {
-            return '<br />';
+            my $leading = '';
+            if ($string =~ m/\A(\s+)/) {
+                $leading = $1;
+            }
+            return "$leading<br />";
         }
     }
     else {
