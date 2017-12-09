@@ -12,6 +12,9 @@
 
 <em>This is a [1] long string with [[http://example.com][**strong**]] emph</em>
 <em>This is a [1] long string with [[http://example.com][**strong**]] emph</em>
+<em>This is a [1] long string with [[http://example.com][***ultra-strong***]] emph</em>
+<em>This is a [1] long string with [[http://example.com][<strong><em>strong</em></strong>]] emph</em>
+
 
 *This is a [1] long string with [[http://example.com][**strong**]] emph*
 
@@ -31,3 +34,9 @@ is a <verbatim>[1] *hello*</verbatim> long string with
 {1} Secondary footnote
 
 {2} Secondary footnote
+
+** ***bolditalic {3} [5] ***
+
+[5] Footnote 5
+
+{3} secondary footnote 3
