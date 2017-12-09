@@ -163,14 +163,14 @@ sub process {
         }
         elsif ($el->type eq 'regular') {
             # manage the special markup
-            if ($el->string =~ m/^\s*-----*\s*$/s) {
+            if ($el->string =~ m/\A\s*-----*\s*\z/s) {
                 push @pieces, $self->manage_hr($el);
             }
             # an image by itself, so avoid it wrapping with <p></p>,
             # but only if just 1 is found. With multiple one, we get
             # incorrect output anyway, so who cares?
-            elsif ($el->string =~ m/^\s*\[\[\s*$imagere\s*\]
-                                    (\[[^\]\[]+?\])?\]\s*$/sx and
+            elsif ($el->string =~ m/\A\s*\[\[\s*$imagere\s*\]
+                                    (\[[^\]\[]+?\])?\]\s*\z/sx and
                    $el->string !~ m/\[\[.*\[\[/s) {
                 push @pieces, $self->manage_regular($el);
             }
@@ -419,6 +419,7 @@ sub inline_elements {
                                                fmt => $self->fmt,
                                               );
     }
+    pos($string) = 0;
     while ($string =~ m{\G # last match
                         (?<text>.*?) # something not greedy, even nothing
                         (?<raw>
@@ -958,7 +959,7 @@ sub manage_verse {
     my (@chunks) = split(/\n/, $el->string);
     my (@out, @stanza, @anchors);
     foreach my $l (@chunks) {
-        if ($l =~ m/^( *)(.+?)$/s) {
+        if ($l =~ m/\A( *)(.+?)\z/s) {
             my $leading = $lead x length($1);
             my ($text, $anchors) = $self->manage_regular($2, anchors => 1);
             if ($anchors) {
@@ -968,7 +969,7 @@ sub manage_verse {
                 push @stanza, $leading . $text;
             }
         }
-        elsif ($l =~ m/^\s*$/s) {
+        elsif ($l =~ m/\A\s*\z/s) {
             push @out, $self->_format_stanza(\@stanza, \@anchors);
             die "wtf" if @stanza || @anchors;
         }
@@ -1158,7 +1159,7 @@ sub _split_table_in_hash {
                   counter => 0,
                  };
     foreach my $row (split "\n", $table) {
-        if ($row =~ m/^\s*\|\+\s*(.+?)\s*\+\|\s*$/) {
+        if ($row =~ m/\A\s*\|\+\s*(.+?)\s*\+\|\s*\z/) {
             $output->{caption} = $1;
             next
         }
@@ -1250,7 +1251,7 @@ sub linkify {
     my ($self, $link) = @_;
     die "no link passed" unless defined $link;
     # warn "Linkifying $link";
-    if ($link =~ m/^\[\[
+    if ($link =~ m/\A\[\[
                      \s*
                      (.+?) # link
                      \s*
@@ -1258,7 +1259,7 @@ sub linkify {
                      \s*
                      (.+?) # desc
                      \s*
-                     \]\]$
+                     \]\]\z
                     /sx) {
         return $self->format_links($1, $2);
     }
@@ -1705,7 +1706,7 @@ is, return a Text::Amuse::Output::Image object.
 sub find_image {
     my ($self, $link) = @_;
     my $imagere = $self->image_re;
-    if ($link =~ m/^$imagere$/s) {
+    if ($link =~ m/\A$imagere\z/s) {
         my $filename = $1;
         my $width = $4;
         my $float = $6;
