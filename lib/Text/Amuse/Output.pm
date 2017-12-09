@@ -179,10 +179,10 @@ sub process {
             }
         }
         elsif ($el->type eq 'standalone') {
-            push @pieces, $self->manage_regular($el);
+            push @pieces, $self->manage_regular($el, noanchors => 1);
         }
         elsif ($el->type eq 'dt') {
-            push @pieces, $self->manage_regular($el);
+            push @pieces, $self->manage_regular($el, noanchors => 1);
         }
         elsif ($el->type =~ m/h[1-6]/) {
 
@@ -349,7 +349,7 @@ sub manage_html_footnote {
     }
     my $chunk = qq{\n<p class="$class"><a class="footnotebody"} . " "
       . qq{href="#fn_back${fn_num}" id="fn${fn_num}">$fn_symbol</a> } .
-        $self->manage_regular($element) .
+        $self->manage_regular($element, noanchors => 1) .
           qq{</p>\n};
 }
 
@@ -436,7 +436,7 @@ sub inline_elements {
                                 \>
                             ) |
                             (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
-                            (?<anchor> ^\x{20}*\#[A-Za-z][A-Za-z0-9]+\x{20}*$) |
+                            (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9]+\x{20}*(?:\n|$)) |
                             (?<br> \x{20}*\< br *\/*\>)
                         )}gcxms) {
         # this is a mammuth, but hey
@@ -715,8 +715,14 @@ sub manage_regular {
             }
         }
         elsif ($piece->type eq 'anchor') {
-            push @anchors, $piece->stringify;
-            next CHUNK;
+            # explicitely ignored
+            if ($opts{noanchors}) {
+                $piece->type('text');
+            }
+            else {
+                push @anchors, $piece->stringify;
+                next CHUNK;
+            }
         }
         push @out, $piece->stringify;
     }
@@ -731,7 +737,7 @@ sub manage_regular {
 sub _format_footnote {
     my ($self, $element) = @_;
     if ($self->is_latex) {
-        my $footnote = $self->manage_regular($element);
+        my $footnote = $self->manage_regular($element, noanchors => 1);
         $footnote =~ s/\s+/ /gs;
         $footnote =~ s/ +$//s;
         # covert <br> to \par in latex. those \\ in the footnotes are
@@ -1124,7 +1130,8 @@ sub manage_table_ltx {
     $textable .= "\\hline\n\\end{tabularx}\n";
     if ($has_caption) {
         $textable .= "\n\\caption[]{" .
-          $self->manage_regular($table->{caption}) . "}\n";
+          $self->manage_regular($table->{caption}, noanchors => 1)
+          . "}\n";
     }
     $textable .= "\\end{minipage}\n";
     if ($has_caption) {
@@ -1277,7 +1284,7 @@ sub linkify {
 
 sub format_links {
     my ($self, $link, $desc) = @_;
-    $desc = $self->manage_regular($desc);
+    $desc = $self->manage_regular($desc, noanchors => 1);
     # first the images
     if (my $image = $self->find_image($link)) {
         my $src = $image->filename;
