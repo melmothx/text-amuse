@@ -318,14 +318,14 @@ sub flush_footnotes {
     return unless (defined $self->{_fn_list});
     # if we flush, we flush and forget, so we don't collect them again
     # on the next call
-    return @{delete $self->{_fn_list}};
+    return sort { $a->footnote_number <=> $b->footnote_number } @{delete $self->{_fn_list}};
 }
 
 sub flush_secondary_footnotes {
     my $self = shift;
     # as above
     return unless (defined $self->{_sec_fn_list});
-    return @{delete $self->{_sec_fn_list}};
+    return sort { $a->footnote_number <=> $b->footnote_number } @{delete $self->{_sec_fn_list}};
 }
 
 =head3 manage_html_footnote
