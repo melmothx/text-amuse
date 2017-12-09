@@ -589,6 +589,7 @@ sub manage_regular {
     }
     # now validate the tags: open and close
     my @tagpile;
+  INLINETAG:
     while (@processed) {
         my $piece = shift @processed;
         if ($piece->type eq 'open') {
@@ -610,6 +611,11 @@ sub manage_regular {
                 # all match, can go
                 # and remove from the pile
                 pop @tagpile;
+                if ($pieces[-1]->type eq 'open' and
+                    $pieces[-1]->tag eq $piece->tag) {
+                    pop @pieces;
+                    next INLINETAG;
+                }
             }
             else {
                 while (@tagpile and $tagpile[-1] ne $piece->tag) {
@@ -619,7 +625,7 @@ sub manage_regular {
                     pop @tagpile;
                 }
                 warn "Found closing element " . $piece->string
-                  . " in <$string> without a matching opening tag. "
+                  . " in \"$string>\" without a matching opening tag. "
                   . "Leaving it as-is, but it's unlikely you want this. "
                   . "To suppress this warning, wrap it around <verbatim>\n";
                 $piece->type('text');
