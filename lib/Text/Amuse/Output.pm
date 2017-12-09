@@ -619,12 +619,6 @@ sub manage_regular {
                 }
             }
             else {
-                while (@tagpile and $tagpile[-1] ne $piece->tag) {
-                    # empty the pile untile we find the matching one,
-                    # if any, we're in error anyway, but we have some
-                    # slight chance to recover.
-                    pop @tagpile;
-                }
                 warn "Found closing element " . $piece->string
                   . " in \"$string>\" without a matching opening tag. "
                   . "Leaving it as-is, but it's unlikely you want this. "
