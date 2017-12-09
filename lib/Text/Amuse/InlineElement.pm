@@ -12,9 +12,34 @@ Text::Amuse::InlineElement - Helper for Text::Amuse
 Everything here is pretty much internal only, underdocumented and
 subject to change.
 
-=head3 new(%args)
+=head2 new(%args)
 
-Constructor
+Constructor. Accepts the following named arguments (which are also
+accessors)
+
+=over 4
+
+=item type
+
+The element type
+
+=item string
+
+The raw string
+
+=item last_position
+
+The offset of the last character in the parsed string
+
+=item tag
+
+The name of the tag
+
+=item fmt
+
+C<ltx> or C<html>
+
+=back
 
 =cut
 
@@ -57,6 +82,13 @@ sub string {
     shift->{string};
 }
 
+=head2 append($element)
+
+Append the provided string to the self's one and update the
+last_position.
+
+=cut
+
 sub append {
     my ($self, $element) = @_;
     $self->{string} .= $element->string;
@@ -70,6 +102,12 @@ sub tag {
 sub fmt {
     shift->{fmt};
 }
+
+=head2 stringify
+
+Main method to get the desired output from the element.
+
+=cut
 
 sub stringify {
     my $self = shift;
@@ -115,7 +153,7 @@ sub stringify {
         }
     }
     elsif ($type eq 'open' or $type eq 'close') {
-        my $out = $self->markup_table->{$self->tag}->{$type}->{$self->fmt};
+        my $out = $self->_markup_table->{$self->tag}->{$type}->{$self->fmt};
         die "Missing markup for $self->fmt $type $self->tag" unless $out;
         return $out;
     }
@@ -148,7 +186,7 @@ sub stringify {
     }
 }
 
-sub markup_table {
+sub _markup_table {
     return {
             'em' => {
                      open => {
@@ -237,6 +275,12 @@ sub _ltx_replace_slash {
     return $string;
 }
 
+=head2 escape_all_html($string)
+
+HTML escape
+
+=cut
+
 sub escape_all_html {
     my ($self, $string) = @_;
     $string =~ s/&/&amp;/g;
@@ -246,6 +290,12 @@ sub escape_all_html {
     $string =~ s/'/&#x27;/g;
     return $string;
 }
+
+=head2 escape_tex
+
+Escape the string for LaTeX output
+
+=cut
 
 sub escape_tex {
     my ($self, $string) = @_;
@@ -265,6 +315,16 @@ sub escape_tex {
 }
 
 
+=head2 is_latex
+
+Shortcut to check if the format is latex
+
+=head2 is_html
+
+Shortcut to check if the format is html
+
+=cut
+
 sub is_latex {
     shift->fmt eq 'ltx';
 }
@@ -272,6 +332,13 @@ sub is_latex {
 sub is_html {
     shift->fmt eq 'html';
 }
+
+=head2 unroll
+
+Convert the close_inline open_inline symbols (= and *) into elements
+an open/close type and the tag properly set.
+
+=cut
 
 sub unroll {
     my $self = shift;

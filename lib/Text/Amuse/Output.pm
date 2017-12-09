@@ -401,6 +401,13 @@ sub _get_unique_counter {
     ++$self->{_unique_counter};
 }
 
+=head3 inline_elements($string)
+
+Parse the provided string into a list of L<Text::Amuse::InlineElement>
+objects.
+
+=cut
+
 sub inline_elements {
     my ($self, $string) = @_;
     return unless length($string);
