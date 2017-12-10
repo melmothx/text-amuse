@@ -318,9 +318,12 @@ sub _parse_body {
     # now we use parsed as output
     $self->_flush_current_footnote;
     my @out;
+    my $elnum = 0;
     while (@{$self->_list_parsing_output}) {
         my $el = shift @{$self->_list_parsing_output};
-        if ($el->type eq 'footnote') {
+        $elnum++;
+        $el->_set_element_number($elnum);
+        if ($el->type eq 'footnote' or $el->type eq 'secondary_footnote') {
             $self->_register_footnote($el);
         }
         elsif (my $fn_indent = $self->_current_footnote_indent) {
@@ -417,8 +420,7 @@ with a numerical argument or even with a string like [123]
 sub get_footnote {
     my ($self, $arg) = @_;
     return undef unless $arg;
-    # ignore the brackets, if they are passed
-    if ($arg =~ m/([0-9]+)/) {
+    if ($arg =~ m/(\{[0-9]+\}|\[[0-9]+\])/) {
         $arg = $1;
     }
     else {
@@ -429,7 +431,6 @@ sub get_footnote {
     }
     else { return undef }
 }
-
 
 sub _raw_footnotes {
     my $self = shift;
@@ -536,10 +537,22 @@ sub _parse_string {
         $element{type} = "comment";
         return %element;
     }
-    if ($l =~ m/^((\[[0-9]+\])\x{20}+)(.+)$/s) {
+    if ($l =~ m/^((\[([0-9]+)\])\x{20}+)(.+)$/s) {
         $element{type} = "footnote";
-        $element{string} = $3;
         $element{removed} = $1;
+        $element{footnote_symbol} = $2;
+        $element{footnote_number} = $3;
+        $element{footnote_index} = $3;
+        $element{string} = $4;
+        return %element;
+    }
+    if ($l =~ m/^((\{([0-9]+)\})\x{20}+)(.+)$/s) {
+        $element{type} = "secondary_footnote";
+        $element{removed} = $1;
+        $element{footnote_symbol} = $2;
+        $element{footnote_number} = $3;
+        $element{footnote_index} = 'b'. $3;
+        $element{string} = $4;
         return %element;
     }
     if ($l =~ m/^((\x{20}{6,})((\*\x{20}?){5})\s*)$/s) {
@@ -562,7 +575,7 @@ sub _parse_string {
         $element{attribute} = $2;
         $element{attribute_type} = 'dt';
         $element{removed} = $1 . $2 . $3 . $4 . $6;
-        $element{indentation} = length($1);
+        $element{indentation} = length($1) + 2;
         $element{start_list_index} = 1;
         return %element;
     }
@@ -572,7 +585,7 @@ sub _parse_string {
             $element{removed} = $1;
             $element{string} = $3;
             $element{block} = "ul";
-            $element{indentation} = length($2);
+            $element{indentation} = length($2) + 2;
             $element{start_list_index} = 1;
             return %element;
         }
@@ -595,7 +608,7 @@ sub _parse_string {
                 $element{removed} = $remove;
                 $element{string} = $text;
                 my $list_type = $self->_identify_list_type($prefix);
-                $element{indentation} = length($whitespace);
+                $element{indentation} = length($whitespace) + 2;
                 $element{block} = $list_type;
                 $element{start_list_index} = $list_index;
                 return %element;
@@ -667,7 +680,7 @@ sub _list_element_can_be_first {
     return 1 if $el->type eq 'dd';
     return unless $el->type eq 'li';
     # first element, can't be too indented
-    if ($el->indentation > 6) {
+    if ($el->indentation > 8) {
         return 0;
     }
     else {
@@ -859,7 +872,7 @@ sub _list_element_is_same_kind_as_in_list {
 
 sub _register_footnote {
     my ($self, $el) = @_;
-    my $fn_num = $el->footnote_index;
+    my $fn_num = $el->footnote_symbol;
     if (defined $fn_num) {
         if ($self->_raw_footnotes->{$fn_num}) {
             warn "Overwriting footnote number $fn_num!\n";
