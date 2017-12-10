@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 127;
+plan tests => 129;
 
 foreach my $testfile (qw/comments
                          inline
@@ -79,6 +79,7 @@ foreach my $testfile (qw/comments
                          links-in-h
                          footnotes-multiline
                          secondary-fn
+                         secondary-fn-recursion
                          fn-ordering
                          enumerations
                          empty-tags

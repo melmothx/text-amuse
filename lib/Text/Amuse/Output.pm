@@ -545,7 +545,7 @@ sub manage_regular {
         if ($el->type eq 'footnote') {
             $insert_primary_footnote = 0;
         }
-        elsif ($el->type eq 'secondary_footnotes') {
+        elsif ($el->type eq 'secondary_footnote') {
             $insert_primary_footnote = 0;
             $insert_secondary_footnote = 0;
         }
@@ -737,6 +737,7 @@ sub manage_regular {
 sub _format_footnote {
     my ($self, $element) = @_;
     if ($self->is_latex) {
+        # print "Calling manage_regular from format_footnote " . Dumper($element);
         my $footnote = $self->manage_regular($element, noanchors => 1);
         $footnote =~ s/\s+/ /gs;
         $footnote =~ s/ +$//s;
