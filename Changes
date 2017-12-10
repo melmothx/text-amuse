@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.92 2017-12-10
+
+ - Fixed recursion bug in secondary footnotes handling
+
 0.91 2017-12-10
 
  - Add support for secondary footnotes (GH#24)

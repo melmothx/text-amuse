@@ -1,3 +1,9 @@
+libtext-amuse-perl (0.92-1+amw1) unstable; urgency=medium
+
+  * New bugfix release
+
+ -- Marco Pessotto <melmothx@gmail.com>  Sun, 10 Dec 2017 15:08:26 +0100
+
 libtext-amuse-perl (0.91-1+amw1) unstable; urgency=medium
 
   * New release
