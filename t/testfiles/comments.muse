@@ -5,3 +5,23 @@
 <comment>
 This is <script>alert</script> a comment \emph
 </comment>
+
+Foo
+; Comment
+; Second line \{\}
+;
+bar
+;
+; comment \{\}
+;
+baz
+
+This is regular
+<comment>
+Hello there, this is a comment
+; comment inside
+</comment>
+; comment as well
+;
+; comment continue
+This is regular

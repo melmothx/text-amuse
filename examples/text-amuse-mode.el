@@ -24,7 +24,7 @@
      ("^ .* |\\+ .*$" . font-lock-constant-face)
      ("\\[\\[.*?\\]\\]" . font-lock-function-name-face)
      ("^ *#\\w+" . font-lock-function-name-face)
-     ("^; .*$" . font-lock-comment-face)
+     ("^;.*$" . font-lock-comment-face)
      ("\\*" . font-lock-warning-face)
      (,(concat "</?" (regexp-opt amuse-mode-tag-names 'words) ">") . font-lock-keyword-face))))
 

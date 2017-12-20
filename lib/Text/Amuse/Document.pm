@@ -532,7 +532,7 @@ sub _parse_string {
         $element{string} = $l;
         return %element;
     }
-    if ($l =~ m/^(\; (.+))$/s) {
+    if ($l =~ m/^(\;(.*))$/s) {
         $element{removed} = $l;
         $element{type} = "comment";
         return %element;
