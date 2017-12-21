@@ -420,7 +420,7 @@ with a numerical argument or even with a string like [123]
 sub get_footnote {
     my ($self, $arg) = @_;
     return undef unless $arg;
-    if ($arg =~ m/(\{[0-9]+\}|\[[0-9]+\])/) {
+    if ($arg =~ m/(\{[1-9][0-9]*\}|\[[1-9][0-9]*\])/) {
         $arg = $1;
     }
     else {
@@ -537,7 +537,7 @@ sub _parse_string {
         $element{type} = "comment";
         return %element;
     }
-    if ($l =~ m/^((\[([0-9]+)\])\x{20}+)(.+)$/s) {
+    if ($l =~ m/^((\[([1-9][0-9]*)\])\x{20}+)(.+)$/s) {
         $element{type} = "footnote";
         $element{removed} = $1;
         $element{footnote_symbol} = $2;
@@ -546,7 +546,7 @@ sub _parse_string {
         $element{string} = $4;
         return %element;
     }
-    if ($l =~ m/^((\{([0-9]+)\})\x{20}+)(.+)$/s) {
+    if ($l =~ m/^((\{([1-9][0-9]*)\})\x{20}+)(.+)$/s) {
         $element{type} = "secondary_footnote";
         $element{removed} = $1;
         $element{footnote_symbol} = $2;

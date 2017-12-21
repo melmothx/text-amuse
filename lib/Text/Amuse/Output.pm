@@ -428,8 +428,8 @@ sub inline_elements {
                             (?<link>         \[\[[^\[].*?\]\])      |
                             (?<open_verb>    \<verbatim\>)     |
                             (?<close_verb>   \<\/verbatim\>)  |
-                            (?<pri_footnote> \s*\[[0-9]+\]) |
-                            (?<sec_footnote> \s*\{[0-9]+\}) |
+                            (?<pri_footnote> \s*\[[1-9][0-9]*\]) |
+                            (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
                             (?<tag> \<
                                 (?<close>\/?)
                                 (?<tag_name> strong | em |  code | strike | del | sup |  sub )
@@ -813,9 +813,9 @@ sub manage_header {
         }
     };
     $body_with_no_footnotes =~ s/(
-                                     \{ [0-9]+ \}
+                                     \{ [1-9][0-9]* \}
                                  |
-                                     \[ [0-9]+ \]
+                                     \[ [1-9][0-9]* \]
                                  )
                                 /$catch_fn->($1)/gxe;
     undef $catch_fn;
