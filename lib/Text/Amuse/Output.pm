@@ -1029,7 +1029,7 @@ sub manage_inline_comment {
     $body =~ s/\s/ /g; # remove eventual newlines, even we don't expect any
 
     if ($self->is_html) {
-        return q{<span class="comment" style="display:none">} . $body . qq{</span>\n};
+        return q{<div class="comment" style="display:none">} . $body . qq{</div>\n};
     }
     elsif ($self->is_latex) {
         return q{% } . $body . "\n";
