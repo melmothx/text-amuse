@@ -134,45 +134,37 @@ sub attachments {
 }
 
 
-=head3 get_lines
+=head3 parse_directives
 
-Returns the raw input lines as a list, reading from the filename if
-it's the first time we call it. Tabs, \r and trailing whitespace are
-cleaned up.
+Return an hashref with the directives found in the document.
 
 =cut
 
-sub get_lines {
+sub parse_directives {
     my $self = shift;
-    my $file = $self->filename;
-    $self->_debug("Reading $file");
-    open (my $fh, "<:encoding(utf-8)", $file) or die "Couldn't open $file! $!\n";
-    my @lines;
-    while (my $l = <$fh>) {
-        # EOL
-        $l =~ s/\r\n/\n/gs;
-        $l =~ s/\r/\n/gs;
-        # TAB
-        $l =~ s/\t/    /g;
-        # trailing
-        $l =~ s/ +$//mg;
-        push @lines, $l;
-    }
-    close $fh;
-    # store the lines in the object
-    return \@lines;
+    my ($directives, $body) = $self->_parse_body_and_directives(directives_only => 1);
+    return $directives;
 }
 
 
-sub _split_body_and_directives {
-    my $self = shift;
-    my (%directives, @body);
+sub _parse_body_and_directives {
+    my ($self, %options) = @_;
+    my $file = $self->filename;
+    open (my $fh, "<:encoding(UTF-8)", $file) or die "Couldn't open $file! $!\n";
+
     my $in_meta = 1;
-    my $lastdirective;
-    my $input = $self->get_lines;
-    # scan the line
-    while (@$input) {
-        my $line = shift @$input;
+    my ($lastdirective, %directives, @body);
+
+  RAWLINE:
+    while (my $line = <$fh>) {
+        # EOL
+        $line =~ s/\r\n/\n/gs;
+        $line =~ s/\r/\n/gs;
+        # TAB
+        $line =~ s/\t/    /g;
+        # trailing
+        $line =~ s/ +$//mg;
+        
         if ($in_meta) {
             # reset the directives on blank lines
             if ($line =~ m/^\s*$/s) {
@@ -192,17 +184,32 @@ sub _split_body_and_directives {
                 $in_meta = 0
             }
         }
-        next if $in_meta;
-        push @body, $line;
+        if ($in_meta) {
+            next RAWLINE;
+        }
+        elsif ($options{directives_only}) {
+            last RAWLINE;
+        }
+        else {
+            push @body, $line;
+        }
     }
     push @body, "\n"; # append a newline
+    close $fh;
+
     # before returning, let's clean the %directives from EOLs
     foreach my $key (keys %directives) {
         $directives{$key} =~ s/\s/ /gs;
         $directives{$key} =~ s/\s+$//gs;
     }
-    $self->{raw_body}   = \@body;
-    $self->{raw_header} = \%directives;
+    return (\%directives, \@body);
+}
+
+sub _split_body_and_directives {
+    my $self = shift;
+    my ($directives, $body) = $self->_parse_body_and_directives;
+    $self->{raw_body}   = $body;
+    $self->{raw_header} = $directives;
 }
 
 =head3 raw_header
