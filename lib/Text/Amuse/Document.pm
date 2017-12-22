@@ -164,7 +164,7 @@ sub _parse_body_and_directives {
         $line =~ s/\t/    /g;
         # trailing
         $line =~ s/ +$//mg;
-        
+
         if ($in_meta) {
             # reset the directives on blank lines
             if ($line =~ m/^\s*$/s) {
@@ -199,8 +199,9 @@ sub _parse_body_and_directives {
 
     # before returning, let's clean the %directives from EOLs
     foreach my $key (keys %directives) {
-        $directives{$key} =~ s/\s/ /gs;
-        $directives{$key} =~ s/\s+$//gs;
+        $directives{$key} =~ s/\s+/ /gs;
+        $directives{$key} =~ s/\s+\z//gs;
+        $directives{$key} =~ s/\A\s+//gs;
     }
     return (\%directives, \@body);
 }
