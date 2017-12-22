@@ -169,10 +169,17 @@ sub _parse_body_and_directives {
             # reset the directives on blank lines
             if ($line =~ m/^\s*$/s) {
                 $lastdirective = undef;
-            } elsif ($line =~ m/^\#([A-Za-z0-9]+)(\s+(.+))?$/s) {
-                my $dir = $1;
-                if ($2) {
-                    $directives{$dir} = $3;
+            } elsif ($line =~ m/^\#([A-Za-z0-9_-]+)(\s+(.+))?$/s) {
+                my ($dir, $material) = ($1, $2);
+
+                # remove underscore and dashes from directive names to
+                # keep compatibility with Emacs Muse, so e.g.
+                # #disable-tables will be parsed as directive, not as
+                # a line.
+
+                $dir =~ s/[_-]//g;
+                if (defined $material) {
+                    $directives{$dir} = $material;
                 }
                 else {
                     $directives{$dir} = '';
@@ -197,7 +204,10 @@ sub _parse_body_and_directives {
     push @body, "\n"; # append a newline
     close $fh;
 
-    # before returning, let's clean the %directives from EOLs
+    # before returning, let's clean the %directives from EOLs and from
+    # empty ones, e.g. #---------------------
+    delete $directives{''};
+
     foreach my $key (keys %directives) {
         $directives{$key} =~ s/\s+/ /gs;
         $directives{$key} =~ s/\s+\z//gs;

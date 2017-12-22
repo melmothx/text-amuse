@@ -23,6 +23,7 @@ t/changes.t
 t/context-parsing.t
 t/crash-on-loops.t
 t/description-lists.t
+t/directives.t
 t/elements.t
 t/false-lists.t
 t/footnotes.t
