@@ -556,9 +556,13 @@ sub _parse_string {
         $element{string} = $l;
         return %element;
     }
-    if ($l =~ m/^(\;(.*))$/s) {
-        $element{removed} = $l;
-        $element{type} = "comment";
+    if ($l =~ m/^(\;)(\x{20}+(.*))?$/s) {
+        $element{removed} = $1;
+        $element{string} = $3;
+        unless (defined ($element{string})) {
+            $element{string} = '';
+        }
+        $element{type} = "inlinecomment";
         return %element;
     }
     if ($l =~ m/^((\[([1-9][0-9]*)\])\x{20}+)(.+)$/s) {
@@ -738,11 +742,11 @@ sub _construct_element {
     my %args = $self->_parse_string($line);
     my $element = Text::Amuse::Element->new(%args);
 
-    # catch the examples. and the verse
+    # catch the examples, comments and the verse in bloks.
     # <example> is greedy, and will stop only at another </example> or
-    # at the end of input. Same is true for verse
+    # at the end of input. Same is true for verse and comments.
 
-    foreach my $block (qw/example verse/) {
+    foreach my $block (qw/example comment verse/) {
         if ($current && $current->type eq $block) {
             if ($element->is_stop_element($current)) {
                 # print Dumper($element) . " is closing\n";
@@ -753,9 +757,13 @@ sub _construct_element {
                                                  rawline => $element->rawline);
             }
             else {
-                # maybe check if we want to stop at headings if verse?
-                # print Dumper($element) . " is appending\n";;
-                $current->append($element);
+                # remove inlined comments from verse environments
+                if ($current->type eq 'verse' and
+                    $element->type eq 'inlinecomment') {
+                }
+                else {
+                    $current->append($element);
+                }
                 return;
             }
         }

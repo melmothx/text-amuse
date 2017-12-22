@@ -210,6 +210,9 @@ sub process {
         elsif ($el->type eq 'verse') {
             push @pieces, $self->manage_verse($el);
         }
+        elsif ($el->type eq 'inlinecomment') {
+            push @pieces, $self->manage_inline_comment($el);
+        }
         elsif ($el->type eq 'comment') {
             push @pieces, $self->manage_comment($el);
         }
@@ -1015,11 +1018,30 @@ sub _format_stanza {
 
 =head3 manage_comment
 
+=head3 manage_inline_comment
+
 =cut
+
+sub manage_inline_comment {
+    my ($self, $el) = @_;
+    my $body = $self->safe($el->string);
+    $body =~ s/\n\z//;
+    $body =~ s/\s/ /g; # remove eventual newlines, even we don't expect any
+
+    if ($self->is_html) {
+        return q{<span class="comment" style="display:none">} . $body . qq{</span>\n};
+    }
+    elsif ($self->is_latex) {
+        return q{% } . $body . "\n";
+    }
+    else {
+        die "Not reached";
+    }
+}
 
 sub manage_comment {
     my ($self, $el) = @_;
-    my $body = $self->safe($el->removed);
+    my $body = $self->safe($el->string);
     chomp $body;
     return $self->blkstring(start => $el->type) .
       $body . $self->blkstring(stop => $el->type);
@@ -1465,11 +1487,11 @@ sub _build_blk_table {
                                   comment => {
                                               start => { # we could also use a more
                                                         # stable startstop hiding
-                                                        html => "\n<!-- start comment -->\n<div class=\"comment\"><span class=\"commentmarker\">{{COMMENT:</span> \n",
+                                                        html => qq{\n<!-- start comment -->\n<div class="comment" style="display:none">\n},
                                                         ltx => "\n\n\\begin{comment}\n",
                                                        },
                                               stop => {
-                                                       html => "\n<span class=\"commentmarker\">END_COMMENT}}:</span>\n</div>\n<!-- stop comment -->\n",  
+                                                       html => "\n</div>\n<!-- stop comment -->\n",
                                                        ltx => "\n\\end{comment}\n\n",
                                                       },
                                              },
