@@ -178,6 +178,12 @@ sub _parse_body_and_directives {
                 # a line.
 
                 $dir =~ s/[_-]//g;
+                unless (length($dir)) {
+                    warn "Found empty directive $line, it will be removed\n";
+                }
+                if (exists $directives{$dir}) {
+                    warn "Overwriting directive '$dir' $directives{$dir} with $line\n";
+                }
                 if (defined $material) {
                     $directives{$dir} = $material;
                 }
