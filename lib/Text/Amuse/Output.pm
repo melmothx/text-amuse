@@ -435,6 +435,7 @@ sub inline_elements {
                                 (?<tag_name> strong | em |  code | strike | del | sup |  sub )
                                 \>
                             ) |
+                            (?<nobreakspace>  \~\~         ) |
                             (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
                             (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9]+\x{20}*(?:\n|$)) |
                             (?<br> \x{20}*\< br *\/*\>)
