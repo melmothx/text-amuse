@@ -60,3 +60,6 @@ Here the verse continue
 Nested
 </comment>
 </comment>
+
+<verbatim>;</verbatim> Not a comment because of <verbatim><verbatim></verbatim>
+
