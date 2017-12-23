@@ -78,3 +78,41 @@ Nested
 
 ; Not a comment because of <verbatim>
 
+
+
+\begin{comment}
+Here the comment will stop. This is a kind of implementation artefact.
+\end{comment}
+
+
+\begin{alltt}
+verbatim
+<verse>
+verse
+</verse>
+\end{alltt}
+
+
+\begin{alltt}
+\{\{\{
+<verse>
+verse
+; comment
+</verse>
+<comment>
+comment
+</comment>
+\}\}\}
+\end{alltt}
+
+
+
+\begin{verse}
+
+\end{verse}
+
+
+\begin{alltt}
+Makes no sense
+\end{alltt}
+

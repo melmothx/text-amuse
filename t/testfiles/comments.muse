@@ -63,3 +63,31 @@ Nested
 
 <verbatim>;</verbatim> Not a comment because of <verbatim><verbatim></verbatim>
 
+<comment>
+Here the comment will stop. This is a kind of implementation artefact.
+
+<example>
+verbatim
+<verse>
+verse
+</verse>
+</example>
+</comment>
+
+<example>
+{{{
+<verse>
+verse
+; comment
+</verse>
+<comment>
+comment
+</comment>
+}}}
+</example>
+
+<verse>
+<example>
+Makes no sense
+</example>
+</verse>
