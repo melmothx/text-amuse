@@ -441,7 +441,7 @@ sub inline_elements {
                             (?<nobreakspace>  \~\~         ) |
                             (?<inline>(?:\*\*\*|\*\*|\*|\=)) |
                             (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9]+\x{20}*(?:\n|$)) |
-                            (?<br> \x{20}*\< br *\/*\>)
+                            (?<br> \x{20}*\< br \x{20}* \/*\>)
                         )}gcxms) {
         # this is a mammuth, but hey
         my %captures = %+;
