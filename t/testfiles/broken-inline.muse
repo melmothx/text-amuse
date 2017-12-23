@@ -1,0 +1,13 @@
+#title Inline broken
+
+
+And. *this is
+*broken* and will not compile.
+
+This (=should be code=).
+
+This (=/this/the/same=).
+
+
+
+
