@@ -677,6 +677,14 @@ sub manage_regular {
             push @processed, $piece;
         }
     }
+    while (@tagpile) {
+        my $opened = pop @tagpile;
+        warn "Found <$opened> tag but not close, forcing the closing in $string";
+        push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                         fmt => $self->fmt,
+                                                         tag => $opened,
+                                                         type => 'close_inline')->unroll;
+    }
 
     # now we're hopefully set.
     my (@out, @anchors);
