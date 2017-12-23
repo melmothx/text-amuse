@@ -10,9 +10,10 @@
      ("^\\*\\*\\* .*$" . font-lock-type-face)
      ("^\\*\\*\\*\\* .*$" . font-lock-type-face)
      ("^\\*\\*\\*\\*\\* .*$" . font-lock-type-face)
-     ("\\[[0-9]+\\]" . font-lock-variable-name-face)
-     ("{[0-9]+}" . font-lock-variable-name-face)
+     ("\\[[1-9][0-9]*\\]" . font-lock-variable-name-face)
+     ("{[1-9][0-9]*}" . font-lock-variable-name-face)
      ("^ +- " . font-lock-keyword-face)
+     ("~~" . font-lock-keyword-face)
      ("\\*+\\(.*?\\w.*?\\)\\*+" . font-lock-variable-name-face)
      ("=\\(.*?\\w.*?\\)=" . font-lock-variable-name-face)
      ("{{{" . font-lock-keyword-face)
@@ -23,8 +24,8 @@
      ("^ .* |+ .*$" . font-lock-constant-face)
      ("^ .* |\\+ .*$" . font-lock-constant-face)
      ("\\[\\[.*?\\]\\]" . font-lock-function-name-face)
-     ("^ *#\\w+" . font-lock-function-name-face)
-     ("^; .*$" . font-lock-comment-face)
+     ("^ *#[0-9A-Za-z_-]+" . font-lock-function-name-face) ; including both anchor and directives
+     ("^;.*$" . font-lock-comment-face)
      ("\\*" . font-lock-warning-face)
      (,(concat "</?" (regexp-opt amuse-mode-tag-names 'words) ">") . font-lock-keyword-face))))
 
