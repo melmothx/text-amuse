@@ -8,7 +8,31 @@ This (=should be code=).
 
 This (=/this/the/same=).
 
+Same **(*ć is paired so it works č*)**
+
+Same (**ć is paired so it works č**)
+
+Same (***ć is paired so it works č***)**
+
+=hello=
+
+=== there =*=
+
+-*- hello -*- ** *=*
+
+=*= =|=
+
+<code>4 + 4 = 2; 2 * 2 = 3</code>
+
+<verbatim>=*= =|=</verbatim>
+
 This is nothing <b>
 
+**
+
+==
+
+(=«»=, =“”= or others), use of em dash (=—=)
 
 
+<em>This should</em> <em> <em>compile</em>

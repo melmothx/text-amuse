@@ -490,9 +490,13 @@ sub inline_elements {
                                                 last_position => $offset + length($last_chunk),
                                                );
     my $last = $#list;
+    my %track;
+
   PARSEINLINE:
     for (my $i = 0; $i < @list; $i++) {
+        # print Dumper(\%track);
         if ($list[$i]->type eq 'inline') {
+            my $current = $list[$i]->string;
             my $next = $i + 1;
             my $previous = $i - 1;
             # check back and forward, just to mark as open or close
@@ -501,6 +505,7 @@ sub inline_elements {
                 if ($next <= $last and
                     $list[$next]->string =~ m/\A\S/) {
                     $list[$i]->type('open_inline');
+                    $track{$current}++;
                     next PARSEINLINE;
                 }
             }
@@ -508,22 +513,29 @@ sub inline_elements {
                 # last element, can only close
                 if ($list[$previous]->string =~ m/\S\z/) {
                     $list[$i]->type('close_inline');
+                    $track{$current}--;
                     next PARSEINLINE;
                 }
             }
             else {
+
+                # see this case (=/string/=)
+
                 # we have both next and previous
                 my $prev_string = $list[$previous]->string;
                 my $next_string = $list[$next]->string;
                 # we give preference to the closing. Logic here is weak.
-                if ($prev_string =~ m/\S\z/ and
-                       $next_string !~ m/\A\w/) {
+                if ($track{$current} and
+                    $prev_string =~ m/\S\z/ and
+                    $next_string !~ m/\A\w/) {
                     $list[$i]->type('close_inline');
+                    $track{$current}--;
                     next PARSEINLINE;
                 }
                 elsif ($prev_string !~ m/\w\z/ and
                     $next_string =~ m/\A\S/) {
                     $list[$i]->type('open_inline');
+                    $track{$current}++;
                     next PARSEINLINE;
                 }
             }

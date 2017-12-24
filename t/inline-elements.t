@@ -3,7 +3,7 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 20;
+use Test::More tests => 22;
 use Text::Amuse::Document;
 use Text::Amuse::Output;
 use Data::Dumper;
@@ -37,6 +37,7 @@ my @strings = (
                "<em>à\n<br>\nđ</em>",
                "0",
                "\n0",
+               "=== there =*=",
               );
 
 foreach my $str (@strings) {
