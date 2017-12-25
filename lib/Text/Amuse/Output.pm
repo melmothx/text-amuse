@@ -4,7 +4,8 @@ use warnings;
 use utf8;
 use Text::Amuse::Output::Image;
 use Text::Amuse::InlineElement;
-# use Data::Dumper;
+# use Data::Dumper::Concise;
+use constant DEBUG => 0;
 
 =head1 NAME
 
@@ -489,59 +490,6 @@ sub inline_elements {
                                                 fmt => $self->fmt,
                                                 last_position => $offset + length($last_chunk),
                                                );
-    my $last = $#list;
-    my %track;
-
-  PARSEINLINE:
-    for (my $i = 0; $i < @list; $i++) {
-        # print Dumper(\%track);
-        if ($list[$i]->type eq 'inline') {
-            my $current = $list[$i]->string;
-            my $next = $i + 1;
-            my $previous = $i - 1;
-            # check back and forward, just to mark as open or close
-            if ($i == 0) {
-                # first element, can be open if next is not a space
-                if ($next <= $last and
-                    $list[$next]->string =~ m/\A\S/) {
-                    $list[$i]->type('open_inline');
-                    $track{$current}++;
-                    next PARSEINLINE;
-                }
-            }
-            elsif ($i == $last) {
-                # last element, can only close
-                if ($list[$previous]->string =~ m/\S\z/) {
-                    $list[$i]->type('close_inline');
-                    $track{$current}--;
-                    next PARSEINLINE;
-                }
-            }
-            else {
-
-                # see this case (=/string/=)
-
-                # we have both next and previous
-                my $prev_string = $list[$previous]->string;
-                my $next_string = $list[$next]->string;
-                # we give preference to the closing. Logic here is weak.
-                if ($track{$current} and
-                    $prev_string =~ m/\S\z/ and
-                    $next_string !~ m/\A\w/) {
-                    $list[$i]->type('close_inline');
-                    $track{$current}--;
-                    next PARSEINLINE;
-                }
-                elsif ($prev_string !~ m/\w\z/ and
-                    $next_string =~ m/\A\S/) {
-                    $list[$i]->type('open_inline');
-                    $track{$current}++;
-                    next PARSEINLINE;
-                }
-            }
-            $list[$i]->type('text');
-        }
-    }
     die "Chunks lost during processing <$string>" unless $string eq join('', map { $_->string } @list);
     return @list;
 }
@@ -604,6 +552,85 @@ sub manage_regular {
         }
         push @processed, $piece;
     }
+
+    # now we decide what to do with the inline elements: either turn
+    # them into open/close tag via unroll, or turn them into regular
+    # text
+
+    # print Dumper(\@processed);
+    my @tracking;
+  MARKUP:
+    while (@processed) {
+        my $piece = shift @processed;
+        if ($piece->type eq 'inline') {
+            my $previous = @pieces ? $pieces[-1] : undef;
+            my $next = @processed ? $processed[0] : undef;
+
+            # first element can only open if there is a next one.
+            if (!$previous) {
+                if ($next and
+                    $next->string =~ m/\A\S/) {
+                    print "Opening initial " . $piece->string . "\n" if DEBUG;
+                    $piece->type('open_inline');
+                    push @pieces, $piece;
+                    push @tracking, $piece->tag;
+                    next MARKUP;
+                }
+            }
+            elsif (!$next) {
+                # last element, can only close
+                if (@tracking and
+                    $piece->tag eq $tracking[-1] and
+                    $previous->string =~ m/\S\z/) {
+                    print "Closing final " . $piece->string . "\n" if DEBUG;
+                    $piece->type('close_inline');
+                    push @pieces, $piece;
+                    pop @tracking;
+                    next MARKUP;
+
+                }
+            }
+            # in the middle.
+            else {
+                print $piece->string . " is in the middle\n" if DEBUG;
+                # print Dumper([ \@processed, \@pieces, \@tracking, $next, $previous ]);
+                if (@tracking and
+                    $piece->tag eq $tracking[-1] and
+                    $previous->string =~ m/\S\z/) {
+                    if ($previous->type ne 'open_inline') {
+                        $piece->type('close_inline');
+                        print "Closing " . $piece->string . "\n" if DEBUG;
+                        push @pieces, $piece;
+                        pop @tracking;
+                        next MARKUP;
+                    }
+                }
+                elsif ($next->string =~ m/\A\S/ and
+                    $previous->string =~ m/\W\z/ and
+                    scalar(grep { $_->tag eq $piece->tag } @processed)) {
+                    print "Opening " . $piece->string . "\n" if DEBUG;
+                    $piece->type('open_inline');
+                    push @pieces, $piece;
+                    push @tracking, $piece->tag;
+                    next MARKUP;
+                }
+            }
+            print "Nothing to do for " . $piece->string . "\n" if DEBUG;
+            # default to text
+            $piece->type('text');
+        }
+        push @pieces, $piece;
+    }
+    while (@pieces) {
+        my $piece = shift @pieces;
+        if ($piece->type =~ /\A(open|close)_inline\z/) {
+            push @processed, $piece->unroll;
+        }
+        else {
+            push @processed, $piece;
+        }
+    }
+
     # now validate the tags: open and close
     my @tagpile;
   INLINETAG:
@@ -656,53 +683,11 @@ sub manage_regular {
                                                       type => 'close');
     }
 
-    # finally, we have to decide if = and * are markup element or
-    # normal pieces and change the type accordingly.
-
-    while (@pieces) {
-        my $piece = shift @pieces;
-        if ($piece->type eq 'close_inline') {
-            if (@tagpile and $tagpile[-1] eq $piece->tag) {
-                # all match, can go
-                # and remove from the pile
-                pop @tagpile;
-                push @processed, $piece->unroll;
-            }
-            else {
-                # this is just a text material like this*
-                $piece->type('text');
-                push @processed, $piece;
-            }
-        }
-        elsif ($piece->type eq 'open_inline') {
-            # check if in the remaning chunks there is a matching closing
-            if (grep { $_->type eq 'close_inline' && $_->tag eq $piece->tag } @pieces) {
-                push @tagpile, $piece->tag;
-                push @processed, $piece->unroll;
-            }
-            else {
-                $piece->type('text');
-                push @processed, $piece;
-            }
-        }
-        else {
-            push @processed, $piece;
-        }
-    }
-    while (@tagpile) {
-        my $opened = pop @tagpile;
-        warn "Found <$opened> tag but not close, forcing the closing in $string";
-        push @processed, Text::Amuse::InlineElement->new(string => '',
-                                                         fmt => $self->fmt,
-                                                         tag => $opened,
-                                                         type => 'close_inline')->unroll;
-    }
-
     # now we're hopefully set.
     my (@out, @anchors);
   CHUNK:
-    while (@processed) {
-        my $piece = shift @processed;
+    while (@pieces) {
+        my $piece = shift @pieces;
         if ($piece->type eq 'link') {
             if ($opts{nolinks}) {
                 $piece->type('text');
