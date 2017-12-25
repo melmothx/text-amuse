@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+0.94 2017-12-25
+
+ - Fix regressions in inline parsing
+
 0.93 2017-12-23
 
  - Permit empty comments and prettify comment output
