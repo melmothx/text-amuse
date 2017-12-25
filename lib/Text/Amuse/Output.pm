@@ -621,15 +621,49 @@ sub manage_regular {
         }
         push @pieces, $piece;
     }
+
+    # we need to do another pass to assert there is a match. Sometime
+    # I regret to solve everything with s/<code>.+</code>/.../ but
+    # that has other problems.
+
+    @tracking = ();
+    # print Dumper(\@pieces);
+
+    my $warning = 'Found %s tag %s '
+                  . " in <$string> without a matching closing tag. "
+                  . "Leaving it as-is, but it's unlikely you want this. "
+                  . "To suppress this warning, wrap it around <verbatim>\n";
+
+  UNROLL:
     while (@pieces) {
         my $piece = shift @pieces;
-        if ($piece->type =~ /\A(open|close)_inline\z/) {
-            push @processed, $piece->unroll;
+        if ($piece->type eq 'open_inline') {
+            # check if we have a matching close in the rest of the string
+            if (grep { $_->type eq 'close_inline' and $_->tag eq $piece->tag } @pieces) {
+                push @tracking, $piece->tag;
+                push @processed, $piece->unroll;
+                next UNROLL;
+            }
+            else {
+                warn sprintf($warning, $piece->type, $piece->tag);
+                $piece->type('text');
+            }
         }
-        else {
-            push @processed, $piece;
+        elsif ($piece->type eq 'close_inline') {
+            if (@tracking and $tracking[-1] eq $piece->tag) {
+                push @processed, $piece->unroll;
+                pop @tracking;
+                next UNROLL;
+            }
+            else {
+                warn sprintf($warning, $piece->type, $piece->tag);
+                $piece->type('text');
+            }
         }
+        push @processed, $piece;
     }
+
+    # print Dumper(\@processed);
 
     # now validate the tags: open and close
     my @tagpile;
@@ -642,10 +676,7 @@ sub manage_regular {
                 push @tagpile, $piece->tag;
             }
             else {
-                warn "Found opening tag " . $piece->string
-                  . " in <$string> without a matching closing tag. "
-                  . "Leaving it as-is, but it's unlikely you want this. "
-                  . "To suppress this warning, wrap it around <verbatim>\n";
+                warn sprintf($warning, $piece->type, $piece->tag);
                 $piece->type('text');
             }
         }
@@ -662,10 +693,7 @@ sub manage_regular {
                 }
             }
             else {
-                warn "Found closing element " . $piece->string
-                  . " in \"$string>\" without a matching opening tag. "
-                  . "Leaving it as-is, but it's unlikely you want this. "
-                  . "To suppress this warning, wrap it around <verbatim>\n";
+                warn sprintf($warning, $piece->type, $piece->tag);
                 $piece->type('text');
             }
         }

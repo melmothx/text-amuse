@@ -3,7 +3,7 @@
 use utf8;
 use strict;
 use warnings;
-use Test::More tests => 26;
+use Test::More tests => 29;
 use Text::Amuse::Document;
 use Text::Amuse::Output;
 use Data::Dumper;
@@ -60,5 +60,10 @@ foreach my $str (@strings) {
     is $parser->manage_regular('This (=should be code=).'), 'This (\texttt{should be code}).';
     is $parser->manage_regular('***Hello there ***'), '***Hello there ***';
     is $parser->manage_regular('This <code> should work'), 'This <code> should work';
-    is $parser->manage_regular('This <code><code></code> should work'), 'This \texttt{<code>} should work';
+    is $parser->manage_regular('This <code><code></code> should work'), 'This \texttt{ should work}';
+    is $parser->manage_regular('Same **(*a is paired so it works a*)**'),
+      'Same \textbf{(\emph{a is paired so it works a})}';
+    is $parser->manage_regular('Same =here **(*a is paired so it works a*)** here='),
+      'Same \texttt{here \textbf{(\emph{a is paired so it works a})} here}';
+
 }
