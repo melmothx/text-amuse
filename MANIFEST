@@ -64,6 +64,9 @@ t/testfiles/br-in-footnotes.muse
 t/testfiles/breaklist.exp.html
 t/testfiles/breaklist.exp.ltx
 t/testfiles/breaklist.muse
+t/testfiles/broken-inline.exp.html
+t/testfiles/broken-inline.exp.ltx
+t/testfiles/broken-inline.muse
 t/testfiles/broken-tags.exp.html
 t/testfiles/broken-tags.exp.ltx
 t/testfiles/broken-tags.muse
