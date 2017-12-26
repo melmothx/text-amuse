@@ -36,3 +36,9 @@ This is nothing <b>
 
 
 <em>This should</em> <em> <em>compile</em>
+
+You can also use the <code><verbatim><code></verbatim></code> tag to indicate code and monospace
+text. This is handy for regions that have an “=” in them.
+
+If the “*” confuse you or the preview is screwed up, you can use
+inline tag <code><verbatim><em></verbatim></code> and <code><verbatim><strong></verbatim></code>, which are guaranteed to work in any case.
