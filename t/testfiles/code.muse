@@ -27,3 +27,13 @@ this=is=normal
 this=is nor=mal
 
 =*code* *hello*= is =code *hello*=
+
+=code
+*a*     \|/
+*whole* /|\
+par=
+
+<code>
+*a*     \|/
+*whole* /|\
+</code>
