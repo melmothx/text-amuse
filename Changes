@@ -1,5 +1,12 @@
 Revision history for perl module Text::Amuse
 
+0.96 2018-01-25
+
+ - The code (or =code=) tag is now a verbatim tag. Any markup inside
+   it will not be interpreted (including footnotes). This is a
+   backward compatible change, but the original implementation was
+   wrong and not compatible with Emacs Muse.
+
 0.95 2017-12-28
 
  - Add function to rewrite headers
