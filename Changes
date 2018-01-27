@@ -4,7 +4,7 @@ Revision history for perl module Text::Amuse
 
  - The code (or =code=) tag is now a verbatim tag. Any markup inside
    it will not be interpreted (including footnotes). This is a
-   backward compatible change, but the original implementation was
+   backward incompatible change, but the original implementation was
    wrong and not compatible with Emacs Muse.
    Thanks @labdsf for pointing that out.
 
