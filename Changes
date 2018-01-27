@@ -1,6 +1,6 @@
 Revision history for perl module Text::Amuse
 
-0.96 2018-01-25
+0.96 2018-01-27
 
  - The code (or =code=) tag is now a verbatim tag. Any markup inside
    it will not be interpreted (including footnotes). This is a
