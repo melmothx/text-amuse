@@ -84,6 +84,9 @@ t/testfiles/broken3.muse
 t/testfiles/captions.exp.html
 t/testfiles/captions.exp.ltx
 t/testfiles/captions.muse
+t/testfiles/code.exp.html
+t/testfiles/code.exp.ltx
+t/testfiles/code.muse
 t/testfiles/comments.exp.html
 t/testfiles/comments.exp.ltx
 t/testfiles/comments.muse

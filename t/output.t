@@ -18,10 +18,11 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 139;
+plan tests => 141;
 
 foreach my $testfile (qw/comments
                          inline
+                         code
                          packing
                          special-chars
                          footnotes-packing
