@@ -29,12 +29,13 @@ foreach my $testfile (qw/comments
                          footnotes
                          footnotes-2
                          verse
+                         verse-2
+                         verse-3
                          example-3
                          table
                          links
                          special
                          breaklist
-                         verse-2
                          headings
                          table-2
                          uneven-table
