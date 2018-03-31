@@ -163,7 +163,7 @@ sub stringify {
             return '~';
         }
         elsif ($self->is_html) {
-            return '&nbsp;'
+            return '&#160;'
         }
     }
     elsif ($type eq 'br') {
