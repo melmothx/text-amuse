@@ -1,11 +1,11 @@
-package Text::Amuse::InlineElement;
+package Text::Amuse::Document::Inline;
 use strict;
 use warnings;
 use utf8;
 
 =head1 NAME
 
-Text::Amuse::InlineElement - Helper for Text::Amuse
+Text::Amuse::Document::Inline - Helper for Text::Amuse
 
 =head1 METHODS/ACCESSORS
 

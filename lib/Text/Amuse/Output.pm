@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use Text::Amuse::Output::Image;
-use Text::Amuse::InlineElement;
+use Text::Amuse::Document::Inline;
 # use Data::Dumper::Concise;
 use constant DEBUG => 0;
 
@@ -407,7 +407,7 @@ sub _get_unique_counter {
 
 =head3 inline_elements($string)
 
-Parse the provided string into a list of L<Text::Amuse::InlineElement>
+Parse the provided string into a list of L<Text::Amuse::Document::Inline>
 objects.
 
 =cut
@@ -417,7 +417,7 @@ sub inline_elements {
     return unless length($string);
     my @list;
     if ($string =~ m{\A\s*\<br */*\>\s*\z}) {
-        return Text::Amuse::InlineElement->new(string => $string,
+        return Text::Amuse::Document::Inline->new(string => $string,
                                                type => 'bigskip',
                                                last_position => length($string),
                                                fmt => $self->fmt,
@@ -457,7 +457,7 @@ sub inline_elements {
         my $raw = delete $captures{raw};
         my $position = pos($string);
         if (length($text)) {
-            push @list, Text::Amuse::InlineElement->new(string => $text,
+            push @list, Text::Amuse::Document::Inline->new(string => $text,
                                                         type => 'text',
                                                         last_position => $position - length($raw),
                                                         fmt => $self->fmt,
@@ -489,11 +489,11 @@ sub inline_elements {
             $args{type} = $type;
         }
         die "Unprocessed captures %captures in <$string>" if %captures;
-        push @list, Text::Amuse::InlineElement->new(%args);
+        push @list, Text::Amuse::Document::Inline->new(%args);
     }
     my $offset = (@list ? $list[-1]->last_position : 0);
     my $last_chunk = substr $string, $offset;
-    push @list, Text::Amuse::InlineElement->new(string => $last_chunk,
+    push @list, Text::Amuse::Document::Inline->new(string => $last_chunk,
                                                 type => 'text',
                                                 fmt => $self->fmt,
                                                 last_position => $offset + length($last_chunk),
@@ -683,7 +683,7 @@ sub manage_regular {
     while (@tagpile) {
         my $unclosed = pop @tagpile;
         warn "Found unclosed tag $unclosed in string <$string>, closing it\n";
-        push @pieces, Text::Amuse::InlineElement->new(string => '',
+        push @pieces, Text::Amuse::Document::Inline->new(string => '',
                                                       fmt => $self->fmt,
                                                       tag => $unclosed,
                                                       type => 'close');
@@ -792,7 +792,7 @@ format, to avoid command injection.
 
 sub safe {
     my ($self, $string) = @_;
-    return Text::Amuse::InlineElement->new(fmt => $self->fmt,
+    return Text::Amuse::Document::Inline->new(fmt => $self->fmt,
                                     string => $string,
                                     type => 'safe')->stringify;
 }
