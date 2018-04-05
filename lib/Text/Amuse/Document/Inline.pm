@@ -5,7 +5,7 @@ use utf8;
 
 =head1 NAME
 
-Text::Amuse::Document::Inline - Helper for Text::Amuse
+Text::Amuse::Document::Inline - Inline elements
 
 =head1 METHODS/ACCESSORS
 
