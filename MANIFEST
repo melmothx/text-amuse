@@ -254,6 +254,9 @@ t/testfiles/unroll.exp.html
 t/testfiles/unroll.exp.ltx
 t/testfiles/unroll.muse
 t/testfiles/update.pl
+t/testfiles/verb-2.exp.html
+t/testfiles/verb-2.exp.ltx
+t/testfiles/verb-2.muse
 t/testfiles/verb.exp.html
 t/testfiles/verb.exp.ltx
 t/testfiles/verb.muse

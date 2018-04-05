@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 145;
+plan tests => 147;
 
 foreach my $testfile (qw/comments
                          inline
@@ -87,6 +87,7 @@ foreach my $testfile (qw/comments
                          enumerations
                          empty-tags
                          verb
+                         verb-2
                          headers
                          prova
                          recursiv
