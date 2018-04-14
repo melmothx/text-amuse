@@ -1,33 +1,44 @@
+% A comment to make sure anchor is not parsed as a directive
+
+\hyperdef{amuse}{start-label}{}%
+
+
+\chapter{First chapter}
+
 
 Starting here
 
 
-\#more-info-1
-
-\chapter{More info 1
-\#hello-1}
+\hyperdef{amuse}{more-info-1}{}%
 
 
-\#more-info-2 and more
+\chapter{More info 1}
+\hyperdef{amuse}{hello-1}{}%
+
+
+\hyperdef{amuse}{more-info-2}{}%
+and more
 
 \chapter{More info 2
-\#hello-2 and more}
+and more}
+\hyperdef{amuse}{hello-2}{}%
 
 
-\#valid-before
+\hyperdef{amuse}{valid-before}{}%
 paragraph with a label before
 
 
+\hyperdef{amuse}{valid-after}{}%
 paragraph with a label after
-\#valid-after
 
 
+\hyperdef{amuse}{label-middle}{}%
 paragraph with label in the middle
-\#label-middle
 paragraph.
 
 
-\#label-begin with material
+\hyperdef{amuse}{label-begin}{}%
+with material
 Here the paragraph contineuse
 
 
@@ -42,28 +53,28 @@ Here the paragraph contineuse
 \section{References}
 
 
-\href{\#more-info-1}{Begin}
+\hyperref{}{amuse}{more-info-1}{Begin}
 
 
-\href{\#hello-1}{Second}
+\hyperref{}{amuse}{hello-1}{Second}
 
 
-\href{\#more-info-2}{3rd}
+\hyperref{}{amuse}{more-info-2}{3rd}
 
 
-\href{\#hello-2}{4th}
+\hyperref{}{amuse}{hello-2}{4th}
 
 
-\href{\#valid-before}{before}
+\hyperref{}{amuse}{valid-before}{before}
 
 
-\href{\#valid-after}{after}
+\hyperref{}{amuse}{valid-after}{after}
 
 
-\href{\#label-middle}{middle}
+\hyperref{}{amuse}{label-middle}{middle}
 
 
-\href{\#label-begin}{begin}
+\hyperref{}{amuse}{label-begin}{begin}
 
 
 \hyperref{}{amuse}{before}{before}

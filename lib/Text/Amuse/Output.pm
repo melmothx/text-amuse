@@ -448,7 +448,7 @@ sub inline_elements {
                             ) |
                             (?<nobreakspace>  \~\~         ) |
                             (?<inline>(?:\*\*\*|\*\*|\*)   ) |
-                            (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9]+\x{20}*(?:\n|$)) |
+                            (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9-]+(?:\s+|\z)) |
                             (?<br> \x{20}*\< br \x{20}* \/?\>)
                         )}gcxms) {
         # this is a mammuth, but hey
@@ -1329,7 +1329,7 @@ sub format_links {
         return $image->output;
     }
     # links
-    if ($link =~ m/\A\#([A-Za-z][A-Za-z0-9]*)\z/) {
+    if ($link =~ m/\A\#([A-Za-z][A-Za-z0-9-]*)\z/) {
         my $linkname = $1;
         if ($self->is_html) {
             $link = "#text-amuse-label-$linkname";

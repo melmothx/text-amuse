@@ -1,5 +1,11 @@
 #title Labels
 
+; A comment to make sure anchor is not parsed as a directive
+
+#start-label
+
+** First chapter
+
 Starting here
 
 #more-info-1
