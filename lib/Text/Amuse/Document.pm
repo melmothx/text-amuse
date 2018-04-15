@@ -507,11 +507,12 @@ sub _parse_string {
                    rawline => $l,
                    raw_without_anchors => $l,
                   );
-    if ($l =~ m/^
+    if ($l =~ m/\A
                 (\s*)
                 (\#([A-Za-z][A-Za-z0-9-]+)\x{20}*)
                 (.*)
-                $/x) {
+                \z
+                /sx) {
         $element{anchor} = $3;
         $l = $1 . $4;
         $element{raw_without_anchors} = $l;
@@ -768,6 +769,8 @@ sub _construct_element {
     my $current = $self->_current_el;
     my %args = $self->_parse_string($line);
     my $element = Text::Amuse::Element->new(%args);
+
+    # print Dumper($element);
 
     # catch the examples, comments and the verse in bloks.
     # <example> is greedy, and will stop only at another </example> or

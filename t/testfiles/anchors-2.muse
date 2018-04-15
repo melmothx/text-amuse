@@ -1,0 +1,29 @@
+#title Anchors
+
+paragraph with label in the middle
+#label-middle and material in a
+paragraph.
+
+#label-begin with material
+Here the paragraph continues
+
+Here the paragraph continues
+#label-end with material
+
+#label-1
+#label-2 Start
+#label-3 Middle
+#label-4
+#label-5 End
+#label-6
+
+paragraph with label in the middle
+#label-another-middle
+paragraph.
+
+#start
+paragraph
+
+end
+#end
+

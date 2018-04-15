@@ -18,7 +18,7 @@ if (!$@) {
 
 my $leave_out_in_tmp = 0;
 
-plan tests => 147;
+plan tests => 151;
 
 foreach my $testfile (qw/comments
                          inline
@@ -93,6 +93,8 @@ foreach my $testfile (qw/comments
                          recursiv
                          broken-inline
                          splat
+                         labels
+                         anchors-2
                         /) {
     test_testfile($testfile);
 }
