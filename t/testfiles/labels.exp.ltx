@@ -1,18 +1,12 @@
 % A comment to make sure anchor is not parsed as a directive
-
-\hyperdef{amuse}{start-label}{}%
-
-
 \chapter{First chapter}
+\hyperdef{amuse}{start-label}{}%
 
 
 Starting here
 
-
-\hyperdef{amuse}{more-info-1}{}%
-
-
 \chapter{More info 1}
+\hyperdef{amuse}{more-info-1}{}%
 \hyperdef{amuse}{hello-1}{}%
 
 
@@ -38,18 +32,34 @@ paragraph.
 
 
 \hyperdef{amuse}{label-begin}{}%
-with material
-Here the paragraph contineuse
-
-
-\hyperdef{amuse}{before}{}%
-
+with materialHere the paragraph continues\footnote{Can I have a label in a \#footnote footnote?}
 
 \chapter{heading, this is ok}
+\hyperdef{amuse}{before}{}%
 
 \chapter{heading after, this is ok as well}
 \hyperdef{amuse}{after}{}%
 
+\chapter{\#inside header}
+
+
+\begin{itemize}
+\item\relax 
+\#inlist in  list
+
+
+
+
+\end{itemize}
+
+\begin{enumerate}[1.]
+\item\relax 
+\#inlist-2 as well
+
+
+
+
+\end{enumerate}
 \section{References}
 
 

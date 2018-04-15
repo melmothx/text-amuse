@@ -505,7 +505,17 @@ sub _parse_string {
     die unless defined $l;
     my %element = (
                    rawline => $l,
+                   raw_without_anchors => $l,
                   );
+    if ($l =~ m/^
+                (\s*)
+                (\#([A-Za-z][A-Za-z0-9-]+)\x{20}*)
+                (.*)
+                $/x) {
+        $element{anchor} = $3;
+        $l = $1 . $4;
+        $element{raw_without_anchors} = $l;
+    }
     my $blockre = qr{(
                          biblio   |
                          play     |
@@ -792,6 +802,18 @@ sub _construct_element {
             $self->_current_el($current);
             return $current;
         }
+    }
+
+    if ($current and  $current->type eq 'null' and $current->anchors) {
+        $element->add_to_anchors($current->anchors);
+        # print "Carry on the anchors: " . join(' ', $current->anchors) . ' to ' . $element->type . "\n";
+        $current->remove_anchors;
+    }
+    if ($element->type eq 'null' and $element->anchors and $current->type ne 'null') {
+        # print "Appending  the anchors: " . join(' ', $element->anchors) . ' to ' . $current->type . "\n";
+        $current->add_to_anchors($element->anchors);
+        $element->remove_anchors;
+        return;
     }
 
     # Pack the lines

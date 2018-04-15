@@ -1,21 +1,13 @@
 <div class="comment" style="display:none">A comment to make sure anchor is not parsed as a directive</div>
-
-<p>
-<a id="text-amuse-label-start-label" class="text-amuse-internal-anchor"></a>
-
-</p>
-<h3 id="toc1">First chapter</h3>
+<h3 id="toc1"><a id="text-amuse-label-start-label" class="text-amuse-internal-anchor"></a>
+First chapter</h3>
 
 
 <p>
 Starting here
 </p>
-
-<p>
-<a id="text-amuse-label-more-info-1" class="text-amuse-internal-anchor"></a>
-
-</p>
-<h3 id="toc2"><a id="text-amuse-label-hello-1" class="text-amuse-internal-anchor"></a>
+<h3 id="toc2"><a id="text-amuse-label-more-info-1" class="text-amuse-internal-anchor"></a>
+<a id="text-amuse-label-hello-1" class="text-amuse-internal-anchor"></a>
 More info 1</h3>
 
 
@@ -46,20 +38,37 @@ paragraph.
 
 <p>
 <a id="text-amuse-label-label-begin" class="text-amuse-internal-anchor"></a>
-with material
-Here the paragraph contineuse
+with materialHere the paragraph continues <a href="#fn1" class="footnote" id="fn_back1">[1]</a>
 </p>
-
-<p>
-<a id="text-amuse-label-before" class="text-amuse-internal-anchor"></a>
-
-</p>
-<h3 id="toc4">heading, this is ok</h3>
+<h3 id="toc4"><a id="text-amuse-label-before" class="text-amuse-internal-anchor"></a>
+heading, this is ok</h3>
 
 <h3 id="toc5"><a id="text-amuse-label-after" class="text-amuse-internal-anchor"></a>
 heading after, this is ok as well</h3>
 
-<h4 id="toc6">References</h4>
+<h3 id="toc6">#inside header</h3>
+
+
+<ul>
+<li>
+<p>
+#inlist in  list
+</p>
+
+</li>
+
+</ul>
+
+<ol>
+<li>
+<p>
+#inlist-2 as well
+</p>
+
+</li>
+
+</ol>
+<h4 id="toc7">References</h4>
 
 
 <p>
@@ -100,4 +109,8 @@ heading after, this is ok as well</h3>
 
 <p>
 <a class="text-amuse-link" href="#text-amuse-label-after">after</a>
+</p>
+
+<p class="fnline"><a class="footnotebody" href="#fn_back1" id="fn1">[1]</a> Can I have a label in a
+    #footnote footnote?
 </p>

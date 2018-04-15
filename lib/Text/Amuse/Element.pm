@@ -22,6 +22,7 @@ sub new {
     my ($class, %args) = @_;
     my $self = {
                 rawline => '',
+                raw_without_anchors => '',
                 block => '',      # the block it says to belong
                 type => 'null', # the type
                 string => '',      # the string
@@ -35,6 +36,7 @@ sub new {
                 footnote_number => 0,
                 footnote_symbol => '',
                 footnote_index => '',
+                anchors => [],
                };
     my %provided;
     foreach my $accessor (keys %$self) {
@@ -46,6 +48,14 @@ sub new {
     unless ($provided{indentation}) {
         $self->{indentation} = length($self->{removed});
     }
+
+    die "anchors passed to the constructor but not a reference $self->{anchors}"
+      unless ref($self->{anchors}) eq 'ARRAY';
+
+    if (exists $args{anchor} and length $args{anchor}) {
+        push @{$self->{anchors}}, $args{anchor};
+    }
+
     bless $self, $class;
 }
 
@@ -78,6 +88,32 @@ sub will_not_merge {
     }
     return $self->{_will_not_merge};
 }
+
+=head2 anchors
+
+A list of anchors for this element.
+
+=head2 add_to_anchors(@list)
+
+Add the anchors passed to the constructor to this element.
+
+=cut
+
+sub anchors {
+    my $self = shift;
+    return @{$self->{anchors}};
+}
+
+sub add_to_anchors {
+    my ($self, @anchors) = @_;
+    push @{$self->{anchors}}, @anchors;
+}
+
+sub remove_anchors {
+    my ($self) = @_;
+    $self->{anchors} = [];
+}
+
 
 =head2 ACCESSORS
 
@@ -412,7 +448,8 @@ sub append {
     else {
         $self->{string} .= $element->string;
     }
-
+    # inherit the anchors
+    $self->add_to_anchors($element->anchors);
 }
 
 =head3 can_append($element)

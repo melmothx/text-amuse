@@ -28,13 +28,22 @@ paragraph with label in the middle
 paragraph.
 
 #label-begin with material
-Here the paragraph contineuse
+Here the paragraph continues [1]
+
+[1] Can I have a label in a
+    #footnote footnote?
 
 #before
 ** heading, this is ok
 
 ** heading after, this is ok as well
 #after
+
+** #inside header
+
+ - #inlist in  list
+
+ 1. #inlist-2 as well
 
 *** References
 

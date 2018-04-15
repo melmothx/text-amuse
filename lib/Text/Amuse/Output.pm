@@ -180,10 +180,10 @@ sub process {
             }
         }
         elsif ($el->type eq 'standalone') {
-            push @pieces, $self->manage_regular($el, noanchors => 1);
+            push @pieces, $self->manage_regular($el);
         }
         elsif ($el->type eq 'dt') {
-            push @pieces, $self->manage_regular($el, noanchors => 1);
+            push @pieces, $self->manage_regular($el);
         }
         elsif ($el->type =~ m/h[1-6]/) {
 
@@ -353,7 +353,7 @@ sub manage_html_footnote {
     }
     my $chunk = qq{\n<p class="$class"><a class="footnotebody"} . " "
       . qq{href="#fn_back${fn_num}" id="fn${fn_num}">$fn_symbol</a> } .
-        $self->manage_regular($element, noanchors => 1) .
+        $self->manage_regular($element) .
           qq{</p>\n};
 }
 
@@ -448,7 +448,6 @@ sub inline_elements {
                             ) |
                             (?<nobreakspace>  \~\~         ) |
                             (?<inline>(?:\*\*\*|\*\*|\*)   ) |
-                            (?<anchor> ^\x{20}* \#[A-Za-z][A-Za-z0-9-]+(?:\s+|\z)) |
                             (?<br> \x{20}*\< br \x{20}* \/?\>)
                         )}gcxms) {
         # this is a mammuth, but hey
@@ -690,7 +689,7 @@ sub manage_regular {
     }
 
     # now we're hopefully set.
-    my (@out, @anchors);
+    my @out;
   CHUNK:
     while (@pieces) {
         my $piece = shift @pieces;
@@ -729,31 +728,16 @@ sub manage_regular {
                 $piece->type('text');
             }
         }
-        elsif ($piece->type eq 'anchor') {
-            # explicitely ignored
-            if ($opts{noanchors}) {
-                $piece->type('text');
-            }
-            else {
-                push @anchors, $piece->stringify;
-                next CHUNK;
-            }
-        }
         push @out, $piece->stringify;
     }
-    if ($opts{anchors}) {
-        return join('', @out), join('', @anchors);
-    }
-    else {
-        return join('', @out);
-    }
+    return join('', @out);
 }
 
 sub _format_footnote {
     my ($self, $element) = @_;
     if ($self->is_latex) {
         # print "Calling manage_regular from format_footnote " . Dumper($element);
-        my $footnote = $self->manage_regular($element, noanchors => 1);
+        my $footnote = $self->manage_regular($element);
         $footnote =~ s/\s+/ /gs;
         $footnote =~ s/ +$//s;
         # covert <br> to \par in latex. those \\ in the footnotes are
@@ -805,11 +789,9 @@ sub safe {
 
 sub manage_paragraph {
     my ($self, $el) = @_;
-    my ($body, $anchors) = $self->manage_regular($el, anchors => 1);
+    my $body = $self->manage_regular($el);
     chomp $body;
-    return $self->blkstring(start  => "p") .
-      $anchors .
-      $body . $self->blkstring(stop => "p");
+    return $self->blkstring(start  => "p") . $self->format_anchors($el) . $body . $self->blkstring(stop => "p");
 }
 
 =head3 manage_header
@@ -818,6 +800,7 @@ sub manage_paragraph {
 
 sub manage_header {
     my ($self, $el) = @_;
+    # print Dumper([$el->anchors]);
     my $body_with_no_footnotes = $el->string;
     my $has_fn;
     my $catch_fn = sub {
@@ -835,11 +818,12 @@ sub manage_header {
                                  )
                                 /$catch_fn->($1)/gxe;
     undef $catch_fn;
+    my $anchors = $self->format_anchors($el);
     my ($body_for_toc);
     if ($has_fn) {
-        ($body_for_toc) = $self->manage_regular($body_with_no_footnotes, nolinks => 1, anchors => 1);
+        ($body_for_toc) = $self->manage_regular($body_with_no_footnotes, nolinks => 1);
     }
-    my ($body, $anchors) = $self->manage_regular($el, nolinks => 1, anchors => 1);
+    my ($body) = $self->manage_regular($el, nolinks => 1);
     chomp $body;
     if (defined $body_for_toc) {
         $body_for_toc =~ s/\s+/ /g;
@@ -974,29 +958,26 @@ sub manage_verse {
     else { die "Not reached" }
 
     my (@chunks) = split(/\n/, $el->string);
-    my (@out, @stanza, @anchors);
+    my (@out, @stanza);
     foreach my $l (@chunks) {
         if ($l =~ m/\A( *)(.+?)\z/s) {
             my $leading = $lead x length($1);
-            my ($text, $anchors) = $self->manage_regular($2, anchors => 1);
-            if ($anchors) {
-                push @anchors, $anchors;
-            }
+            my $text = $self->manage_regular($2);
             if (length($text)) {
                 push @stanza, $leading . $text;
             }
         }
         elsif ($l =~ m/\A\s*\z/s) {
-            push @out, $self->_format_stanza(\@stanza, \@anchors);
-            die "wtf" if @stanza || @anchors;
+            push @out, $self->_format_stanza(\@stanza);
+            die "wtf" if @stanza;
         }
         else {
             die "wtf?";
         }
     }
-    # flush the stanzas and the anchors
-    push @out, $self->_format_stanza(\@stanza, \@anchors) if @stanza || @anchors;
-    die "wtf" if @stanza || @anchors;
+    # flush the stanzas
+    push @out, $self->_format_stanza(\@stanza) if @stanza;
+    die "wtf" if @stanza;
 
     # process
     return $self->blkstring(start => $el->type) .
@@ -1004,7 +985,7 @@ sub manage_verse {
 }
 
 sub _format_stanza {
-    my ($self, $stanza, $anchors) = @_;
+    my ($self, $stanza) = @_;
 
     my $eol;
     if ($self->is_html) {
@@ -1015,16 +996,12 @@ sub _format_stanza {
     }
     else { die "Not reached" };
 
-    my ($anchor_string, $stanza_string) = ('', '');
-    if (@$anchors) {
-        $anchor_string = join("\n", @$anchors);
-        @$anchors = ();
-    }
+    my $stanza_string = '';
     if (@$stanza) {
         $stanza_string = join($eol, @$stanza);
         @$stanza = ();
     }
-    return $anchor_string . $stanza_string;
+    return $stanza_string;
 }
 
 
@@ -1166,7 +1143,7 @@ sub manage_table_ltx {
     $textable .= "\\hline\n\\end{tabularx}\n";
     if ($has_caption) {
         $textable .= "\n\\caption[]{" .
-          $self->manage_regular($table->{caption}, noanchors => 1)
+          $self->manage_regular($table->{caption})
           . "}\n";
     }
     $textable .= "\\end{minipage}\n";
@@ -1320,7 +1297,7 @@ sub linkify {
 
 sub format_links {
     my ($self, $link, $desc) = @_;
-    $desc = $self->manage_regular($desc, noanchors => 1);
+    $desc = $self->manage_regular($desc);
     # first the images
     if (my $image = $self->find_image($link)) {
         my $src = $image->filename;
@@ -1857,6 +1834,17 @@ sub _latex_header {
     else {
         return "\\" . $name . '{';
     }
+}
+
+sub format_anchors {
+    my ($self, $el) = @_;
+    my $out = '';
+    if (my @anchors = map { Text::Amuse::InlineElement->new(string => $_,
+                                                            type => 'anchor',
+                                                            fmt => $self->fmt)->stringify } $el->anchors) {
+        return join('', @anchors);
+    }
+    return $out;
 }
 
 1;
