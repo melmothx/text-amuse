@@ -152,20 +152,22 @@ sub process {
     # loop over the parsed elements
     foreach my $el ($self->document->elements) {
         if ($el->type eq 'null') {
+            push @pieces, $self->format_anchors($el) if $el->anchors;
             next;
         }
         if ($el->type eq 'startblock') {
             die "startblock with string passed!: " . $el->string if $el->string;
-            push @pieces, $self->blkstring(start => $el->block, start_list_index => $el->start_list_index);
+            push @pieces, $self->blkstring(start => $el->block, start_list_index => $el->start_list_index),
+              $self->format_anchors($el);
         }
         elsif ($el->type eq 'stopblock') {
             die "stopblock with string passed!:" . $el->string if $el->string;
-            push @pieces, $self->blkstring(stop => $el->block);
+            push @pieces, $self->format_anchors($el), $self->blkstring(stop => $el->block);
         }
         elsif ($el->type eq 'regular') {
             # manage the special markup
             if ($el->string =~ m/\A\s*-----*\s*\z/s) {
-                push @pieces, $self->manage_hr($el);
+                push @pieces, $self->manage_hr($el), $self->format_anchors($el);
             }
             # an image by itself, so avoid it wrapping with <p></p>,
             # but only if just 1 is found. With multiple one, we get
@@ -173,7 +175,7 @@ sub process {
             elsif ($el->string =~ m/\A\s*\[\[\s*$imagere\s*\]
                                     (\[[^\]\[]+?\])?\]\s*\z/sx and
                    $el->string !~ m/\[\[.*\[\[/s) {
-                push @pieces, $self->manage_regular($el);
+                push @pieces, $self->format_anchors($el), $self->manage_regular($el);
             }
             else {
                 push @pieces, $self->manage_paragraph($el);
@@ -185,8 +187,7 @@ sub process {
         elsif ($el->type eq 'dt') {
             push @pieces, $self->manage_regular($el);
         }
-        elsif ($el->type =~ m/h[1-6]/) {
-
+        elsif ($el->is_header) {
             # if we want a split html, we cut here and flush the footnotes
             if ($el->type =~ m/h[1-4]/ and $split and @pieces) {
                 
@@ -209,7 +210,7 @@ sub process {
             push @pieces, $self->manage_header($el);
         }
         elsif ($el->type eq 'verse') {
-            push @pieces, $self->manage_verse($el);
+            push @pieces, $self->format_anchors($el), $self->manage_verse($el);
         }
         elsif ($el->type eq 'inlinecomment') {
             push @pieces, $self->manage_inline_comment($el);
@@ -218,13 +219,13 @@ sub process {
             push @pieces, $self->manage_comment($el);
         }
         elsif ($el->type eq 'table') {
-            push @pieces, $self->manage_table($el);
+            push @pieces, $self->format_anchors($el), $self->manage_table($el);
         }
         elsif ($el->type eq 'example') {
-            push @pieces, $self->manage_example($el);
+            push @pieces, $self->format_anchors($el), $self->manage_example($el);
         }
         elsif ($el->type eq 'newpage') {
-            push @pieces, $self->manage_newpage($el);
+            push @pieces, $self->manage_newpage($el), $self->format_anchors($el);
         }
         else {
             die "Unrecognized element: " . $el->type;
@@ -339,6 +340,7 @@ sub flush_secondary_footnotes {
 sub manage_html_footnote {
     my ($self, $element) = @_;
     return unless $element;
+    my $anchors = $self->format_anchors($element);
     my $fn_num = $element->footnote_index;
     my $fn_symbol = $element->footnote_symbol;
     my $class;
@@ -352,8 +354,8 @@ sub manage_html_footnote {
         die "wrong type " . $element->type . '  ' . $element->string;
     }
     my $chunk = qq{\n<p class="$class"><a class="footnotebody"} . " "
-      . qq{href="#fn_back${fn_num}" id="fn${fn_num}">$fn_symbol</a> } .
-        $self->manage_regular($element) .
+      . qq{href="#fn_back${fn_num}" id="fn${fn_num}">$fn_symbol</a>$anchors }
+      . $self->manage_regular($element) .
           qq{</p>\n};
 }
 
@@ -738,6 +740,7 @@ sub _format_footnote {
     if ($self->is_latex) {
         # print "Calling manage_regular from format_footnote " . Dumper($element);
         my $footnote = $self->manage_regular($element);
+        my $anchors = $self->format_anchors($element);
         $footnote =~ s/\s+/ /gs;
         $footnote =~ s/ +$//s;
         # covert <br> to \par in latex. those \\ in the footnotes are
@@ -748,10 +751,10 @@ sub _format_footnote {
         # https://tex.stackexchange.com/questions/248620/footnote-of-several-paragraphs-length-to-section-title
         $footnote =~ s/\\forcelinebreak /\\protect\\endgraf /g;
         if ($element->type eq 'secondary_footnote') {
-            return '\footnoteB{' . $footnote . '}';
+            return '\footnoteB{' . $anchors . $footnote . '}';
         }
         else {
-            return '\footnote{' . $footnote . '}';
+            return '\footnote{' . $anchors . $footnote . '}';
         }
     } elsif ($self->is_html) {
         # in html, just remember the number

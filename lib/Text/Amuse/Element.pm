@@ -70,6 +70,11 @@ sub rawline {
     return $self->{rawline};
 }
 
+sub raw_without_anchors {
+    my $self = shift;
+    return $self->{raw_without_anchors};
+}
+
 sub _reset_rawline {
     my ($self, $line) = @_;
     $self->{rawline} = $line;
@@ -112,6 +117,12 @@ sub add_to_anchors {
 sub remove_anchors {
     my ($self) = @_;
     $self->{anchors} = [];
+}
+
+sub move_anchors_to {
+    my ($self, $el) = @_;
+    $el->add_to_anchors($self->anchors);
+    $self->remove_anchors;
 }
 
 
@@ -440,10 +451,16 @@ Append the element passed as argument to this one, setting the raw_line
 sub append {
     my ($self, $element) = @_;
     $self->{rawline} .= $element->rawline;
+    $self->{raw_without_anchors} .= $element->raw_without_anchors;
     my $type = $self->type;
     # greedy elements
-    if ($type eq 'example' or $type eq 'verse' or $type eq 'footnote') {
+    if ($type eq 'example') {
         $self->{string} .= $element->rawline;
+        # ignore the anchors, they can't be inside.
+        return;
+    }
+    elsif ($type eq 'verse' or $type eq 'footnote') {
+        $self->{string} .= $element->raw_without_anchors;
     }
     else {
         $self->{string} .= $element->string;
@@ -501,6 +518,16 @@ sub element_number {
 sub _set_element_number {
     my ($self, $num) = @_;
     $self->{element_number} = $num;
+}
+
+sub is_header {
+    my $self = shift;
+    if ($self->type =~ m/h[1-6]/) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
 }
 
 1;

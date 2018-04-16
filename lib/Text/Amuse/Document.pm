@@ -770,7 +770,19 @@ sub _construct_element {
     my %args = $self->_parse_string($line);
     my $element = Text::Amuse::Element->new(%args);
 
-    # print Dumper($element);
+    if ($current and $current->type eq 'null' and $current->anchors) {
+        # previous element is null, carry on
+        $current->move_anchors_to($element);
+    }
+    if ($element->type eq 'null' and
+        $element->anchors and
+        $current->type ne 'null' and
+        $current->type ne 'example') {
+        # incoming has anchors
+        $element->move_anchors_to($current);
+        # null element with anchors. it was fully merged, so return
+        return;
+    }
 
     # catch the examples, comments and the verse in bloks.
     # <example> is greedy, and will stop only at another </example> or
@@ -779,11 +791,10 @@ sub _construct_element {
     foreach my $block (qw/example comment verse/) {
         if ($current && $current->type eq $block) {
             if ($element->is_stop_element($current)) {
-                # print Dumper($element) . " is closing\n";
-
                 $self->_current_el(undef);
                 return Text::Amuse::Element->new(type => 'null',
                                                  removed => $element->rawline,
+                                                 anchors => [ $element->anchors ],
                                                  rawline => $element->rawline);
             }
             else {
@@ -800,25 +811,14 @@ sub _construct_element {
         elsif ($element->is_start_block($block)) {
             $current = Text::Amuse::Element->new(type => $block,
                                                  style => $element->style,
+                                                 anchors => [ $element->anchors ],
                                                  removed => $element->rawline,
+                                                 raw_without_anchors => $element->raw_without_anchors,
                                                  rawline => $element->rawline);
             $self->_current_el($current);
             return $current;
         }
     }
-
-    if ($current and  $current->type eq 'null' and $current->anchors) {
-        $element->add_to_anchors($current->anchors);
-        # print "Carry on the anchors: " . join(' ', $current->anchors) . ' to ' . $element->type . "\n";
-        $current->remove_anchors;
-    }
-    if ($element->type eq 'null' and $element->anchors and $current->type ne 'null') {
-        # print "Appending  the anchors: " . join(' ', $element->anchors) . ' to ' . $current->type . "\n";
-        $current->add_to_anchors($element->anchors);
-        $element->remove_anchors;
-        return;
-    }
-
     # Pack the lines
     if ($current && $current->can_append($element)) {
         # print "Packing " . Dumper($element) . ' into ' . Dumper($current);
