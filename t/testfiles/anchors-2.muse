@@ -27,3 +27,94 @@ paragraph
 end
 #end
 
+#item
+
+ - Item
+
+ - Another
+   #another-item
+
+
+ #enum-1
+ 1. Enum
+
+<quote>
+#quote
+In quotation
+</quote>
+
+
+<right>
+#right
+In right
+</right>
+
+
+<center>
+#center
+In center
+</center>
+
+
+  #quote-1
+  In quotation 1
+
+
+
+                                                   #right-1
+                                                   In right 1
+
+
+
+         #center-1
+         In center 1
+
+
+ #dt
+ Desc :: list
+
+ Desc :: list
+ #dt-1
+
+
+#example
+
+{{{
+This is not
+#an anchor
+}}}
+
+#example-after
+
+
+#verse
+
+> This is a verse
+
+#verse-1
+
+<verse>
+A verse
+#a-in-verse anchor
+</verse>
+
+
+#table-1
+
+ This | is | a | table
+
+
+#verse-2
+> This is a verse
+
+#verse-3
+<verse>
+Another verse
+
+A stanza
+#stanza
+</verse>
+
+<comment>
+#irrelevant
+</comment>
