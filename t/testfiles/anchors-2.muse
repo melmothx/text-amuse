@@ -80,8 +80,29 @@ In center
 #example
 
 {{{
-This is not
-#an anchor
+#title My text
+
+#badanchor
+This is not an anchor, it's part of the header with a dummy name.
+
+<br>
+
+#begin
+This will work.
+
+*** Section
+
+#anchor
+Here we have our text.
+
+More text.
+
+*** Next section with an anchor
+#nextsection
+
+And here we can link to [[#anchor][our anchor]] and to the
+[[#begin][begin]] and to [[#nextsection][this section]].
+
 }}}
 
 #example-after
@@ -118,3 +139,96 @@ A stanza
 <comment>
 #irrelevant
 </comment>
+
+Body [1] and [2]
+
+[1] A label in a footnote
+    #footnote and contine
+
+#footnote-2
+[2] This footnote is labeled.
+
+** List
+
+[[#title][#title]]
+
+[[#label-middle][#label-middle]]
+
+[[#label-begin][#label-begin]]
+
+[[#label-end][#label-end]]
+
+[[#label-1][#label-1]]
+
+[[#label-2][#label-2]]
+
+[[#label-3][#label-3]]
+
+[[#label-4][#label-4]]
+
+[[#label-5][#label-5]]
+
+[[#label-6][#label-6]]
+
+[[#label-another-middle][#label-another-middle]]
+
+[[#start][#start]]
+
+[[#end][#end]]
+
+[[#item][#item]]
+
+[[#another-item][#another-item]]
+
+[[#enum-1][#enum-1]]
+
+[[#quote][#quote]]
+
+[[#right][#right]]
+
+[[#center][#center]]
+
+[[#quote-1][#quote-1]]
+
+[[#right-1][#right-1]]
+
+[[#center-1][#center-1]]
+
+[[#dt][#dt]]
+
+[[#dt-1][#dt-1]]
+
+[[#example][#example]]
+
+[[#title][#title]]
+
+[[#badanchor][#badanchor]]
+
+[[#begin][#begin]]
+
+[[#anchor][#anchor]]
+
+[[#nextsection][#nextsection]]
+
+[[#example-after][#example-after]]
+
+[[#verse][#verse]]
+
+[[#verse-1][#verse-1]]
+
+[[#a-in-verse][#a-in-verse]]
+
+[[#table-1][#table-1]]
+
+[[#verse-2][#verse-2]]
+
+[[#verse-3][#verse-3]]
+
+[[#stanza][#stanza]]
+
+[[#irrelevant][#irrelevant]]
+
+[[#footnote][#footnote]]
+
+[[#footnote-2][#footnote-2]]
+

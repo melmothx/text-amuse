@@ -155,4 +155,5 @@ sub show_diff {
     else {
         diag "GOT:\n$got\n\nEXP:\n$exp\n\n";
     }
+    die if $ENV{FAILURE_IS_FATAL};
 }

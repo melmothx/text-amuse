@@ -145,8 +145,29 @@ list
 \hyperdef{amuse}{example}{}%
 
 \begin{alltt}
-This is not
-\#an anchor
+\#title My text
+
+\#badanchor
+This is not an anchor, it's part of the header with a dummy name.
+
+<br>
+
+\#begin
+This will work.
+
+*** Section
+
+\#anchor
+Here we have our text.
+
+More text.
+
+*** Next section with an anchor
+\#nextsection
+
+And here we can link to [[\#anchor][our anchor]] and to the
+[[\#begin][begin]] and to [[\#nextsection][this section]].
+
 \end{alltt}
 
 \hyperdef{amuse}{verse}{}%
@@ -200,4 +221,134 @@ A stanza
 \begin{comment}
 
 \end{comment}
+
+
+Body\footnote{\hyperdef{amuse}{footnote}{}%
+A label in a footnote and contine} and\footnote{\hyperdef{amuse}{footnote-2}{}%
+This footnote is labeled.}
+
+\chapter{List}
+
+
+\hyperref{}{amuse}{title}{\#title}
+
+
+\hyperref{}{amuse}{label-middle}{\#label-middle}
+
+
+\hyperref{}{amuse}{label-begin}{\#label-begin}
+
+
+\hyperref{}{amuse}{label-end}{\#label-end}
+
+
+\hyperref{}{amuse}{label-1}{\#label-1}
+
+
+\hyperref{}{amuse}{label-2}{\#label-2}
+
+
+\hyperref{}{amuse}{label-3}{\#label-3}
+
+
+\hyperref{}{amuse}{label-4}{\#label-4}
+
+
+\hyperref{}{amuse}{label-5}{\#label-5}
+
+
+\hyperref{}{amuse}{label-6}{\#label-6}
+
+
+\hyperref{}{amuse}{label-another-middle}{\#label-another-middle}
+
+
+\hyperref{}{amuse}{start}{\#start}
+
+
+\hyperref{}{amuse}{end}{\#end}
+
+
+\hyperref{}{amuse}{item}{\#item}
+
+
+\hyperref{}{amuse}{another-item}{\#another-item}
+
+
+\hyperref{}{amuse}{enum-1}{\#enum-1}
+
+
+\hyperref{}{amuse}{quote}{\#quote}
+
+
+\hyperref{}{amuse}{right}{\#right}
+
+
+\hyperref{}{amuse}{center}{\#center}
+
+
+\hyperref{}{amuse}{quote-1}{\#quote-1}
+
+
+\hyperref{}{amuse}{right-1}{\#right-1}
+
+
+\hyperref{}{amuse}{center-1}{\#center-1}
+
+
+\hyperref{}{amuse}{dt}{\#dt}
+
+
+\hyperref{}{amuse}{dt-1}{\#dt-1}
+
+
+\hyperref{}{amuse}{example}{\#example}
+
+
+\hyperref{}{amuse}{title}{\#title}
+
+
+\hyperref{}{amuse}{badanchor}{\#badanchor}
+
+
+\hyperref{}{amuse}{begin}{\#begin}
+
+
+\hyperref{}{amuse}{anchor}{\#anchor}
+
+
+\hyperref{}{amuse}{nextsection}{\#nextsection}
+
+
+\hyperref{}{amuse}{example-after}{\#example-after}
+
+
+\hyperref{}{amuse}{verse}{\#verse}
+
+
+\hyperref{}{amuse}{verse-1}{\#verse-1}
+
+
+\hyperref{}{amuse}{a-in-verse}{\#a-in-verse}
+
+
+\hyperref{}{amuse}{table-1}{\#table-1}
+
+
+\hyperref{}{amuse}{verse-2}{\#verse-2}
+
+
+\hyperref{}{amuse}{verse-3}{\#verse-3}
+
+
+\hyperref{}{amuse}{stanza}{\#stanza}
+
+
+\hyperref{}{amuse}{irrelevant}{\#irrelevant}
+
+
+\hyperref{}{amuse}{footnote}{\#footnote}
+
+
+\hyperref{}{amuse}{footnote-2}{\#footnote-2}
 
