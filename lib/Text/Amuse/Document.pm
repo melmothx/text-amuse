@@ -770,7 +770,7 @@ sub _construct_element {
     my %args = $self->_parse_string($line);
     my $element = Text::Amuse::Element->new(%args);
 
-    if ($current and $current->type eq 'null' and $current->anchors) {
+    if ($current and ($current->type eq 'null' or $current->type eq 'startblock') and $current->anchors) {
         # previous element is null, carry on
         $current->move_anchors_to($element);
     }
