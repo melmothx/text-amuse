@@ -151,8 +151,18 @@ Body [1] and [2]
 [1] A label in a footnote
     #footnote and contine
 
+    Here continues (1)
+    because of the indentation (1)
+
+
 #footnote-2
 [2] This footnote is labeled.
+
+    Here continues (2)
+    #label-fn-1
+    #label-fn-2 with material
+    because of the indentation (2)
+    #label-fn-3
 
 ** List
 
