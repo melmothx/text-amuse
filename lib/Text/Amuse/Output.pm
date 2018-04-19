@@ -1839,6 +1839,12 @@ sub _latex_header {
     }
 }
 
+=head3 format_anchors($element)
+
+Return a formatted string with the anchors found in the element.
+
+=cut
+
 sub format_anchors {
     my ($self, $el) = @_;
     my $out = '';

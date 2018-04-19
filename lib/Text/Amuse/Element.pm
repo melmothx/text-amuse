@@ -70,6 +70,12 @@ sub rawline {
     return $self->{rawline};
 }
 
+=head3 raw_without_anchors
+
+Return the original string, but with anchors stripped out.
+
+=cut
+
 sub raw_without_anchors {
     my $self = shift;
     return $self->{raw_without_anchors};
@@ -101,6 +107,15 @@ A list of anchors for this element.
 =head2 add_to_anchors(@list)
 
 Add the anchors passed to the constructor to this element.
+
+=head2 remove_anchors
+
+Empty the anchors array in the element
+
+=head2 move_anchors_to($element)
+
+Remove the anchors from this element and add them to the one passed as
+argument.
 
 =cut
 
@@ -519,6 +534,12 @@ sub _set_element_number {
     my ($self, $num) = @_;
     $self->{element_number} = $num;
 }
+
+=head3 is_header
+
+Return 1 if the element type is h1/h6, 0 otherwise.
+
+=cut
 
 sub is_header {
     my $self = shift;
