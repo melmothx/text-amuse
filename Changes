@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.10 UNRELEASED
+
+ - Improve anchors restoring compatibility with Emacs Muse (#39)
+
 1.01 2018-03-31
 
  - Removed noisy warning (thanks @labdsf)
