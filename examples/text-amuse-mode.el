@@ -40,7 +40,11 @@
   "\n<play>\n" _ "\n</play>\n")
 
 (define-skeleton amuse-mode-insert-example "Insert <example></example>" "Text: "
-  "\n<example>\n" _ "\n</example>\n")
+  "\n{{{\n" _ "\n</}}}\n")
+
+(define-skeleton amuse-mode-insert-verse "Insert <verse></verse>" "Text: "
+  "\n<verse>\n" _ "\n</verse>\n")
+
 
 (defvar amuse-mode-map
   (let ((map (make-sparse-keymap)))
@@ -48,6 +52,7 @@
     (define-key map "\C-c\C-b" 'amuse-mode-insert-biblio)
     (define-key map "\C-c\C-p" 'amuse-mode-insert-play)
     (define-key map "\C-c\C-e" 'amuse-mode-insert-example)
+    (define-key map "\C-c\C-v" 'amuse-mode-insert-verse)
     map))
 
 (define-derived-mode amuse-mode text-mode "Text::Amuse"
