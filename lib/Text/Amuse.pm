@@ -455,6 +455,7 @@ sub _language_mapping {
             et => 'estonian',
             fi => 'finnish',
             fr => 'french',
+            id => 'bahasai',
             ga => 'irish',
             gl => 'galician',
             he => 'hebrew',  # R2L, unsupported so far
