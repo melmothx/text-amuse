@@ -1353,12 +1353,20 @@ sub format_single_link {
             return "\\hyperref{}{amuse}{$linkname}{$linkname}";
         }
     }
+
+    my $url = $self->_url_safe_escape($link);
+    my $desc = $self->safe($link);
     if ($self->is_html) {
-        $link = $self->_url_safe_escape($link);
-        return qq{<a class="text-amuse-link" href="$link">$link</a>};
+        return qq{<a class="text-amuse-link" href="$url">$desc</a>};
     }
     elsif ($self->is_latex) {
-        return "\\url{" . $self->_url_safe_escape($link) . "}";
+        if ($link eq $url) {
+            return "\\url{$url}";
+        }
+        else {
+            # URL was percent-encoded, display original URL
+            return "\\href{$url}{$desc}";
+        }
     }
     else { die "Not reached" }
 }
