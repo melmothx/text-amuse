@@ -1357,16 +1357,10 @@ sub format_single_link {
     my $url = $self->_url_safe_escape($link);
     my $desc = $self->safe($link);
     if ($self->is_html) {
-        return qq{<a class="text-amuse-link" href="$url">$desc</a>};
+        return qq{<a class="text-amuse-link text-amuse-is-single-link" href="$url">$desc</a>};
     }
     elsif ($self->is_latex) {
-        if ($link eq $url) {
-            return "\\url{$url}";
-        }
-        else {
-            # URL was percent-encoded, display original URL
-            return "\\href{$url}{$desc}";
-        }
+        return "\\href{$url}{\\texttt{$desc}}";
     }
     else { die "Not reached" }
 }
