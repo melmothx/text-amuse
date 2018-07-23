@@ -12,7 +12,7 @@ BEGIN {
         *eq_or_diff = \&is_deeply;
     }
 }
-use Test::More tests => 4;
+use Test::More tests => 8;
 
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
@@ -27,9 +27,9 @@ Text <<<و اساسی است باید مجانی باشد>>>
 left to right and again
  <<<و اساسی است باید مجانی باشد>>>
 
->>>Text goes left to rigth<<< 
+>>>Text goes left to right<<< 
 <<<اساسی است باید مجانی>>> 
->>>Text goes left to rigth<<< 
+>>>Text goes left to right<<< 
 <<<اساسی است باید مجانی>>>
 
 MUSE
@@ -57,9 +57,9 @@ left to right and again
 </p>
 
 <p>
-<span dir="ltr">Text goes left to rigth</span>&#x200F;
+<span dir="ltr">Text goes left to right</span>&#x200F;
 <span dir="rtl">اساسی است باید مجانی</span>&#x200E;
-<span dir="ltr">Text goes left to rigth</span>&#x200F;
+<span dir="ltr">Text goes left to right</span>&#x200F;
 <span dir="rtl">اساسی است باید مجانی</span>&#x200E;
 </p>
 HTML
@@ -71,14 +71,16 @@ left to right and again
  \RL{و اساسی است باید مجانی باشد}
 
 
-\LR{Text goes left to rigth}
+\LR{Text goes left to right}
 \RL{اساسی است باید مجانی}
-\LR{Text goes left to rigth}
+\LR{Text goes left to right}
 \RL{اساسی است باید مجانی}
 
 LTX
     eq_or_diff $obj->as_html, $html;
     eq_or_diff $obj->as_latex, $latex;
+    ok !$obj->is_rtl;
+    ok $obj->is_bidi;
 }
 
 {
@@ -106,7 +108,8 @@ this does nothing
 LTX
     eq_or_diff $obj->as_html, $html;
     eq_or_diff $obj->as_latex, $latex;
-
+    ok $obj->is_rtl;
+    ok $obj->is_bidi;
 }
 
 
