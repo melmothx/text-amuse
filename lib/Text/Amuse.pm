@@ -605,7 +605,17 @@ sub is_bidi {
     return shift->document->bidi_document;
 }
 
-
+sub font_script {
+    my $self = shift;
+    my %scripts = (
+                   mk => 'Cyrillic',
+                   ru => 'Cyrillic',
+                   fa => 'Arabic',
+                   ar => 'Arabic',
+                   he => 'Hebrew',
+                  );
+    return $scripts{$self->language_code} || 'Latin';
+}
 
 =head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP
 
