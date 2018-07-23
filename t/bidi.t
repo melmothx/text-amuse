@@ -43,7 +43,7 @@ my $esum =<<'MUSE';
 و اساسی اس<verbatim> >>>
 this does nothing
 <<<</verbatim>
->ت باید مجانی باشد
+<<<ت باید مجانی باشد
 MUSE
 
 {
@@ -93,7 +93,8 @@ LTX
 و اساسی اس &gt;&gt;&gt;
 this does nothing
 &lt;&lt;&lt;
-&gt;ت باید مجانی باشد
+<span dir="rtl">ت باید مجانی باشد
+</span>&#x200E;
 </p>
 HTML
     my $latex = <<'LTX';
@@ -103,7 +104,8 @@ HTML
 و اساسی اس >>>
 this does nothing
 <<<
->ت باید مجانی باشد
+\RL{ت باید مجانی باشد
+}
 
 LTX
     eq_or_diff $obj->as_html, $html;

@@ -569,7 +569,13 @@ sub manage_regular {
             push @processed, $piece;
         }
     }
-
+    if ($current_direction) {
+        push @processed, Text::Amuse::InlineElement->new(string => '',
+                                                         fmt => $self->fmt,
+                                                         tag => $current_direction,
+                                                         type => 'close');
+        $current_direction = '';
+    }
 
     # now we decide what to do with the inline elements: either turn
     # them into open/close tag via unroll, or turn them into regular
