@@ -37,6 +37,7 @@ sub new {
                 _current_footnote_stack  => [],
                 _list_element_pile => [],
                 _list_parsing_output => [],
+                _bidi_document => 0,
                };
     if (@_ % 2 == 0) {
         %args = @_;
@@ -131,6 +132,14 @@ sub attachments {
     else {
         return sort(keys %{$self->{_attached_files}});
     }
+}
+
+sub bidi_document {
+    shift->{_bidi_document};
+}
+
+sub set_bidi_document {
+    shift->{_bidi_document} = 1;
 }
 
 
