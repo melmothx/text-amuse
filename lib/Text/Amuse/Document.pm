@@ -468,7 +468,7 @@ sub _parse_body {
                     push @parsed, $block;
                 }
             }
-            push @pile, @carry_on;
+            push @pile, reverse @carry_on;
         }
         push @parsed, $el;
     }
