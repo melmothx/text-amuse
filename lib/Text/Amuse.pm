@@ -590,6 +590,28 @@ sub hyphenation {
     return $self->{_doc_hyphenation};
 }
 
+=head3 is_rtl
+
+Return true if the language is RTL (ar, he, fa -- so far)
+
+=head3 is_bidi
+
+Return true if the document use direction switches.
+
+=head3 html_direction
+
+Return the direction (rtl or ltr) of the document, based on the
+language
+
+=head3 font_script
+
+Return the script of the language.
+
+Implemented for Russian, Macedonian, Farsi, Arabic, Hebrew. Otherwise
+return Latin.
+
+=cut
+
 sub is_rtl {
     my $self = shift;
     my $lang = $self->language_code;
@@ -603,6 +625,16 @@ sub is_rtl {
 
 sub is_bidi {
     return shift->document->bidi_document;
+}
+
+sub html_direction {
+    my $self = shift;
+    if ($self->is_rtl) {
+        return 'rtl';
+    }
+    else {
+        return 'ltr';
+    }
 }
 
 sub font_script {
