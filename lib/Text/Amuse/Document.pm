@@ -134,6 +134,16 @@ sub attachments {
     }
 }
 
+=head3 bidi_document
+
+Return true if the document uses a bidirectionl marker.
+
+=head3 set_bidi_document
+
+Internal, set the bidi flag on.
+
+=cut
+
 sub bidi_document {
     shift->{_bidi_document};
 }
