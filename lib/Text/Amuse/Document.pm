@@ -305,6 +305,31 @@ sub _parse_body {
             $el->type('verse');
         }
     }
+    # turn the direction switching into proper open/close blocks
+    {
+        my $current_direction = '';
+        my %dirs = (
+                    '<<<' => 'rtl',
+                    '>>>' => 'ltr',
+                   );
+        foreach my $el (@parsed) {
+            if ($el->type eq 'bidimarker') {
+                $self->set_bidi_document;
+                my $dir = $dirs{$el->block} or die "Invalid bidimarker " . $el->block;
+                if ($current_direction and $current_direction ne $dir) {
+                    $el->type('stopblock');
+                    $el->block($current_direction);
+                    $current_direction = '';
+                }
+                else {
+                    warn "Direction already set to $current_direction!" if $current_direction;
+                    $el->type('startblock');
+                    $el->block($dir);
+                    $current_direction = $dir;
+                }
+            }
+        }
+    }
     $self->_reset_list_parsing_output;
   LISTP:
     while (@parsed) {
@@ -429,11 +454,21 @@ sub _parse_body {
             }
         }
         elsif (@pile and $el->should_close_blocks) {
+            my @carry_on;
+
+            my %keep = map { $_ => 1 } (qw/h1 h2 h3 h4 h5 h6 newpage table/);
+
             while (@pile) {
                 my $block = pop @pile;
-                warn "Forcing the closing of " . $block->block . "\n";
-                push @parsed, $block;
+                if (($block->block eq 'rtl' || $block->block eq 'ltr') and !$keep{$el->type}) {
+                    push @carry_on, $block;
+                }
+                else {
+                    warn "Forcing the closing of " . $block->block . "\n";
+                    push @parsed, $block;
+                }
             }
+            push @pile, @carry_on;
         }
         push @parsed, $el;
     }
@@ -545,6 +580,12 @@ sub _parse_string {
     }
     if ($l =~ m!^(<($blockre)>\s*)$!s) {
         $element{type} = "startblock";
+        $element{removed} = $1;
+        $element{block} = $2;
+        return %element;
+    }
+    if ($l =~ m/^((\<\<\<|\>\>\>)\s*)$/s) {
+        $element{type} = "bidimarker";
         $element{removed} = $1;
         $element{block} = $2;
         return %element;

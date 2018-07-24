@@ -1443,6 +1443,30 @@ sub blk_table {
 
 sub _build_blk_table {
     my $table = {
+            'rtl' => {
+                      start => {
+                                html => '<div dir="rtl">',
+                                # ltx => "\n\\setRTL\%",
+                                ltx => "\n\\begin{RTL}\n",
+                              },
+                      stop => {
+                                html => "</div>\n",
+                                ltx => "\n\\end{RTL}\n",
+                               # ltx => "\n\\setLTR\%",
+                               },
+                     },
+            'ltr' => {
+                      start => {
+                                html => '<div dir="ltr">',
+                                ltx => "\n\\begin{LTR}\n",
+                                # ltx => "\n\\setLTR\%",
+                              },
+                      stop => {
+                               html => "</div>\n", #  RLM (U+200F RIGHT-TO-LEFT MARK)
+                               ltx => "\n\\end{LTR}\n",
+                               # ltx => "\n\\setRTL\%",
+                               },
+                     },
                                   p =>  { start => {
                                                     ltx => "\n",
                                                     html => "\n<p>\n",
