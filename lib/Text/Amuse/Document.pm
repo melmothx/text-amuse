@@ -454,13 +454,13 @@ sub _parse_body {
             }
         }
         elsif (@pile and $el->should_close_blocks) {
-            my @carry_on;
 
-            my %keep = map { $_ => 1 } (qw/h1 h2 h3 h4 h5 h6 newpage table/);
+            my @carry_on;
+            my %close_rtl = map { $_ => 1 } (qw/h1 h2 h3 h4 h5 h6 newpage/);
 
             while (@pile) {
                 my $block = pop @pile;
-                if (($block->block eq 'rtl' || $block->block eq 'ltr') and !$keep{$el->type}) {
+                if (($block->block eq 'rtl' || $block->block eq 'ltr') and !$close_rtl{$el->type}) {
                     push @carry_on, $block;
                 }
                 else {
