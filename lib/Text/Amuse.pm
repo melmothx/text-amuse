@@ -443,7 +443,7 @@ Babel, Polyglossia, etc.
 sub _language_mapping {
     my $self = shift;
     return {
-            ar => 'arabic', # R2L, unsupported so far
+            ar => 'arabic', # R2L
             bg => 'bulgarian',
             ca => 'catalan',
             cs => 'czech',
@@ -453,12 +453,13 @@ sub _language_mapping {
             en => 'english',
             es => 'spanish',
             et => 'estonian',
+            fa => 'farsi', # R2L
             fi => 'finnish',
             fr => 'french',
             id => 'bahasai',
             ga => 'irish',
             gl => 'galician',
-            he => 'hebrew',  # R2L, unsupported so far
+            he => 'hebrew',  # R2L
             hi => 'hindi',
             hr => 'croatian',
             hu => 'magyar',
@@ -589,6 +590,64 @@ sub hyphenation {
     return $self->{_doc_hyphenation};
 }
 
+=head3 is_rtl
+
+Return true if the language is RTL (ar, he, fa -- so far)
+
+=head3 is_bidi
+
+Return true if the document use direction switches.
+
+=head3 html_direction
+
+Return the direction (rtl or ltr) of the document, based on the
+language
+
+=head3 font_script
+
+Return the script of the language.
+
+Implemented for Russian, Macedonian, Farsi, Arabic, Hebrew. Otherwise
+return Latin.
+
+=cut
+
+sub is_rtl {
+    my $self = shift;
+    my $lang = $self->language_code;
+    my %rtl = (
+               ar => 1,
+               he => 1,
+               fa => 1,
+              );
+    return $rtl{$lang};
+}
+
+sub is_bidi {
+    return shift->document->bidi_document;
+}
+
+sub html_direction {
+    my $self = shift;
+    if ($self->is_rtl) {
+        return 'rtl';
+    }
+    else {
+        return 'ltr';
+    }
+}
+
+sub font_script {
+    my $self = shift;
+    my %scripts = (
+                   mk => 'Cyrillic',
+                   ru => 'Cyrillic',
+                   fa => 'Arabic',
+                   ar => 'Arabic',
+                   he => 'Hebrew',
+                  );
+    return $scripts{$self->language_code} || 'Latin';
+}
 
 =head1 DIFFERENCES WITH THE ORIGINAL EMACS MUSE MARKUP
 
