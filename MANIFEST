@@ -77,6 +77,12 @@ t/testfiles/br-in-footnotes.muse
 t/testfiles/breaklist.exp.html
 t/testfiles/breaklist.exp.ltx
 t/testfiles/breaklist.muse
+t/testfiles/broken-bidi-1.exp.html
+t/testfiles/broken-bidi-1.exp.ltx
+t/testfiles/broken-bidi-1.muse
+t/testfiles/broken-bidi-2.exp.html
+t/testfiles/broken-bidi-2.exp.ltx
+t/testfiles/broken-bidi-2.muse
 t/testfiles/broken-inline.exp.html
 t/testfiles/broken-inline.exp.ltx
 t/testfiles/broken-inline.muse
