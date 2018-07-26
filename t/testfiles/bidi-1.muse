@@ -60,3 +60,11 @@ Source code, LTR
 {1} قدمت اولین متن‌های به جا مانده از توابع مثلثاتی به دوران پیش از میلاد در مصر باستان و یونان باستان بازمی‌گردد؟
 
 {2} قدمت اولین متن‌های به جا مانده از توابع مثلثاتی به دوران پیش از میلاد در مصر باستان و یونان باستان بازمی‌گردد؟
+
+** Verbatim
+
+{{{
+You can use <<< >>> to switch directions
+}}}
+
+You can use <verbatim><<<</verbatim> and  <verbatim>>>></verbatim> to switch directions
