@@ -83,6 +83,9 @@ t/testfiles/broken-bidi-1.muse
 t/testfiles/broken-bidi-2.exp.html
 t/testfiles/broken-bidi-2.exp.ltx
 t/testfiles/broken-bidi-2.muse
+t/testfiles/broken-bidi-3.exp.html
+t/testfiles/broken-bidi-3.exp.ltx
+t/testfiles/broken-bidi-3.muse
 t/testfiles/broken-inline.exp.html
 t/testfiles/broken-inline.exp.ltx
 t/testfiles/broken-inline.muse
