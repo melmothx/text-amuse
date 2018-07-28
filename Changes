@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.21 2018-07-28
+
+ - Trigger the parsing on is_bidi and attachments calls
+
 1.20 2018-07-26
 
  - Introduce EXPERIMENTAL markup for RTL/LTR with <<< >>> markers
