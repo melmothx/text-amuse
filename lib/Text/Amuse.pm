@@ -415,15 +415,13 @@ sub header_as_latex {
 
 =head3 attachments
 
-Report the attachments (images) found, as a list. This can be invoked
-only after a call (direct or indirect) to C<as_html> or C<as_latex>,
-or any other operation which scans the body, otherwise you'll get an
-empty list.
+Report the attachments (images) found, as a list.
 
 =cut
 
 sub attachments {
     my $self = shift;
+    $self->as_latex;
     return $self->document->attachments;
 }
 
@@ -624,7 +622,10 @@ sub is_rtl {
 }
 
 sub is_bidi {
-    return shift->document->bidi_document;
+    my $self = shift;
+    # trigger the parsing
+    $self->as_latex;
+    return $self->document->bidi_document;
 }
 
 sub html_direction {
