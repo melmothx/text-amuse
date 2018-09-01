@@ -439,7 +439,7 @@ sub inline_elements {
 
                             (?<verbatim>      \<verbatim\> .*? \<\/verbatim\>      ) |
                             (?<verbatim_code> \<code\>     .*? \<\/code\>          ) |
-                            (?<verbatim_code> (?<!\w)\=(?=\S)  .+? (?<=\S)\=(?!\w) ) |
+                            (?<verbatim_code> (?<![[:alnum:]])\=(?=\S)  .+? (?<=\S)\=(?![[:alnum:]]) ) |
                             (?<bidimarker>   (?:\<\<\<|\>\>\>) ) |
                             (?<pri_footnote> \s*\[[1-9][0-9]*\]) |
                             (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
@@ -593,8 +593,8 @@ sub manage_regular {
             my $el = $processed[$i];
             if ($el->type eq 'inline') {
                 if ($i > 0 and $i < $#processed) {
-                    if ($processed[$i - 1]->string =~ m/\w\z/ and
-                        $processed[$i + 1]->string =~ m/\A\w/) {
+                    if ($processed[$i - 1]->string =~ m/[[:alnum:]]\z/ and
+                        $processed[$i + 1]->string =~ m/\A[[:alnum:]]/) {
                         $el->type('text');
                         $el->tag('');
                     }
@@ -654,7 +654,7 @@ sub manage_regular {
                     }
                 }
                 elsif ($next->string =~ m/\A\S/ and
-                    $previous->string =~ m/\W\z/ and
+                    $previous->string =~ m/[[:^alnum:]]\z/ and
                     scalar(grep { $_->tag eq $piece->tag } @processed)) {
                     print "Opening " . $piece->string . "\n" if DEBUG;
                     $piece->type('open_inline');

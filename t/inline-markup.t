@@ -3,6 +3,12 @@ use utf8;
 use strict;
 use warnings;
 use Test::More;
+
+my $builder = Test::More->builder;
+binmode $builder->output,         ":encoding(UTF-8)";
+binmode $builder->failure_output, ":encoding(UTF-8)";
+binmode $builder->todo_output,    ":encoding(UTF-8)";
+
 use Text::Amuse::Functions qw/muse_to_object/;
 
 my @tests = (
@@ -14,7 +20,7 @@ my @tests = (
              [ 'foo*bar*' => 'foo*bar*',           ],
              [ '*foo*bar' => '*foo*bar',           ],
              [ '*foo*0bar' => '*foo*0bar',         ],
-             [ '*foo*_underscore' => '*foo*_underscore' ],
+             [ '*foo*_underscore' => '<em>foo</em>_underscore' ],
 
              # symmetry
              [ '*foo*,bar' => '<em>foo</em>,bar',  ],
@@ -23,11 +29,20 @@ my @tests = (
              [ '**foo**,bar' => '<strong>foo</strong>,bar',  ],
              [ 'foo,**bar**' => 'foo,<strong>bar</strong>',  ],
 
-             [ 'foo_*bar*_baz' => 'foo_*bar*_baz' ],
+             [ 'foo_*bar*_baz' => 'foo_<em>bar</em>_baz' ],
              [ 'foo-*bar*-baz' => 'foo-<em>bar</em>-baz' ],
-             [ 'foo_*bar*-baz' => 'foo_*bar*-baz' ],
-             [ 'foo-*bar*_baz' => 'foo-*bar*_baz' ],
+             [ 'foo_*bar*-baz' => 'foo_<em>bar</em>-baz' ],
+             [ 'foo-*bar*_baz' => 'foo-<em>bar</em>_baz' ],
 
+             [
+              'Hello *¡Hola!* *байна* *ຂໍໃຫ້ໂຊກດີ* *નમસ્તે*'
+              . ' *Здра́вствуйте!* *Γειά σας* *السّلام عليكم*',
+              'Hello <em>¡Hola!</em> <em>байна</em> <em>ຂໍໃຫ້ໂຊກດີ</em>'
+              . ' <em>નમસ્તે</em> <em>Здра́вствуйте!</em> <em>Γειά σας</em>'
+              . ' <em>السّلام عليكم</em>'
+             ],
+
+             [ 'નમ*સ્*તે', 'નમ*સ્*તે' ],
 
              # confusing input, got outclosed, garbage in/garbage out.
              [ '*foo *bar*' => "<em>foo <em>bar</em>\n</em>", {skip_adding => 1}],
@@ -39,18 +54,18 @@ my @tests = (
 
              [ '*"foo"* and **!bar!**' => '<em>&quot;foo&quot;</em> and <strong>!bar!</strong>',],
 
-             # Asterisk and equal symbols (<verbatim>*, **, ***
-             # =</verbatim>) are interpreted as markup elements if
-             # they are paired.
-
-             # The opening one must be preceded by something which is
-             # not a word (or at the beginning of the line) and
-             # followed by something which is not a space.
-
-             # The closing one must be preceded by something which is
-             # not a space, and followed by something which is not a
-             # word (or at the end of the line).
-
+# Asterisk and equal symbols (<verbatim>*, **, *** =</verbatim>) are
+# interpreted as markup elements if they are paired (an opening one and
+# a closing one).
+# 
+# The opening one must be preceded by something which is not an
+# alphanumerical character (or at the beginning of the line) and
+# followed by something which is not a space.
+# 
+# The closing one must be preceded by something which is not a space,
+# and followed by something which is not an alphanumerical character (or
+# at the end of the line).
+# 
              # Random unclear input gets an undefined behavior, for
              # that please use the tag versions (<verbatim><code>,
              # <em>, <strong>).
