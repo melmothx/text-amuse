@@ -14,6 +14,7 @@ my @tests = (
              [ 'foo*bar*' => 'foo*bar*',           ],
              [ '*foo*bar' => '*foo*bar',           ],
              [ '*foo*0bar' => '*foo*0bar',         ],
+             [ '*foo*_underscore' => '*foo*_underscore' ],
 
              # symmetry
              [ '*foo*,bar' => '<em>foo</em>,bar',  ],
@@ -21,6 +22,11 @@ my @tests = (
 
              [ '**foo**,bar' => '<strong>foo</strong>,bar',  ],
              [ 'foo,**bar**' => 'foo,<strong>bar</strong>',  ],
+
+             [ 'foo_*bar*_baz' => 'foo_*bar*_baz' ],
+             [ 'foo-*bar*-baz' => 'foo-<em>bar</em>-baz' ],
+             [ 'foo_*bar*-baz' => 'foo_*bar*-baz' ],
+             [ 'foo-*bar*_baz' => 'foo-*bar*_baz' ],
 
 
              # confusing input, got outclosed, garbage in/garbage out.
@@ -56,7 +62,7 @@ my @tests = (
              [ '=$var *test* $<=' => '<code>$var *test* $&lt;</code>' ],
             );
 
-my @contexts = ('', "/", " ", " material ", ",", ".", "(");
+my @contexts = ('', "/", " ", " material ", ",", ".", "(", "-");
 
 plan tests => scalar(@tests) * scalar(@contexts);
 
