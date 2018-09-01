@@ -43,6 +43,8 @@ my @tests = (
              ],
 
              [ 'નમ*સ્*તે', 'નમ*સ્*તે' ],
+             [ '*عل*يكم', '*عل*يكم'],
+             [ 'Здр*а́*вству*й*те!', 'Здр*а́*вству*й*те!'],
 
              # confusing input, got outclosed, garbage in/garbage out.
              [ '*foo *bar*' => "<em>foo <em>bar</em>\n</em>", {skip_adding => 1}],
