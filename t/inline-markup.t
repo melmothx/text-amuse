@@ -39,16 +39,13 @@ my @tests = (
 
              [ '*"foo"* and **!bar!**' => '<em>&quot;foo&quot;</em> and <strong>!bar!</strong>',],
 
-             # opening inline wants something not a word before, and something not a space after.
-             # closing inline wants something not a space before, and something not a word after.
-
              # Asterisk and equal symbols (<verbatim>*, **, ***
              # =</verbatim>) are interpreted as markup elements if
              # they are paired.
 
              # The opening one must be preceded by something which is
              # not a word (or at the beginning of the line) and
-             # followed by something not which is not a space.
+             # followed by something which is not a space.
 
              # The closing one must be preceded by something which is
              # not a space, and followed by something which is not a
