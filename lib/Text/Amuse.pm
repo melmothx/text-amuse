@@ -668,6 +668,19 @@ Emphasis and strong can also be written with tags, like <em>emphasis</em>,
 
 Added tag <sup> and <sub> for superscript and subscript.
 
+=head4 Inline logic
+
+Asterisk and equal symbols (*, **, *** =) are interpreted as markup
+elements if they are paired (an opening one and a closing one).
+
+The opening one must be preceded by something which is not an
+alphanumerical character (or at the beginning of the line) and
+followed by something which is not a space.
+
+The closing one must be preceded by something which is not a space,
+and followed by something which is not an alphanumerical character (or
+at the end of the line).
+
 =head3 Block markup
 
 The only tables supported are the native one (with ||| as separator).
