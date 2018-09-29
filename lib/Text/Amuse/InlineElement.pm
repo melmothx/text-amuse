@@ -51,6 +51,7 @@ sub new {
                 last_position => 0,
                 tag => '',
                 fmt => '',
+                lang => 'en',
                };
     foreach my $k (keys %$self) {
         if (defined $args{$k}) {
@@ -58,7 +59,7 @@ sub new {
         }
         delete $args{$k};
     }
-    die "Extra arguments passed %args" if %args;
+    die "Extra arguments passed :" . join(" ", %args) if %args;
     die "Missing type for <$self->{string}>" unless $self->{type};
     unless ($self->{fmt} eq 'ltx' or $self->{fmt} eq 'html') {
         die "Missing format $self->{fmt} for <$self->{string}>"
@@ -80,6 +81,16 @@ sub last_position {
 
 sub string {
     shift->{string};
+}
+
+=head2 lang
+
+The language code.
+
+=cut
+
+sub lang {
+    shift->{lang};
 }
 
 =head2 append($element)

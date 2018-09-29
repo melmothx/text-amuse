@@ -81,5 +81,8 @@ sub attachments {
     return;
 }
 
+sub language_code {
+    return 'en';
+}
 
 1;
