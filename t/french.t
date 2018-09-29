@@ -25,6 +25,10 @@ my $muse = <<'MUSE';
 
 "stop" . semicolon ; colon : question ? bang ! « quote »
 
+«quote»?
+
+is this a « quote » ?
+
 http://hello.org
 
 semicolon ; 
@@ -49,6 +53,14 @@ my $html = <<'HTML';
 
 <p>
 &quot;stop&quot; . semicolon&#160;; colon&#160;: question&#160;? bang&#160;! «&#160;quote&#160;»
+</p>
+
+<p>
+«&#160;quote&#160;»&#160;?
+</p>
+
+<p>
+is this a «&#160;quote&#160;»&#160;?
 </p>
 
 <p>

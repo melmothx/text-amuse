@@ -376,15 +376,16 @@ sub _html_french_punctuation {
     # unclear how it will rendered. However, keep them separate for now
 
     # optional space, punct, and then either space or end of line
-    $string =~ s/[\x{20}\x{a0}]*([;!?])(?=[\x{20}])/\x{a0}$1/gs;
-    $string =~ s/[\x{20}\x{a0}]*([;!?])$/\x{a0}$1/gms;
+    my $ws = qr{[\x{20}\x{a0}]};
+    $string =~ s/$ws*([;!?])(?=$ws)/\x{a0}$1/gs;
+    $string =~ s/$ws*([;!?])$/\x{a0}$1/gms;
 
     # ditto
-    $string =~ s/[\x{20}\x{a0}]*([:»])(?=[\x{20}])/\x{a0}$1/gs;
-    $string =~ s/[\x{20}\x{a0}]*([:»])$/\x{a0}$1/gms;
+    $string =~ s/$ws*([:»])(?=$ws)/\x{a0}$1/gs;
+    $string =~ s/$ws*([:»])$/\x{a0}$1/gms;
 
     # easy: always add
-    $string =~ s/«[\x{20}\x{a0}]*/«\x{a0}/gs;
+    $string =~ s/«$ws*/«\x{a0}/gs;
     return $string;
 }
 
