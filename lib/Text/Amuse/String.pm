@@ -64,6 +64,8 @@ They return nothing, but nevertheless the Output module won't complain.
 
 =item attachments
 
+=item language_code
+
 =back
 
 =cut
