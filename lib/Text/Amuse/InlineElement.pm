@@ -135,11 +135,15 @@ sub stringify {
             return $string;
         }
         elsif ($self->is_html) {
-            $string =  $self->escape_all_html($string);
             if ($self->lang eq 'fr') {
                 $string = $self->_html_french_punctuation($string);
+                $string = $self->escape_all_html($string);
+                $string =~ s/\x{a0}/&#160;/g; # make them visible
+                return $string;
             }
-            return $string;
+            else {
+                return $self->escape_all_html($string);
+            }
         }
         else {
             die "Not reached";
@@ -381,7 +385,6 @@ sub _html_french_punctuation {
 
     # easy: always add
     $string =~ s/«[\x{20}\x{a0}]*/«\x{a0}/gs;
-    $string =~ s/\x{a0}/&#160;/g; # make them visible
     return $string;
 }
 
