@@ -135,7 +135,11 @@ sub stringify {
             return $string;
         }
         elsif ($self->is_html) {
-            return $self->escape_all_html($string);
+            $string =  $self->escape_all_html($string);
+            if ($self->lang eq 'fr') {
+                $string = $self->_html_french_punctuation($string);
+            }
+            return $string;
         }
         else {
             die "Not reached";
@@ -341,6 +345,46 @@ sub _ltx_replace_slash {
     $string =~ s!/!\\Slash{}!g;
     return $string;
 }
+
+# https://unicode.org/udhr/n/notes_fra.html
+# espace fine insécable 	; 		espace justifiante
+# espace fine insécable 	! 		espace justifiante
+# espace fine insécable 	? 		espace justifiante
+
+# espace mots insécable 	: 		espace justifiante
+# espace mots insécable 	» 		espace justifiante
+
+# espace justifiante    	« 		espace mots insécable
+
+# espace justifiante 		tiret 	espace justifiante
+# pas de blanc 				, 		espace justifiante
+# pas de blanc 				. 		espace justifiante
+# espace justifiante 	( 	pas de blanc
+# espace justifiante 	[ 	pas de blanc
+# pas de blanc 	) 	espace justifiante
+# pas de blanc 	] 	espace justifiante
+
+
+sub _html_french_punctuation {
+    my ($self, $string) = @_;
+
+    # here we could use \x{202f}, but seems buggy, plus on readers is
+    # unclear how it will rendered. However, keep them separate for now
+
+    # optional space, punct, and then either space or end of line
+    $string =~ s/[\x{20}\x{a0}]*([;!?])(?=[\x{20}])/\x{a0}$1/gs;
+    $string =~ s/[\x{20}\x{a0}]*([;!?])$/\x{a0}$1/gms;
+
+    # ditto
+    $string =~ s/[\x{20}\x{a0}]*([:»])(?=[\x{20}])/\x{a0}$1/gs;
+    $string =~ s/[\x{20}\x{a0}]*([:»])$/\x{a0}$1/gms;
+
+    # easy: always add
+    $string =~ s/«[\x{20}\x{a0}]*/«\x{a0}/gs;
+    $string =~ s/\x{a0}/&#160;/g; # make them visible
+    return $string;
+}
+
 
 =head2 escape_all_html($string)
 
