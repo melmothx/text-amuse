@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use Data::Dumper;
-use Test::More tests => 4;
+use Test::More tests => 5;
 use Text::Amuse::Functions qw/muse_to_object muse_fast_scan_header muse_format_line/;
 my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
