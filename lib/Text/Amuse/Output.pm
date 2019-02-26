@@ -1987,4 +1987,6 @@ sub format_anchors {
 
 =back
 
+=cut
+
 1;
