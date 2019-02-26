@@ -419,13 +419,6 @@ is the processed string, the second is the processed anchors string.
 
 =back
 
-=cut
-
-sub _get_unique_counter {
-    my $self = shift;
-    ++$self->{_unique_counter};
-}
-
 =item inline_elements($string)
 
 Parse the provided string into a list of L<Text::Amuse::InlineElement>
