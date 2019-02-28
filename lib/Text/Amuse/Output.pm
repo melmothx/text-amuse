@@ -1085,7 +1085,7 @@ sub _format_stanza {
         $eol = "<br />\n";
     }
     elsif ($self->is_latex) {
-        $eol = "\\forcelinebreak\n";
+        $eol = " \\\\\n";
     }
     else { die "Not reached" };
 
