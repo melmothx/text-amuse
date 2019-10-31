@@ -699,8 +699,10 @@ sub manage_regular {
     @tracking = ();
     # print Dumper(\@pieces);
 
-    chomp (my $chomped_string = $string);
-    my $format_warning = sub($$) {
+    my $chomped_string = $string;
+    chomp($chomped_string);
+
+    my $format_warning = sub {
         my ($type, $tag) = @_;
         my $matching = 'closing';
         if ($type eq 'close' or $type eq 'close_inline') {
