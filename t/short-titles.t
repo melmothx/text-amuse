@@ -31,6 +31,16 @@ is_deeply([$doc->raw_html_toc],
             'level' => '3',
             'string' => 'Short',
            },
+           {
+             'index' => 4,
+             'level' => '1',
+             'string' => '| &lt;Weird&gt; &quot;\\\\one&quot;'
+           },
+           {
+             'string' => '',
+             'level' => '2',
+             'index' => 5
+           },
           ],
           "ToC is OK");
 
