@@ -8,11 +8,9 @@ use Text::Amuse;
 use File::Spec::Functions qw/catfile tmpdir/;
 use Data::Dumper;
 
-plan tests => 1;
+plan tests => 2;
 
 my $doc = Text::Amuse->new(file => catfile(qw/t testfiles titles-short.muse/));
-
-diag Dumper([$doc->raw_html_toc]);
 
 is_deeply([$doc->raw_html_toc],
           [
@@ -44,5 +42,4 @@ is_deeply([$doc->raw_html_toc],
           ],
           "ToC is OK");
 
-diag $doc->toc_as_html;
-
+unlike $doc->toc_as_html, qr{\#toc5};
