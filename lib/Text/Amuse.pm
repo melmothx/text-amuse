@@ -235,10 +235,11 @@ sub toc_as_html {
     foreach my $item (@toc) {
         next unless $item->{index}; # skip the 0 one, is dummy
         next unless length $item->{string}; # skip empty one at output level
+        my $anchor = $item->{named} ? $item->{named}  : 'toc' . $item->{index};
         my $line = qq{<p class="tableofcontentline toclevel} .
           $item->{level} . qq{"><span class="tocprefix">} .
           '&#160;&#160;' x  $item->{level} . "</span>" .
-            qq{<a href="#toc} . $item->{index} . qq{">} .
+            qq{<a href="#} . $anchor . qq{">} .
               $item->{string} . "</a></p>";
         push @out, $line;
     }
