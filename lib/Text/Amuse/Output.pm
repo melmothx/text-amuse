@@ -931,7 +931,7 @@ sub manage_header {
     undef $catch_fn;
     my ($first_anchor) = $el->anchors;
     # just in case, should be already vadidated
-    if ($first_anchor and $first_anchor =~ m/\w/a) {
+    if ($first_anchor and $first_anchor =~ m/[A-Za-z0-9]/) {
         $first_anchor =~ s/[^A-Za-z0-9-]//g;
         $first_anchor = 'text-amuse-label-' . $first_anchor;
     }
