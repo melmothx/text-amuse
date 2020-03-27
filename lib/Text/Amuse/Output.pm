@@ -1192,13 +1192,20 @@ sub manage_table_html {
             my $cells = shift @{$table->{$tablepart}};
 
             push @out, $map->{btr};
-            while (@$cells) {
-                my $cell = shift @$cells;
-                push @out, $map->{$tablepart}->{bcell},
+            my @cells = @$cells;
+            my $i = 0;
+            for (my $i = 0; $i < @cells; $i++) {
+                my $cell = $cells[$i];
+                my $spec;
+                if ($table->{specification}) {
+                    $spec = $table->{specification}->[$i];
+                }
+                push @out, $map->{$tablepart}->{bcell}->($spec),
                   $self->manage_regular($cell),
                     $map->{$tablepart}->{ecell},
                 }
             push @out, $map->{etr};
+            $i++;
         }
         push @out, $map->{$tablepart}->{e};
     }
@@ -1958,24 +1965,46 @@ sub url_re {
 
 =cut
 
+sub _format_table_tag {
+    my ($tag, $spec) = @_;
+    my $attrs = '';
+    if ($spec) {
+        my %specs = (
+                     c => 'center',
+                     l => 'left',
+                     r => 'right',
+                    );
+        if (my $align = $specs{$spec}) {
+            $attrs = qq{ style="text-align:$align"};
+        }
+    }
+    return '<' . $tag . $attrs . '>';
+}
+
 sub html_table_mapping {
     return {
             head => {
                      b => " <thead>",
                      e => " </thead>",
-                     bcell => "   <th>",
+                     bcell => sub {
+                         return "   " . _format_table_tag(th => @_);
+                     },
                      ecell => "   </th>",
                     },
             foot => {
                      b => " <tfoot>",
                      e => " </tfoot>",
-                     bcell => "   <td>",
+                     bcell => sub {
+                         return "   " . _format_table_tag(td => @_);
+                     },
                      ecell => "   </td>",
                     },
             body => {
                      b => " <tbody>",
                      e => " </tbody>",
-                     bcell => "   <td>",
+                     bcell => sub {
+                         return "   " . _format_table_tag(td => @_);
+                     },
                      ecell => "   </td>",
                     },
             btr => "  <tr>",
