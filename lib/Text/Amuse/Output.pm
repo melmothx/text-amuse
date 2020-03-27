@@ -1244,8 +1244,16 @@ sub manage_table_ltx {
     }
     $textable .= " \\begin{minipage}[t]{\\textwidth}\n";
     $textable .= "\\begin{tabularx}{\\textwidth}{" ;
-    $textable .= "|X" x $table->{counter};
-    $textable .= "|}\n";
+
+    if ($table->{specification}) {
+        $textable .= join('', @{$table->{specification}});
+    }
+    else {
+        # back compat
+        $textable .= "|X" x $table->{counter};
+        $textable .= "|";
+    }
+    $textable .= "}\n";
     if (my @head = @{$out->{head}}) {
         $textable .= "\\hline\n" . join("", @head);
     }
@@ -1277,6 +1285,39 @@ sub manage_table_ltx {
 
 =cut
 
+sub _table_row_specification {
+    my ($self, $cells) = @_;
+    my @spec;
+    foreach my $c (@$cells) {
+        # print "Examining $c\n";
+        if ($c =~ m/\A\s*\:?---+\:?\s*\z/) {
+            if ($c =~ m/\:-+\:/) {
+                push @spec, 'c';
+            }
+            elsif ($c =~ m/\:-/) {
+                push @spec, 'l';
+            }
+            elsif ($c =~ m/-\:/) {
+                push @spec, 'r';
+            }
+            else {
+                push @spec, 'X';
+            }
+        }
+        else {
+            # discard all and give up
+            @spec = ();
+            last;
+        }
+    }
+    if (@spec and @spec == @$cells) {
+        return @spec;
+    }
+    else {
+        return;
+    }
+}
+
 sub _split_table_in_hash {
     my ($self, $table) = @_;
     return {} unless $table;
@@ -1286,7 +1327,9 @@ sub _split_table_in_hash {
                   head => [],
                   foot => [],
                   counter => 0,
+                  specification => undef,
                  };
+  ROW:
     foreach my $row (split "\n", $table) {
         if ($row =~ m/\A\s*\|\+\s*(.+?)\s*\+\|\s*\z/) {
             $output->{caption} = $1;
@@ -1296,6 +1339,12 @@ sub _split_table_in_hash {
         my @cells = split /\|+/, $row;
         if ($output->{counter} < scalar(@cells)) {
             $output->{counter} = scalar(@cells);
+        }
+        if (!$output->{specification}) {
+            if (my @spec = $self->_table_row_specification(\@cells)) {
+                $output->{specification} = \@spec;
+                next ROW;
+            }
         }
         if ($row =~ m/\|\|\|/) {
             push @{$output->{foot}}, \@cells;
@@ -1312,6 +1361,13 @@ sub _split_table_in_hash {
                 # warn "Found uneven table: " . join (":", @$row), "\n";
                 push @$row, " ";
             }
+        }
+    }
+
+    # pad the specification with X if short.
+    if (my $spec = $output->{specification}) {
+        while (@$spec < $output->{counter}) {
+            push @$spec, 'X';
         }
     }
     return $output;
