@@ -1336,31 +1336,75 @@ sub _split_table_in_hash {
                   counter => 0,
                   specification => undef,
                  };
-  ROW:
-    foreach my $row (split "\n", $table) {
-        if ($row =~ m/\A\s*\|\+\s*(.+?)\s*\+\|\s*\z/) {
+
+    # remove the caption
+    my @rows;
+    my $caption_done = 0;
+    foreach my $r (split(/\n/, $table)) {
+        if ($r =~ m/\A\s*\|\+\s*(.+?)\s*\+\|\s*\z/) {
             $output->{caption} = $1;
-            next
+            $caption_done++;
         }
-        my $dest;
-        my @cells = split /\|+/, $row;
+        else {
+            push @rows, $r;
+        }
+    }
+
+    my $empty_first_cell = 0;
+    my @row_cells;
+    foreach my $r (@rows) {
+        my @cells = split /\|+/, $r;
+        my $type = 'body';
+        if ($r =~ m/\|\|\|/) {
+            $type = 'foot';
+        }
+        elsif ($r =~ m/\|\|/) {
+            $type = 'head';
+        }
+        if ($cells[0] =~ /\A\s*\z/) {
+            $empty_first_cell++;
+        }
+        push @row_cells, {
+                          cells => \@cells,
+                          type => $type,
+                         };
+    }
+
+    # consistently empty first cell: nuke
+    if ($empty_first_cell == @row_cells) {
+        foreach my $r (@row_cells) {
+            shift @{$r->{cells}};
+        }
+    }
+
+  ROW:
+    for (my $i = 0; $i < @row_cells; $i++) {
+
+        my @cells = @{$row_cells[$i]{cells}};
+        my $type = $row_cells[$i]{type};
+
         if ($output->{counter} < scalar(@cells)) {
             $output->{counter} = scalar(@cells);
         }
         if (!$output->{specification}) {
+            # print Dumper(\@cells);
             if (my @spec = $self->_table_row_specification(\@cells)) {
                 $output->{specification} = \@spec;
+                # print Dumper(\@cells);
+                # now, if we're on the second, the previous row was
+                # the header, so move it.
+                if ($i == 1) {
+                    # print Dumper($output);
+                    if (@{$output->{body}} == 1 and @{$output->{head}} == 0) {
+                        push @{$output->{head}}, shift @{$output->{body}};
+                    }
+                }
                 next ROW;
             }
         }
-        if ($row =~ m/\|\|\|/) {
-            push @{$output->{foot}}, \@cells;
-        } elsif ($row =~ m/\|\|/) {
-            push @{$output->{head}}, \@cells;
-        } else {
-            push @{$output->{body}}, \@cells;
-        }
+        push @{$output->{$type}}, \@cells;
     }
+
     # pad the cells with " " if their number doesn't match
     foreach my $part (qw/body head foot/) {
         foreach my $row (@{$output->{$part}}) {

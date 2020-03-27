@@ -23,6 +23,7 @@
      ("^ +.* :: " . font-lock-string-face)
      ("^ .* |+ .*$" . font-lock-constant-face)
      ("^ .* |\\+ .*$" . font-lock-constant-face)
+     ("^|+ .*$" . font-lock-constant-face)
      ("\\[\\[.*?\\]\\]" . font-lock-function-name-face)
      ("^ *#[0-9A-Za-z_-]+" . font-lock-function-name-face) ; including both anchor and directives
      ("^;.*$" . font-lock-comment-face)
