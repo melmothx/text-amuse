@@ -1537,6 +1537,10 @@ sub format_links {
             $link = "#text-amuse-label-$linkname";
         }
         elsif ($self->is_latex) {
+            # turn ?? placeholder in the page name; the starred
+            # version is without hyperlink, because we're already
+            # inside one.
+            $desc =~ s/\?\?/\\pageref*{textamuse:$linkname}/g;
             return "\\hyperref{}{amuse}{$linkname}{$desc}";
         }
     }

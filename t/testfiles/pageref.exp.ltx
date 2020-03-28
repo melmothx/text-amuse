@@ -3,14 +3,16 @@ Test me
 
 \chapter{This is the chapter}
 \hyperdef{amuse}{here}{}%
+\label{textamuse:here}%
 
 \chapter{Another}
 \hyperdef{amuse}{there}{}%
+\label{textamuse:there}%
 
 
 \clearpage
 
 
-Here on \hyperref{}{amuse}{here}{page ??} we talk,
-and \hyperref{}{amuse}{there}{on page ??} of another.
+Here on \hyperref{}{amuse}{here}{page \pageref*{textamuse:here}} we talk,
+and \hyperref{}{amuse}{there}{on page \pageref*{textamuse:there}} of another.
 
