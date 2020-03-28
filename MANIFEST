@@ -238,6 +238,9 @@ t/testfiles/packing.muse
 t/testfiles/pagebreaks.exp.html
 t/testfiles/pagebreaks.exp.ltx
 t/testfiles/pagebreaks.muse
+t/testfiles/pageref.exp.html
+t/testfiles/pageref.exp.ltx
+t/testfiles/pageref.muse
 t/testfiles/prova.exp.html
 t/testfiles/prova.exp.ltx
 t/testfiles/prova.muse
