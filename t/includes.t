@@ -16,7 +16,7 @@ BEGIN {
     }
 }
 
-plan tests => 15;
+plan tests => 18;
 
 
 # test with or without leading /, same thing.
@@ -127,7 +127,7 @@ Body begins
 
 #include ///
 
-#include ../../../../../../../../../../../../../../../../../../../../../etc/passwd/etc/passwd
+#include ../../../../../../../../../../../../../../../../../../../../../etc/passwd
 
 {{{
 #include ../../../../../../../../../../../../../../../../../../../../../etc/passwd
@@ -144,7 +144,7 @@ MUSE
                                                 ],
                               );
     ok scalar($obj->include_paths);
-    diag $obj->as_latex;
+    like $obj->as_html, qr{etc/passwd.*etc/passwd}s;
     ok !$obj->included_files;
 }
 
@@ -166,6 +166,43 @@ MUSE
                                                            ],
                                           });
     ok scalar($obj->include_paths);
-    diag $obj->as_latex;
     ok !$obj->included_files;
+    my $exp_html = <<'HTML';
+<div class="comment" style="display:none">exists, but the .. invalidates it.</div>
+
+<p>
+<a id="text-amuse-label-include" class="text-amuse-internal-anchor"></a>
+include/../include/pippo.muse
+</p>
+
+<p>
+<a id="text-amuse-label-include" class="text-amuse-internal-anchor"></a>
+include/./pippo.muse
+</p>
+
+<p>
+<a id="text-amuse-label-include" class="text-amuse-internal-anchor"></a>
+include/./pippo.muse
+</p>
+HTML
+    eq_or_diff $obj->as_html, $exp_html, "HTML OK";
+    my $exp_latex = <<'LATEX';
+% exists, but the .. invalidates it.
+
+\hyperdef{amuse}{include}{}%
+\label{textamuse:include}%
+include\Slash{}..\Slash{}include\Slash{}pippo.muse
+
+
+\hyperdef{amuse}{include}{}%
+\label{textamuse:include}%
+include\Slash{}.\Slash{}pippo.muse
+
+
+\hyperdef{amuse}{include}{}%
+\label{textamuse:include}%
+include\Slash{}.\Slash{}pippo.muse
+
+LATEX
+    eq_or_diff $obj->as_latex, $exp_latex, "LaTeX OK";
 }
