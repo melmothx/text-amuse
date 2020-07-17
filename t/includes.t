@@ -29,7 +29,7 @@ Body begins
 #include include/pippo.muse
 
 {{{
-#include /include/pippo.txt
+#include ///include/pippo.txt
 }}}
 MUSE
 
@@ -122,6 +122,8 @@ LATEX
 #title Try inclusion
 
 Body begins
+
+#include ///
 
 #include ../../../../../../../../../../../../../../../../../../../../../etc/passwd/etc/passwd
 

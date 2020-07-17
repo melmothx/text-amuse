@@ -387,11 +387,14 @@ sub _split_body_and_directives {
 sub _resolve_include {
     my ($self, $filename, $include_paths) = @_;
     my ($volume, $directories, $file) = File::Spec->splitpath($filename);
-    my @dirs = File::Spec->splitdir($directories);
+    my @dirs = grep { length $_ } File::Spec->splitdir($directories);
     # if hidden files or traversals are passed, bail out.
     if (grep { /^\./ } @dirs) {
         return;
     }
+    # just in case
+    return unless $file;
+
     # the base directory are set by the object, not by the user, so
     # they are considered safe.
     my @out;
