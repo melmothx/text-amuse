@@ -16,7 +16,7 @@ BEGIN {
     }
 }
 
-plan tests => 10;
+plan tests => 15;
 
 
 # test with or without leading /, same thing.
@@ -103,10 +103,11 @@ LATEX
     eq_or_diff($obj->as_latex, $expected_latex);
     is scalar($obj->included_files), 2, "Included files: " . Dumper([$obj->included_files]);
     unlike $obj->as_html, qr{\#include}, "string #included was replaced";
+    ok scalar($obj->include_paths);
 }
 {
     my $obj = muse_to_object($muse);
-    diag Dumper([ $obj->include_paths ]);
+    ok !scalar($obj->include_paths);
     is(scalar($obj->included_files), 0, "Nothing included") or diag Dumper([$obj->included_files]);
     like $obj->as_html, qr{pippo\.muse}, "string #included is still there";
     like $obj->as_html, qr{pippo\.txt}, "string #included is still there";
@@ -136,7 +137,34 @@ MUSE
     open (my $fh, '>:encoding(UTF-8)', $file) or die $!;
     print $fh $malicious;
     close $fh;
-    my $obj = Text::Amuse->new(file => $file);
+    my $obj = Text::Amuse->new(file => $file,
+                               include_paths => [
+                                                 $FindBin::Bin,
+                                                ],
+                              );
+    ok scalar($obj->include_paths);
+    diag $obj->as_latex;
+    ok !$obj->included_files;
+}
+
+{
+    my $malicious = <<MUSE;
+#title Try inclusion
+
+; exists, but the .. invalidates it.
+
+#include include/../include/pippo.muse
+
+#include include/./pippo.muse
+
+#include include/./pippo.muse
+MUSE
+    my $obj = muse_to_object($malicious, {
+                                          include_paths => [
+                                                            $FindBin::Bin,
+                                                           ],
+                                          });
+    ok scalar($obj->include_paths);
     diag $obj->as_latex;
     ok !$obj->included_files;
 }
