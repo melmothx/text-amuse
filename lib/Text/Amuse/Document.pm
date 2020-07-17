@@ -66,7 +66,7 @@ sub new {
         else {
             push @includes, $args{include_paths};
         }
-        $self->{include_paths} = [ grep { length($_) && -d $_  } @includes ];
+        $self->{include_paths} = [ grep { defined($_) && length($_) && -d $_  } @includes ];
     }
     $self->{debug} = 1 if $args{debug};
     bless $self, $class;

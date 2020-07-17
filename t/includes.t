@@ -93,6 +93,7 @@ LATEX
 {
     my $obj = muse_to_object($muse, {
                                      include_paths => [
+                                                       undef,
                                                        File::Spec->catdir($FindBin::Bin, 'non-existent'),
                                                        $FindBin::Bin,
                                                        # twice, so we test if it doesn't include twice
@@ -103,7 +104,7 @@ LATEX
     eq_or_diff($obj->as_latex, $expected_latex);
     is scalar($obj->included_files), 2, "Included files: " . Dumper([$obj->included_files]);
     unlike $obj->as_html, qr{\#include}, "string #included was replaced";
-    ok scalar($obj->include_paths);
+    is scalar($obj->include_paths), 2, "Only two paths are included (the valid ones)";
 }
 {
     my $obj = muse_to_object($muse);
