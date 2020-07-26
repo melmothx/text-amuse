@@ -145,7 +145,7 @@ sub include_paths {
 
 sub included_files {
     my $self = shift;
-    $self->as_latex;
+    $self->document->raw_body; # call it to get it populated
     return $self->document->included_files;
 }
 

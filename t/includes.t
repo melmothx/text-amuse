@@ -100,11 +100,16 @@ LATEX
                                                        $FindBin::Bin,
                                                       ]
                                     });
+    is scalar($obj->included_files), 2, "Included files: " . Dumper([$obj->included_files]);
     eq_or_diff($obj->as_html, $expected_html);
     eq_or_diff($obj->as_latex, $expected_latex);
-    is scalar($obj->included_files), 2, "Included files: " . Dumper([$obj->included_files]);
     unlike $obj->as_html, qr{\#include}, "string #included was replaced";
-    is scalar($obj->include_paths), 2, "Only two paths are included (the valid ones)";
+    is_deeply([ $obj->included_files],
+              [
+               File::Spec->catfile($FindBin::Bin, 'include', 'pippo.muse'),
+               File::Spec->catfile($FindBin::Bin, 'include', 'pippo.txt'),
+              ],
+              "Only two paths are included (the valid ones)");
 }
 {
     my $obj = muse_to_object($muse);
