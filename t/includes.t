@@ -238,8 +238,11 @@ MUSE
     ok scalar($obj->include_paths);
     ok !$obj->included_files;
     diag Dumper(\@warnings);
-    is scalar(@warnings), 3, "3 warnings found";
+    ok scalar(@warnings), "warnings found";
     like $warnings[0], qr{Directory traversal};
-    like $warnings[1], qr{Invalid file};
-    like $warnings[2], qr{Invalid file};
+  SKIP: {
+        skip "Skipped on windows", 2 if $^O eq 'MSWin32';
+        like $warnings[1], qr{Invalid file};
+        like $warnings[2], qr{Invalid file};
+    }
 }

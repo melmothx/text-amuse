@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.62 2020-07-26
+
+ - Fix tests on Windows
+
 1.61 2020-07-26
 
  - Fix missing documentation for included_files in Document class
