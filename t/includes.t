@@ -236,7 +236,12 @@ MUSE
                                                           ],
                                         });
     ok scalar($obj->include_paths);
-    ok !$obj->included_files;
+    if ($^O eq 'MSWin32') {
+        ok scalar($obj->included_files), "On windows backslash are fine";
+    }
+    else {
+        ok !$obj->included_files, "No file was included";
+    }
     diag Dumper(\@warnings);
     ok scalar(@warnings), "warnings found";
     like $warnings[0], qr{Directory traversal};

@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.63 2020-07-26
+
+ - Fix include-related test on Windows
+
 1.62 2020-07-26
 
  - Fix tests on Windows
