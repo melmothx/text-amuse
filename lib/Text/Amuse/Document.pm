@@ -72,6 +72,17 @@ sub new {
     bless $self, $class;
 }
 
+
+=item include_paths
+
+The return the list of directories where the included files need to be searched.
+
+=item included_files
+
+The return the list of files actually included.
+
+=cut
+
 sub include_paths {
     return @{ shift->{include_paths} };
 }
