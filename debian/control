@@ -3,7 +3,15 @@ Section: perl
 Priority: optional
 Maintainer: packager <melmothx@gmail.com>
 Build-Depends: debhelper (>= 9)
-Build-Depends-Indep: perl
+Build-Depends-Indep: perl,
+ libtest-differences-perl,
+ libtest-pod-perl,
+ libtest-pod-coverage-perl,
+ libtest-checkmanifest-perl,
+ libtest-memory-cycle-perl,
+ libdevel-size-perl,
+ libtext-diff-perl,
+ libcpan-changes-perl
 Standards-Version: 3.9.6
 Homepage: https://metacpan.org/release/Text-Amuse
 
