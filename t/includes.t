@@ -16,7 +16,7 @@ BEGIN {
     }
 }
 
-plan tests => 18;
+plan tests => 24;
 
 
 # test with or without leading /, same thing.
@@ -210,4 +210,36 @@ include\Slash{}.\Slash{}pippo.muse
 
 LATEX
     eq_or_diff $obj->as_latex, $exp_latex, "LaTeX OK";
+}
+
+{
+    my $not_good = <<'MUSE';
+#title Try slashes
+
+~~
+
+#include include/.pippo.muse
+
+#include include\pippo.muse
+
+#include include/pi\\ppo.muse
+
+MUSE
+    my @warnings;
+    local $SIG{__WARN__} = sub {
+        push @warnings, @_;
+    };
+
+    my $obj = muse_to_object($not_good, {
+                                         include_paths => [
+                                                           $FindBin::Bin,
+                                                          ],
+                                        });
+    ok scalar($obj->include_paths);
+    ok !$obj->included_files;
+    diag Dumper(\@warnings);
+    is scalar(@warnings), 3, "3 warnings found";
+    like $warnings[0], qr{Directory traversal};
+    like $warnings[1], qr{Invalid file};
+    like $warnings[2], qr{Invalid file};
 }

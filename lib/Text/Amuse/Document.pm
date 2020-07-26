@@ -389,7 +389,13 @@ sub _resolve_include {
     my ($volume, $directories, $file) = File::Spec->splitpath($filename);
     my @dirs = grep { length $_ } File::Spec->splitdir($directories);
     # if hidden files or traversals are passed, bail out.
-    if (grep { /^\./ } @dirs) {
+    if (grep { /^\./ } @dirs, $file) {
+        warn "Directory traversal or hidden file found in included $filename!";
+        return;
+    }
+    # if we have slash (unix) or backslash (windows), it's not good
+    if (grep { /[\/\\]/ } @dirs, $file) {
+        warn "Invalid file or directory name (slashes?) found in included $filename!";
         return;
     }
     # just in case
