@@ -4,7 +4,7 @@ use utf8;
 use Test::More;
 use Text::Amuse::Output::Image;
 
-plan tests => 52;
+plan tests => 54;
 my ($image, $ltx, $html);
 
 $image = Text::Amuse::Output::Image->new(
@@ -223,3 +223,29 @@ EOF
 
 is($image->as_latex, $ltx, "TeX output ok");
 
+$image = Text::Amuse::Output::Image->new(
+                                         width => 25,
+                                         wrap => "r",
+                                         filename => "test.png",
+                                         desc => 'Blabla',
+                                         rotate => 90,
+                                        );
+$html =<<'HTML';
+
+<div class="float_image_r" style="width:25%; transform:rotate(90deg); background: transparent;">
+<img src="test.png" alt="test.png" class="embedimg" />
+<div class="caption">Blabla</div>
+</div>
+HTML
+
+$ltx = <<'LTX';
+
+\begin{wrapfigure}{r}{0.25\textwidth}
+\centering
+\includegraphics[origin=c,angle=90,keepaspectratio=true,height=0.85\textheight,width=0.25\textwidth]{test.png}
+\caption[]{\noindent Blabla}
+\end{wrapfigure}
+LTX
+
+is $image->as_latex, $ltx, "LaTeX rotation ok";
+is $image->as_html, $html, "HTML rotation ok";
