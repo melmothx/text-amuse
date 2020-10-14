@@ -231,11 +231,12 @@ sub as_latex {
         $open = "\\begin{figure}[htbp!]";
         $close = "\\end{figure}";
     }
+    my $heightratio = $desc ? '0.85' : "";
     my $out = <<"EOF";
 
 $open
 \\centering
-\\includegraphics[keepaspectratio=true,height=0.75\\textheight,width=$width]{$src}$desc
+\\includegraphics[keepaspectratio=true,height=$heightratio\\textheight,width=$width]{$src}$desc
 $close
 EOF
     return $out;
