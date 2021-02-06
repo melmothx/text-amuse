@@ -1,6 +1,7 @@
 (defvar amuse-mode-tag-names
   '("quote" "biblio" "play" "comment" "verse" "center" "right" "example"
     "br" "verbatim"
+    "sc" "sf"
     "em" "strong" "code" "sup" "sub"))
 
 (defvar amuse-mode-font-lock-defaults
