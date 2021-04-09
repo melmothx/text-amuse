@@ -624,6 +624,7 @@ sub font_script {
                    fa => 'Arabic',
                    ar => 'Arabic',
                    he => 'Hebrew',
+                   el => 'Greek',
                   );
     return $scripts{$self->language_code} || 'Latin';
 }
