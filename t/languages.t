@@ -35,6 +35,11 @@ my %langs = (
              el => 'greek',
              eo => 'esperanto',
              zh => 'chinese',
+             ja => 'japanese',
+             ko => 'korean',
+             th => 'thai',
+             km => 'khmer',
+             my => 'burmese',
             );
 
 plan tests => (scalar(keys %langs) + 8) * 10 + 2;

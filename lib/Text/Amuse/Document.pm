@@ -254,8 +254,11 @@ sub _language_mapping {
             uk => 'ukrainian',
             vi => 'vietnamese',
             zh => 'chinese',
-            # ja => 'japanese',
-            # ko => 'korean',
+            ja => 'japanese',
+            ko => 'korean',
+            th => 'thai',
+            km => 'khmer',
+            my => 'burmese',
            };
 }
 
