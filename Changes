@@ -1,5 +1,9 @@
 Revision history for perl module Text::Amuse
 
+1.79 2022-01-15
+
+ - Add more language mappings
+
 1.78 2021-12-30
 
  - Add support for Chinese
