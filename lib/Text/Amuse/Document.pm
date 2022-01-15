@@ -222,7 +222,7 @@ sub _language_mapping {
             fa => 'farsi', # R2L
             fi => 'finnish',
             fr => 'french',
-            id => 'bahasai',
+            id => 'indonesian',
             ga => 'irish',
             gl => 'galician',
             he => 'hebrew',  # R2L
@@ -235,6 +235,7 @@ sub _language_mapping {
             lv => 'latvian',
             lt => 'lithuanian',
             ml => 'malayalam',
+            ms => 'malay',
             mk => 'macedonian', # needs workaround
             mr => 'marathi',
             nl => 'dutch',
@@ -251,6 +252,7 @@ sub _language_mapping {
             sq => 'albanian',
             sv => 'swedish',
             tr => 'turkish',
+            tl => 'filipino',
             uk => 'ukrainian',
             vi => 'vietnamese',
             zh => 'chinese',
