@@ -43,6 +43,7 @@ sub new {
                 _bidi_document => 0,
                 include_paths => [],
                 included_files => [],
+                _other_doc_language_codes => [],
                };
     if (@_ % 2 == 0) {
         %args = @_;
@@ -287,6 +288,35 @@ sub language {
         $self->{_doc_language} = $self->_language_mapping->{$lc};
     }
     return $self->{_doc_language};
+}
+
+sub other_language_codes {
+    my $self = shift;
+    return @{ $self->{_other_doc_language_codes} };
+}
+
+sub other_languages {
+    my $self = shift;
+    my $map = $self->_language_mapping;
+    my @out = map { $map->{$_} } $self->other_language_codes;
+    return @out;
+}
+
+sub _add_to_other_language_codes {
+    my ($self, $lang) = @_;
+    return unless $lang;
+    $lang = lc($lang);
+    if ($self->_language_mapping->{$lang}) {
+        if ($lang ne $self->language_code) {
+            unless (grep { $_ eq $lang } $self->other_language_codes) {
+                push @{$self->{_other_doc_language_codes}}, $lang;
+            }
+        }
+    }
+    else {
+        warn "Unknown language $lang";
+    }
+    return;
 }
 
 =item parse_directives

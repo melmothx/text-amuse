@@ -90,12 +90,12 @@ sub test_lang {
     is($doc->as_latex, "\nHello\n\n", "body ok");
     ok(!$doc->other_language_codes);
     ok(!$doc->other_languages);
-    if ($doc->language_code eq 'el') {
-        is $doc->font_script, 'Greek';
+    if ($lang eq 'en') {
+        $doc->document->_add_to_other_language_codes('en');
+        $doc->document->_add_to_other_language_codes('xx');
+        $doc->document->_add_to_other_language_codes('hr');
+        is_deeply [ $doc->other_languages ], [ 'croatian' ], "Found other languages";
+        is_deeply [ $doc->other_language_codes ], [ 'hr' ], "Found other language codes";
     }
-    if ($doc->language_code eq 'ru') {
-        is $doc->font_script, 'Cyrillic';
-    }
-
 }
 

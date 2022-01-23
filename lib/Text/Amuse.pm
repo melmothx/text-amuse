@@ -528,7 +528,7 @@ the future. It should return an arrayref or undef.
 =cut
 
 sub other_language_codes {
-    return;
+    shift->document->other_language_codes;
 }
 
 =item other_languages
@@ -540,7 +540,7 @@ arrayref or undef.
 
 
 sub other_languages {
-    return;
+    shift->document->other_languages;
 }
 
 =item hyphenation
