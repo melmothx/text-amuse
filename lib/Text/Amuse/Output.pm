@@ -4,6 +4,7 @@ use warnings;
 use utf8;
 use Text::Amuse::Output::Image;
 use Text::Amuse::InlineElement;
+use Text::Amuse::Utils;
 # use Data::Dumper::Concise;
 use constant DEBUG => 0;
 
@@ -174,7 +175,10 @@ sub process {
         }
         if ($el->type eq 'startblock') {
             die "startblock with string passed!: " . $el->string if $el->string;
-            push @pieces, $self->blkstring(start => $el->block, start_list_index => $el->start_list_index),
+            push @pieces, $self->blkstring(start => $el->block,
+                                           start_list_index => $el->start_list_index,
+                                           language => $el->language,
+                                          ),
               $self->format_anchors($el);
         }
         elsif ($el->type eq 'stopblock') {
@@ -1650,6 +1654,26 @@ sub blk_table {
 
 sub _build_blk_table {
     my $table = {
+                 languageswitch => {
+                                    start => {
+                                              html => sub {
+                                                  my %attrs = @_;
+                                                  my $lang = $attrs{language} || "en";
+                                                  return qq{<div lang="$lang">\n};
+                                              },
+                                              ltx => sub {
+                                                  my %attrs = @_;
+                                                  my $iso = $attrs{language} || "en";
+                                                  my $lang = Text::Amuse::Utils::language_mapping()->{$iso};
+                                                  return sprintf("\\begin{otherlanguage}{%s}\n",
+                                                                 $lang || "english");
+                                              }
+                                             },
+                                    stop => {
+                                             html => sub { return qq{</div>\n} },
+                                             ltx => "\\end{otherlanguage}\n",
+                                            },
+                                   },
             'rtl' => {
                       start => {
                                 html => '<div dir="rtl">',

@@ -3,6 +3,7 @@ package Text::Amuse::Document;
 use strict;
 use warnings;
 use Text::Amuse::Element;
+use Text::Amuse::Utils;
 use File::Spec;
 use constant {
     IMAJOR => 1,
@@ -199,70 +200,24 @@ The language code of the document. This method will looks into the
 header of the document, searching for the keys C<lang> or C<language>,
 defaulting to C<en>.
 
+=item other_language_codes
+
+Same as above, but for other languages declared with the experimental
+tag C<<[en>>
+
 =item language
 
 Same as above, but returns the human readable version, notably used by
 Babel, Polyglossia, etc.
 
+=item other_languages
+
+Same as above, for the other languages
+
 =cut
 
 sub _language_mapping {
-    my $self = shift;
-    return {
-            ar => 'arabic', # R2L
-            bg => 'bulgarian',
-            ca => 'catalan',
-            cs => 'czech',
-            da => 'danish',
-            de => 'german',
-            el => 'greek',
-            en => 'english',
-            eo => 'esperanto',
-            es => 'spanish',
-            et => 'estonian',
-            fa => 'farsi', # R2L
-            fi => 'finnish',
-            fr => 'french',
-            id => 'indonesian',
-            ga => 'irish',
-            gl => 'galician',
-            he => 'hebrew',  # R2L
-            hi => 'hindi',
-            hr => 'croatian',
-            hu => 'magyar',
-            is => 'icelandic',
-            it => 'italian',
-            lo => 'lao',
-            lv => 'latvian',
-            lt => 'lithuanian',
-            ml => 'malayalam',
-            ms => 'malay',
-            mk => 'macedonian', # needs workaround
-            mr => 'marathi',
-            nl => 'dutch',
-            no => 'norsk',
-            nn => 'nynorsk',
-            oc => 'occitan',
-            sr => 'serbian',
-            ro => 'romanian',
-            ru => 'russian',
-            sk => 'slovak',
-            sl => 'slovenian',
-            pl => 'polish',
-            pt => 'portuges',
-            sq => 'albanian',
-            sv => 'swedish',
-            tr => 'turkish',
-            tl => 'filipino',
-            uk => 'ukrainian',
-            vi => 'vietnamese',
-            zh => 'chinese',
-            ja => 'japanese',
-            ko => 'korean',
-            th => 'thai',
-            km => 'khmer',
-            my => 'burmese',
-           };
+    return Text::Amuse::Utils::language_mapping();
 }
 
 sub language_code {
@@ -310,13 +265,14 @@ sub _add_to_other_language_codes {
         if ($lang ne $self->language_code) {
             unless (grep { $_ eq $lang } $self->other_language_codes) {
                 push @{$self->{_other_doc_language_codes}}, $lang;
+                return $lang;
             }
         }
     }
     else {
         warn "Unknown language $lang";
     }
-    return;
+    return 'en';
 }
 
 =item parse_directives
@@ -539,6 +495,8 @@ sub _parse_body {
             push @parsed, $el;
         }
     }
+    $self->_debug(Dumper(\@parsed));
+
     # turn the versep into verse now that the merging is done
     foreach my $el (@parsed) {
         if ($el->type eq 'versep') {
@@ -732,7 +690,12 @@ sub elements {
     unless (defined $self->{_parsed_document}) {
         $self->{_parsed_document} = $self->_parse_body;
     }
-    return @{$self->{_parsed_document}}
+    if (defined wantarray) {
+        return @{$self->{_parsed_document}};
+    }
+    else {
+        return;
+    }
 }
 
 =item get_footnote
@@ -825,9 +788,29 @@ sub _parse_string {
         return %element;
     }
     if ($l =~ m/^((\<\<\<|\>\>\>)\s*)$/s) {
+        # here turn them into language switch
         $element{type} = "bidimarker";
         $element{removed} = $1;
         $element{block} = $2;
+        return %element;
+    }
+    if ($l =~ m/^(
+                    (
+                        \<
+                        (\/?)
+                        \[
+                        ([a-zA-Z-]+)
+                        \]
+                        \>
+                    )
+                    \s*
+                )$/sx) {
+        my ($all, $full, $close, $lang) = ($1, $2, $3, $4);
+        $element{type} = $close ? "stopblock" : "startblock";
+        $element{language} = $lang;
+        $element{removed} = $l;
+        $self->_add_to_other_language_codes($lang);
+        $element{block} = "languageswitch";
         return %element;
     }
     if ($l =~ m/^(\{\{\{)\s*$/s) {

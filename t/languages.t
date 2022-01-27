@@ -44,7 +44,7 @@ my %langs = (
              tl => 'filipino',
             );
 
-plan tests => (scalar(keys %langs) + 8) * 10 + 2;
+plan tests => (scalar(keys %langs) + 8) * 10 + 6;
 
 foreach my $k (keys %langs) {
     test_lang($k, $k, $langs{$k});
@@ -99,3 +99,39 @@ sub test_lang {
     }
 }
 
+{
+    my $fh = File::Temp->new(TEMPLATE => "musetestXXXXXX",
+                             SUFFIX => ".muse",
+                             TMPDIR => 1);
+    my $muse =<<'MUSE';
+#title test lang
+#lang en
+
+Hello
+
+<[hr]>
+
+Test
+
+</[hr]>
+
+Test
+
+<[it]>
+
+Ciao
+
+MUSE
+    binmode $fh, ":encoding(utf-8)";
+    print $fh $muse;
+    close $fh;
+    # print $fh->filename, "\n";
+    my $doc = Text::Amuse->new(file => $fh->filename,
+                               debug => 1);
+    # diag Dumper($doc->document->elements);
+    is $doc->language_code, "en";
+    is_deeply [ $doc->other_language_codes ], [qw/hr it/];
+    like $doc->as_latex, qr/croatian/;
+    like $doc->as_latex, qr/italian/;
+
+}

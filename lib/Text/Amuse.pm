@@ -6,6 +6,7 @@ use warnings;
 use Text::Amuse::Document;
 use Text::Amuse::Output;
 use Text::Amuse::Beamer;
+use Text::Amuse::Utils;
 
 =head1 NAME
 
@@ -482,7 +483,7 @@ Babel, Polyglossia, etc.
 =cut
 
 sub _language_mapping {
-    shift->document->_language_mapping;
+    return Text::Amuse::Utils::language_mapping();
 }
 
 =item header_defined
@@ -528,7 +529,10 @@ the future. It should return an arrayref or undef.
 =cut
 
 sub other_language_codes {
-    shift->document->other_language_codes;
+    my $self = shift;
+    # ensure the body is parsed
+    $self->document->elements;
+    $self->document->other_language_codes;
 }
 
 =item other_languages
