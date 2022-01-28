@@ -531,7 +531,7 @@ the future. It should return an arrayref or undef.
 sub other_language_codes {
     my $self = shift;
     # ensure the body is parsed
-    $self->document->elements;
+    $self->as_latex;
     $self->document->other_language_codes;
 }
 

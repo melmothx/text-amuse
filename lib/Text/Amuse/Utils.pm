@@ -14,6 +14,10 @@ Text::Amuse::Output - Internal module for L<Text::Amuse> output
 
 Return an hashref with the ISO language codes to Babel ones.
 
+=head2 get_latex_lang($iso)
+
+Return the babel name of the ISO language code. If missing or invalid return 'english'.
+
 =cut
 
 
@@ -74,6 +78,11 @@ sub language_mapping {
                 km => 'khmer',
                 my => 'burmese',
                };
+}
+
+sub get_latex_lang {
+    my $lang = shift || 'en';
+    return language_mapping()->{$lang} || 'english';
 }
 
 1;

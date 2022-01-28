@@ -44,7 +44,7 @@ my %langs = (
              tl => 'filipino',
             );
 
-plan tests => (scalar(keys %langs) + 8) * 10 + 6;
+plan tests => (scalar(keys %langs) + 8) * 10 + 9;
 
 foreach my $k (keys %langs) {
     test_lang($k, $k, $langs{$k});
@@ -119,6 +119,8 @@ Test
 
 <[it]>
 
+Hello <[fr]>Ćao</[fr]> inlined.
+
 Ciao
 
 MUSE
@@ -130,8 +132,14 @@ MUSE
                                debug => 1);
     # diag Dumper($doc->document->elements);
     is $doc->language_code, "en";
-    is_deeply [ $doc->other_language_codes ], [qw/hr it/];
-    like $doc->as_latex, qr/croatian/;
-    like $doc->as_latex, qr/italian/;
-
+    is_deeply [ $doc->other_language_codes ], [qw/hr it fr/];
+    my $html = $doc->as_html;
+    my $latex = $doc->as_latex;
+    like $latex, qr/croatian/;
+    like $latex, qr/italian/;
+    like $latex, qr/french/;
+    like $html, qr/<div lang="hr">.*<span lang="fr">/s;
+    is_deeply [ $doc->other_languages ], [qw/croatian italian french/];
+    diag $latex;
+    diag $html;
 }

@@ -462,7 +462,9 @@ sub inline_elements {
                             (?<sec_footnote> \s*\{[1-9][0-9]*\}) |
                             (?<tag> \<
                                 (?<close>\/?)
-                                (?<tag_name> strong | em |  strike | del | sup |  sub  | sf | sc )
+                                (?<tag_name> strong | em |  strike | del | sup |  sub  | sf | sc |
+                                    \[(?<lang>[a-z-]+)\]
+                                )
                                 \>
                             ) |
                             (?<nobreakspace>  \~\~         ) |
@@ -482,11 +484,15 @@ sub inline_elements {
                                                         lang => $self->_lang,
                                                        );
         }
+        my $inlined_lang = delete $captures{lang};
+        if ($inlined_lang) {
+            $self->document->_add_to_other_language_codes($inlined_lang);
+        }
         my %args = (
                     string => $raw,
                     last_position => $position,
                     fmt => $self->fmt,
-                    lang => $self->_lang,
+                    lang => $inlined_lang || $self->_lang,
                    );
 
         if (delete $captures{tag}) {
