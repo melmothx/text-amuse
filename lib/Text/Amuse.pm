@@ -522,9 +522,7 @@ sub language {
 
 =item other_language_codes
 
-Always return undef, because in the current implementation you can't
-switch language in the middle of a text. But could be implemented in
-the future. It should return an arrayref or undef.
+It returns an arrayref or undef.
 
 =cut
 
@@ -532,19 +530,21 @@ sub other_language_codes {
     my $self = shift;
     # ensure the body is parsed
     $self->as_latex;
-    $self->document->other_language_codes;
+    return $self->document->other_language_codes;
 }
 
 =item other_languages
 
-Always return undef. When and if implemented, it should return an
-arrayref or undef.
+It return an arrayref or undef.
 
 =cut
 
 
 sub other_languages {
-    shift->document->other_languages;
+    my $self = shift;
+    # ensure the body is parsed
+    $self->as_latex;
+    return $self->document->other_languages;
 }
 
 =item hyphenation

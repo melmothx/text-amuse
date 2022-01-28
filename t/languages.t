@@ -94,8 +94,8 @@ sub test_lang {
         $doc->document->_add_to_other_language_codes('en');
         $doc->document->_add_to_other_language_codes('xx');
         $doc->document->_add_to_other_language_codes('hr');
-        is_deeply [ $doc->other_languages ], [ 'croatian' ], "Found other languages";
-        is_deeply [ $doc->other_language_codes ], [ 'hr' ], "Found other language codes";
+        is_deeply $doc->other_languages, [ 'croatian' ], "Found other languages";
+        is_deeply $doc->other_language_codes, [ 'hr' ], "Found other language codes";
     }
 }
 
@@ -132,14 +132,14 @@ MUSE
                                debug => 1);
     # diag Dumper($doc->document->elements);
     is $doc->language_code, "en";
-    is_deeply [ $doc->other_language_codes ], [qw/hr it fr/];
+    is_deeply $doc->other_language_codes, [qw/hr it fr/];
     my $html = $doc->as_html;
     my $latex = $doc->as_latex;
     like $latex, qr/croatian/;
     like $latex, qr/italian/;
     like $latex, qr/french/;
     like $html, qr/<div lang="hr">.*<span lang="fr">/s;
-    is_deeply [ $doc->other_languages ], [qw/croatian italian french/];
+    is_deeply $doc->other_languages, [qw/croatian italian french/];
     diag $latex;
     diag $html;
 }

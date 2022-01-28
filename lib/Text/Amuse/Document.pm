@@ -247,14 +247,15 @@ sub language {
 
 sub other_language_codes {
     my $self = shift;
-    return @{ $self->{_other_doc_language_codes} };
+    my @out =  @{ $self->{_other_doc_language_codes} };
+    return @out ? \@out : undef;
 }
 
 sub other_languages {
     my $self = shift;
     my $map = $self->_language_mapping;
-    my @out = map { $map->{$_} } $self->other_language_codes;
-    return @out;
+    my @out = map { $map->{$_} } @{ $self->other_language_codes || [] };
+    return @out ? \@out : undef;
 }
 
 sub _add_to_other_language_codes {
@@ -263,7 +264,7 @@ sub _add_to_other_language_codes {
     $lang = lc($lang);
     if ($self->_language_mapping->{$lang}) {
         if ($lang ne $self->language_code) {
-            unless (grep { $_ eq $lang } $self->other_language_codes) {
+            unless (grep { $_ eq $lang } @{ $self->other_language_codes || [] }) {
                 push @{$self->{_other_doc_language_codes}}, $lang;
                 return $lang;
             }
