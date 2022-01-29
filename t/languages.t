@@ -4,6 +4,7 @@ use utf8;
 use Test::More;
 use Text::Amuse;
 use File::Temp;
+use Text::Amuse::Utils;
 use Data::Dumper;
 binmode STDOUT, ":encoding(utf-8)";
 binmode STDERR, ":encoding(utf-8)";
@@ -23,7 +24,7 @@ my %langs = (
              hr => 'croatian',
              ru => 'russian',
              es => 'spanish',
-             pt => 'portuges',
+             pt => 'portuguese',
              de => 'german',
              fr => 'french',
              nl => 'dutch',
@@ -41,16 +42,16 @@ my %langs = (
              km => 'khmer',
              my => 'burmese',
              ms => 'malay',
-             tl => 'filipino',
+             # tl => 'filipino',
             );
 
-plan tests => (scalar(keys %langs) + 8) * 10 + 9;
+plan tests => (scalar(keys %langs) + 8) * 10 + 14;
 
 foreach my $k (keys %langs) {
     test_lang($k, $k, $langs{$k});
 }
 
-foreach my $fake ("as", "lòasdf", "alkd", "alksdàa", "aàsdflk",  "aasdfà",  "aòlsdf" , "laò") {
+foreach my $fake ("asxx", "lòasdf", "alkd", "alksdàa", "aàsdflk",  "aasdfà",  "aòlsdf" , "laò") {
     test_lang($fake, en => "english");
     # print $fake, "\n";
 }
@@ -143,3 +144,9 @@ MUSE
     diag $latex;
     diag $html;
 }
+
+ok Text::Amuse::Utils::has_babel_ldf('it');
+ok Text::Amuse::Utils::has_babel_ldf('italian');
+ok !Text::Amuse::Utils::has_babel_ldf('zh');
+ok !Text::Amuse::Utils::has_babel_ldf('chinese');
+ok Text::Amuse::Utils::has_babel_ldf('croatian');
