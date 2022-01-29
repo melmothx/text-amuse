@@ -29,6 +29,7 @@
      ("^ *#[0-9A-Za-z_-]+" . font-lock-function-name-face) ; including both anchor and directives
      ("^;.*$" . font-lock-comment-face)
      ("\\*" . font-lock-warning-face)
+     ("</?\\[[A-Za-z_-]+\\]>" . font-lock-keyword-face)
      (,(concat "</?" (regexp-opt amuse-mode-tag-names 'words) ">") . font-lock-keyword-face))))
 
 
