@@ -22,6 +22,10 @@ Return the babel name of the ISO language code. If missing or invalid return 'en
 
 Return true if the babel name passed has an .ldf file.
 
+=head2 lang_code_is_rtl($iso)
+
+Return true if the language is RTL.
+
 =cut
 
 
@@ -471,6 +475,16 @@ sub has_babel_ldf {
 sub get_latex_lang {
     my $lang = shift || 'en';
     return language_mapping()->{$lang} || 'english';
+}
+
+sub lang_code_is_rtl {
+    my $lang = shift || 'en';
+    my %rtl = (
+               ar => 1,
+               he => 1,
+               fa => 1,
+              );
+    return $rtl{$lang};
 }
 
 1;

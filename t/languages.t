@@ -45,7 +45,7 @@ my %langs = (
              # tl => 'filipino',
             );
 
-plan tests => (scalar(keys %langs) + 8) * 10 + 14;
+plan tests => 369;
 
 foreach my $k (keys %langs) {
     test_lang($k, $k, $langs{$k});
@@ -91,6 +91,7 @@ sub test_lang {
     is($doc->as_latex, "\nHello\n\n", "body ok");
     ok(!$doc->other_language_codes);
     ok(!$doc->other_languages);
+    ok !$doc->is_bidi;
     if ($lang eq 'en') {
         $doc->document->_add_to_other_language_codes('en');
         $doc->document->_add_to_other_language_codes('xx');
@@ -122,7 +123,7 @@ Test
 
 Hello <[fr]>Ćao</[fr]> inlined.
 
-Ciao
+<[ar]>Ciao</[ar]>
 
 MUSE
     binmode $fh, ":encoding(utf-8)";
@@ -133,14 +134,15 @@ MUSE
                                debug => 1);
     # diag Dumper($doc->document->elements);
     is $doc->language_code, "en";
-    is_deeply $doc->other_language_codes, [qw/hr it fr/];
+    is_deeply $doc->other_language_codes, [qw/hr it fr ar/];
     my $html = $doc->as_html;
     my $latex = $doc->as_latex;
     like $latex, qr/croatian/;
     like $latex, qr/italian/;
     like $latex, qr/french/;
     like $html, qr/<div lang="hr">.*<span lang="fr">/s;
-    is_deeply $doc->other_languages, [qw/croatian italian french/];
+    is_deeply $doc->other_languages, [qw/croatian italian french arabic/];
+    ok $doc->is_bidi;
     diag $latex;
     diag $html;
 }
@@ -150,3 +152,5 @@ ok Text::Amuse::Utils::has_babel_ldf('italian');
 ok !Text::Amuse::Utils::has_babel_ldf('zh');
 ok !Text::Amuse::Utils::has_babel_ldf('chinese');
 ok Text::Amuse::Utils::has_babel_ldf('croatian');
+ok Text::Amuse::Utils::lang_code_is_rtl('ar');
+ok !Text::Amuse::Utils::lang_code_is_rtl('it');

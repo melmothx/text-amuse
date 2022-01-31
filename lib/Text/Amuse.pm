@@ -593,21 +593,16 @@ return Latin.
 =cut
 
 sub is_rtl {
-    my $self = shift;
-    my $lang = $self->language_code;
-    my %rtl = (
-               ar => 1,
-               he => 1,
-               fa => 1,
-              );
-    return $rtl{$lang};
+    Text::Amuse::Utils::lang_code_is_rtl(shift->language_code);
 }
 
 sub is_bidi {
     my $self = shift;
     # trigger the parsing
     $self->as_latex;
-    return $self->document->bidi_document;
+    return $self->document->bidi_document || scalar(grep { Text::Amuse::Utils::lang_code_is_rtl($_) }
+                                                    ($self->language_code,
+                                                     @{ $self->other_language_codes || [] }));
 }
 
 sub html_direction {
