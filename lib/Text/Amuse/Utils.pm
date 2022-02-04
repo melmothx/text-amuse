@@ -427,7 +427,7 @@ sub has_babel_ldf {
                  germanb          => 1,
                  ngerman          => 1,
                  naustrian        => 1,
-                 greek            => 1,
+                 # greek            => 1,
                  polutonikogreek  => 1,
                  hebrew           => 1,
                  icelandic        => 1,
