@@ -26,6 +26,18 @@ Return true if the babel name passed has an .ldf file.
 
 Return true if the language is RTL.
 
+=head2 language_code_locale_captions($iso)
+
+If the language is aliased, return an hashref with a C<_base_> key
+pointing to the base language, and the other keys should be use to set
+the captions.
+
+E.g.
+
+  \setlocalecaption{english}{contents}{Table of Contents}
+
+Requires babel 3.51 (2020-10-27)
+
 =cut
 
 
@@ -388,6 +400,10 @@ sub language_mapping {
             # zh => 'chinese-traditional-hongkongsarchina',
             # zh => 'chinese-traditional-macausarchina',
             zu => 'zulu',
+
+            # aliases, see below. cebuano and tagalog
+            ceb => 'filipino',
+            tl => 'filipino',
            };
 }
 
@@ -485,6 +501,22 @@ sub lang_code_is_rtl {
                fa => 1,
               );
     return $rtl{$lang};
+}
+
+sub language_code_locale_captions {
+    my $code = shift;
+    # usually we need only the doc
+    my %aliases = (
+                   ceb => {
+                           _base_ => "filipino", # not used for the moment.
+                           contents => "Talaan sa mga Sulod",
+                          },
+                   tl => {
+                          _base_ => "filipino",
+                          contents => "Talaan ng mga nilalaman",
+                         },
+                  );
+    return $aliases{$code || ''};
 }
 
 1;
