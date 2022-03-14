@@ -576,7 +576,11 @@ Return true if the language is RTL (ar, he, fa -- so far)
 
 =item is_bidi
 
-Return true if the document use direction switches.
+Return true if the document uses direction switches.
+
+=item has_ruby
+
+Return true if the document uses the ruby annotation.
 
 =item html_direction
 
@@ -603,6 +607,10 @@ sub is_bidi {
     return $self->document->bidi_document || scalar(grep { Text::Amuse::Utils::lang_code_is_rtl($_) }
                                                     ($self->language_code,
                                                      @{ $self->other_language_codes || [] }));
+}
+
+sub has_ruby {
+    shift->document->has_ruby;
 }
 
 sub html_direction {
