@@ -105,4 +105,8 @@ sub set_bidi_document {
     return;
 }
 
+sub set_has_ruby {
+    return;
+}
+
 1;
